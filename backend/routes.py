@@ -255,17 +255,30 @@ async def get_lessons(limit: int = 50, published_only: bool = True):
     """Get all encounter lessons"""
     try:
         query = {"published": True} if published_only else {}
-        lessons = await db.lessons.find(query).sort("created_at", -1).limit(limit).to_list(limit)
         
-        # Get comment count for each lesson
-        result = []
-        for lesson in lessons:
-            lesson_obj = Lesson(**lesson)
-            comment_count = await db.comments.count_documents({"lesson_id": lesson_obj.id})
-            lesson_obj.comment_count = comment_count
-            result.append(lesson_obj)
+        # Use aggregation to get comment counts efficiently
+        pipeline = [
+            {"$match": query},
+            {"$sort": {"created_at": -1}},
+            {"$limit": limit},
+            {
+                "$lookup": {
+                    "from": "comments",
+                    "localField": "id",
+                    "foreignField": "lesson_id",
+                    "as": "comments"
+                }
+            },
+            {
+                "$addFields": {
+                    "comment_count": {"$size": "$comments"}
+                }
+            },
+            {"$project": {"comments": 0}}  # Remove the comments array, keep only count
+        ]
         
-        return result
+        lessons = await db.lessons.aggregate(pipeline).to_list(limit)
+        return [Lesson(**lesson) for lesson in lessons]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -380,17 +393,30 @@ async def get_revelations(limit: int = 50, published_only: bool = True):
     """Get all revelation posts"""
     try:
         query = {"published": True} if published_only else {}
-        revelations = await db.revelations.find(query).sort("created_at", -1).limit(limit).to_list(limit)
         
-        # Get comment count for each revelation
-        result = []
-        for revelation in revelations:
-            revelation_obj = Revelation(**revelation)
-            comment_count = await db.revelation_comments.count_documents({"revelation_id": revelation_obj.id})
-            revelation_obj.comment_count = comment_count
-            result.append(revelation_obj)
+        # Use aggregation to get comment counts efficiently
+        pipeline = [
+            {"$match": query},
+            {"$sort": {"created_at": -1}},
+            {"$limit": limit},
+            {
+                "$lookup": {
+                    "from": "revelation_comments",
+                    "localField": "id",
+                    "foreignField": "revelation_id",
+                    "as": "comments"
+                }
+            },
+            {
+                "$addFields": {
+                    "comment_count": {"$size": "$comments"}
+                }
+            },
+            {"$project": {"comments": 0}}  # Remove the comments array, keep only count
+        ]
         
-        return result
+        revelations = await db.revelations.aggregate(pipeline).to_list(limit)
+        return [Revelation(**revelation) for revelation in revelations]
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
