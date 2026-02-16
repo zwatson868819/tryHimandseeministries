@@ -6,7 +6,7 @@ export const ministryInfo = {
   verse: "Matthew 10:8",
   mission: "Encouraging people to follow Christ and seek encounters with Him while serving the poor and underserved communities of Richmond and Henrico.",
   contact: {
-    email: "info@tryhimandseeministries.org",
+    email: "tryHimandsee3.7@gmail.com",
     phone: "(804) 555-0100",
     address: "Richmond, VA"
   }
