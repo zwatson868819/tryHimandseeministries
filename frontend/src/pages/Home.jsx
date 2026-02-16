@@ -98,10 +98,6 @@ const Home = () => {
                 alt="Community Impact" 
                 className="rounded-2xl shadow-2xl"
               />
-              <div className="absolute -bottom-6 -left-6 bg-gradient-to-br from-amber-500 to-amber-600 text-slate-900 p-6 rounded-xl shadow-xl">
-                <p className="text-3xl font-bold mb-1">5+</p>
-                <p className="text-sm font-semibold">Years Serving</p>
-              </div>
             </div>
           </div>
         </div>
