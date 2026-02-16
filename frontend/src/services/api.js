@@ -98,6 +98,58 @@ export const getMinistryStats = async () => {
   }
 };
 
+// Encounter Lessons API
+export const createLesson = async (lessonData) => {
+  try {
+    const response = await axios.post(`${API}/lessons`, lessonData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating lesson:', error);
+    throw error;
+  }
+};
+
+export const getLessons = async (limit = 50, publishedOnly = true) => {
+  try {
+    const response = await axios.get(`${API}/lessons?limit=${limit}&published_only=${publishedOnly}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching lessons:', error);
+    throw error;
+  }
+};
+
+export const getLesson = async (lessonId) => {
+  try {
+    const response = await axios.get(`${API}/lessons/${lessonId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching lesson:', error);
+    throw error;
+  }
+};
+
+// Lesson Comments API
+export const submitComment = async (commentData) => {
+  try {
+    const response = await axios.post(`${API}/comments`, commentData);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting comment:', error);
+    throw error;
+  }
+};
+
+export const getComments = async (lessonId, limit = 100) => {
+  try {
+    const response = await axios.get(`${API}/comments/${lessonId}?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    throw error;
+  }
+};
+
 // Health Check
 export const healthCheck = async () => {
   try {

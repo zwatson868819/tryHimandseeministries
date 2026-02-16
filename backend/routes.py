@@ -3,7 +3,9 @@ from models import (
     Contact, ContactCreate,
     Volunteer, VolunteerCreate,
     PrayerRequest, PrayerRequestCreate,
-    Donation, DonationCreate
+    Donation, DonationCreate,
+    Lesson, LessonCreate,
+    Comment, CommentCreate
 )
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import List
@@ -216,4 +218,134 @@ async def get_ministry_stats():
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching stats: {str(e)}"
+        )
+
+
+# Encounter Lesson Endpoints
+@router.post("/lessons", response_model=Lesson, status_code=status.HTTP_201_CREATED)
+async def create_lesson(lesson_data: LessonCreate):
+    """Create a new encounter lesson (admin use)"""
+    try:
+        lesson = Lesson(**lesson_data.dict())
+        
+        # Calculate week number based on total lessons
+        total_lessons = await db.lessons.count_documents({})
+        lesson.week_number = total_lessons + 1
+        
+        result = await db.lessons.insert_one(lesson.dict())
+        
+        if not result.inserted_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create lesson"
+            )
+        
+        return lesson
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating lesson: {str(e)}"
+        )
+
+
+@router.get("/lessons", response_model=List[Lesson])
+async def get_lessons(limit: int = 50, published_only: bool = True):
+    """Get all encounter lessons"""
+    try:
+        query = {"published": True} if published_only else {}
+        lessons = await db.lessons.find(query).sort("created_at", -1).limit(limit).to_list(limit)
+        
+        # Get comment count for each lesson
+        result = []
+        for lesson in lessons:
+            lesson_obj = Lesson(**lesson)
+            comment_count = await db.comments.count_documents({"lesson_id": lesson_obj.id})
+            lesson_obj.comment_count = comment_count
+            result.append(lesson_obj)
+        
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching lessons: {str(e)}"
+        )
+
+
+@router.get("/lessons/{lesson_id}", response_model=Lesson)
+async def get_lesson(lesson_id: str):
+    """Get a specific lesson by ID"""
+    try:
+        lesson = await db.lessons.find_one({"id": lesson_id})
+        
+        if not lesson:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Lesson not found"
+            )
+        
+        lesson_obj = Lesson(**lesson)
+        comment_count = await db.comments.count_documents({"lesson_id": lesson_id})
+        lesson_obj.comment_count = comment_count
+        
+        return lesson_obj
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching lesson: {str(e)}"
+        )
+
+
+# Lesson Comment Endpoints
+@router.post("/comments", response_model=Comment, status_code=status.HTTP_201_CREATED)
+async def create_comment(comment_data: CommentCreate):
+    """Submit a comment on a lesson"""
+    try:
+        # Verify lesson exists
+        lesson = await db.lessons.find_one({"id": comment_data.lesson_id})
+        if not lesson:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Lesson not found"
+            )
+        
+        comment = Comment(**comment_data.dict())
+        result = await db.comments.insert_one(comment.dict())
+        
+        if not result.inserted_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to submit comment"
+            )
+        
+        return comment
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error submitting comment: {str(e)}"
+        )
+
+
+@router.get("/comments/{lesson_id}", response_model=List[Comment])
+async def get_comments(lesson_id: str, limit: int = 100):
+    """Get all comments for a specific lesson"""
+    try:
+        query = {"lesson_id": lesson_id, "approved": True}
+        comments = await db.comments.find(query).sort("created_at", -1).limit(limit).to_list(limit)
+        
+        # Hide email addresses for public display
+        result = []
+        for comment in comments:
+            comment_obj = Comment(**comment)
+            comment_obj.email = None  # Hide email for privacy
+            result.append(comment_obj)
+        
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching comments: {str(e)}"
         )

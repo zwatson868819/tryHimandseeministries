@@ -70,3 +70,34 @@ class Donation(DonationCreate):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     status: str = "pending"  # pending, completed, failed
     transaction_id: Optional[str] = None
+
+
+# Encounter Lesson Model
+class LessonCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., min_length=1)
+    scripture_reference: Optional[str] = None
+    video_url: Optional[str] = None
+    published: bool = True
+
+
+class Lesson(LessonCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    week_number: Optional[int] = None
+    comment_count: int = 0
+
+
+# Lesson Comment Model
+class CommentCreate(BaseModel):
+    lesson_id: str
+    name: str = Field(..., min_length=1, max_length=100)
+    email: Optional[EmailStr] = None
+    comment: str = Field(..., min_length=1, max_length=1000)
+
+
+class Comment(CommentCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    approved: bool = True  # For moderation if needed
