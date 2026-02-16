@@ -57,13 +57,18 @@ Build a website for tryHimandsee ministries nonprofit that:
 #### 4. Encounters Page (Separate Section)
 - Encounter logo integration
 - "Encounter is Waiting" hero section
-- What to Expect section (Worship, Prayer, Teaching)
-- Encounter Series details:
-  - Weekly Encounter Nights (Fridays 7 PM)
-  - Prayer Gatherings (Tuesdays 6 AM)
-  - Annual Encounter Conference
-- Testimonials
-- Practical information (when, where, what to bring)
+- **Weekly Lessons Platform:**
+  - Lesson sidebar with week numbers and comment counts
+  - Full lesson content display with scripture references
+  - Video embed support (optional)
+  - Formatted lesson text with proper spacing
+- **Community Comments:**
+  - Comment submission form (name, email optional, comment)
+  - Comments display with timestamps
+  - Real-time comment count updates
+  - Comments tied to specific lessons
+- Responsive 3-column layout (sidebar + content)
+- Lesson switching functionality
 
 #### 5. Get Involved Page
 - Ways to serve overview
@@ -136,6 +141,11 @@ Build a website for tryHimandsee ministries nonprofit that:
 - GET `/api/prayer-requests` - Get prayer wall (public)
 - POST `/api/donations` - Submit donation (Stripe pending)
 - GET `/api/donations` - Get all donations (admin)
+- **POST `/api/lessons`** - Create encounter lesson (admin)
+- **GET `/api/lessons`** - Get all published lessons
+- **GET `/api/lessons/{id}`** - Get specific lesson
+- **POST `/api/comments`** - Submit comment on lesson
+- **GET `/api/comments/{lesson_id}`** - Get comments for lesson
 - GET `/api/stats` - Get ministry statistics
 
 ### Static Data (Still in mock.js)
