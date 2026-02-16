@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
 import { toast } from 'sonner';
+import { submitContact } from '../services/api';
 
 const Contact = () => {
   const [contactForm, setContactForm] = useState({
@@ -12,11 +13,16 @@ const Contact = () => {
     message: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock submission
-    toast.success('Message sent successfully! We will get back to you soon.');
-    setContactForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    try {
+      await submitContact(contactForm);
+      toast.success('Message sent successfully! We will get back to you soon.');
+      setContactForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to send message. Please try again or contact us directly.');
+      console.error('Contact form error:', error);
+    }
   };
 
   const handleInputChange = (e) => {

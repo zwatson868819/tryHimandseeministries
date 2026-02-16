@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Heart, DollarSign, CreditCard, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { submitDonation } from '../services/api';
 
 const Donate = () => {
   const [donationType, setDonationType] = useState('one-time');
@@ -14,14 +15,35 @@ const Donate = () => {
 
   const presetAmounts = ['25', '50', '100', '250', '500'];
 
-  const handleDonation = (e) => {
+  const handleDonation = async (e) => {
     e.preventDefault();
     const donationAmount = amount === 'custom' ? customAmount : amount;
-    toast.success(`Thank you for your ${donationType} donation of $${donationAmount}!`);
-    // Reset form
-    setAmount('');
-    setCustomAmount('');
-    setDonorInfo({ name: '', email: '', message: '' });
+    
+    if (!donationAmount || parseFloat(donationAmount) <= 0) {
+      toast.error('Please select a valid donation amount');
+      return;
+    }
+
+    try {
+      const donationData = {
+        amount: parseFloat(donationAmount),
+        donation_type: donationType,
+        name: donorInfo.name,
+        email: donorInfo.email,
+        message: donorInfo.message
+      };
+
+      await submitDonation(donationData);
+      toast.success(`Thank you for your ${donationType} donation of $${donationAmount}!`);
+      
+      // Reset form
+      setAmount('');
+      setCustomAmount('');
+      setDonorInfo({ name: '', email: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to process donation. Please try again or contact us directly.');
+      console.error('Donation error:', error);
+    }
   };
 
   const handleInputChange = (e) => {

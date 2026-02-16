@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Users, HandHeart, Calendar, Check } from 'lucide-react';
 import { volunteerOpportunities } from '../data/mock';
 import { toast } from 'sonner';
+import { submitVolunteer } from '../services/api';
 
 const GetInvolved = () => {
   const [volunteerForm, setVolunteerForm] = useState({
@@ -12,11 +13,16 @@ const GetInvolved = () => {
     message: ''
   });
 
-  const handleVolunteerSubmit = (e) => {
+  const handleVolunteerSubmit = async (e) => {
     e.preventDefault();
-    // Mock submission
-    toast.success('Thank you for signing up! We will contact you soon.');
-    setVolunteerForm({ name: '', email: '', phone: '', opportunity: '', message: '' });
+    try {
+      await submitVolunteer(volunteerForm);
+      toast.success('Thank you for signing up! We will contact you soon.');
+      setVolunteerForm({ name: '', email: '', phone: '', opportunity: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to submit application. Please try again.');
+      console.error('Volunteer form error:', error);
+    }
   };
 
   const handleInputChange = (e) => {

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, Heart, Clock } from 'lucide-react';
-import { prayerRequests } from '../data/mock';
 import { toast } from 'sonner';
+import { submitPrayerRequest, getPrayerRequests } from '../services/api';
 
 const PrayerRequests = () => {
   const [prayerForm, setPrayerForm] = useState({
@@ -10,11 +10,36 @@ const PrayerRequests = () => {
     request: '',
     isAnonymous: false
   });
+  const [prayerRequests, setPrayerRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    fetchPrayerRequests();
+  }, []);
+
+  const fetchPrayerRequests = async () => {
+    try {
+      const data = await getPrayerRequests(10, true);
+      setPrayerRequests(data);
+    } catch (error) {
+      console.error('Error loading prayer requests:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.success('Your prayer request has been submitted. We are praying for you!');
-    setPrayerForm({ name: '', email: '', request: '', isAnonymous: false });
+    try {
+      await submitPrayerRequest(prayerForm);
+      toast.success('Your prayer request has been submitted. We are praying for you!');
+      setPrayerForm({ name: '', email: '', request: '', isAnonymous: false });
+      // Refresh prayer wall
+      fetchPrayerRequests();
+    } catch (error) {
+      toast.error('Failed to submit prayer request. Please try again.');
+      console.error('Prayer request error:', error);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -167,34 +192,44 @@ const PrayerRequests = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {prayerRequests.map((request) => (
-              <div 
-                key={request.id}
-                className="bg-slate-950 border border-slate-800 rounded-xl p-6 hover:border-amber-500/30 transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
-                      <Heart className="text-amber-400" size={20} />
-                    </div>
-                    <div>
-                      <p className="text-white font-semibold">{request.name}</p>
-                      <div className="flex items-center text-slate-500 text-sm">
-                        <Clock size={14} className="mr-1" />
-                        {new Date(request.date).toLocaleDateString()}
+            {loading ? (
+              <div className="col-span-2 text-center text-slate-400 py-8">
+                Loading prayer requests...
+              </div>
+            ) : prayerRequests.length === 0 ? (
+              <div className="col-span-2 text-center text-slate-400 py-8">
+                No prayer requests yet. Be the first to submit one!
+              </div>
+            ) : (
+              prayerRequests.map((request) => (
+                <div 
+                  key={request.id}
+                  className="bg-slate-950 border border-slate-800 rounded-xl p-6 hover:border-amber-500/30 transition-all"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center">
+                        <Heart className="text-amber-400" size={20} />
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold">{request.display_name || 'Anonymous'}</p>
+                        <div className="flex items-center text-slate-500 text-sm">
+                          <Clock size={14} className="mr-1" />
+                          {new Date(request.created_at).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <p className="text-slate-300 leading-relaxed italic">"{request.request}"</p>
+                  <div className="mt-4 pt-4 border-t border-slate-800">
+                    <button className="text-amber-400 text-sm font-semibold hover:text-amber-300 transition-colors flex items-center">
+                      <Heart size={16} className="mr-1" />
+                      Praying
+                    </button>
+                  </div>
                 </div>
-                <p className="text-slate-300 leading-relaxed italic">"{request.request}"</p>
-                <div className="mt-4 pt-4 border-t border-slate-800">
-                  <button className="text-amber-400 text-sm font-semibold hover:text-amber-300 transition-colors flex items-center">
-                    <Heart size={16} className="mr-1" />
-                    Praying
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           <div className="text-center mt-10">
