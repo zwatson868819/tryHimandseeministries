@@ -59,7 +59,7 @@ class PrayerRequest(PrayerRequestCreate):
 # Donation Model (Placeholder - Stripe integration later)
 class DonationCreate(BaseModel):
     amount: float = Field(..., gt=0)
-    donation_type: str = Field(..., regex="^(one-time|monthly)$")
+    donation_type: str = Field(..., pattern="^(one-time|monthly)$")
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
     message: Optional[str] = None
