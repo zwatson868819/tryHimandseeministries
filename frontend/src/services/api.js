@@ -150,6 +150,58 @@ export const getComments = async (lessonId, limit = 100) => {
   }
 };
 
+// Reading Revelation API
+export const createRevelation = async (revelationData) => {
+  try {
+    const response = await axios.post(`${API}/revelations`, revelationData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating revelation:', error);
+    throw error;
+  }
+};
+
+export const getRevelations = async (limit = 50, publishedOnly = true) => {
+  try {
+    const response = await axios.get(`${API}/revelations?limit=${limit}&published_only=${publishedOnly}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching revelations:', error);
+    throw error;
+  }
+};
+
+export const getRevelation = async (revelationId) => {
+  try {
+    const response = await axios.get(`${API}/revelations/${revelationId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching revelation:', error);
+    throw error;
+  }
+};
+
+// Revelation Comments API
+export const submitRevelationComment = async (commentData) => {
+  try {
+    const response = await axios.post(`${API}/revelation-comments`, commentData);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting revelation comment:', error);
+    throw error;
+  }
+};
+
+export const getRevelationComments = async (revelationId, limit = 100) => {
+  try {
+    const response = await axios.get(`${API}/revelation-comments/${revelationId}?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching revelation comments:', error);
+    throw error;
+  }
+};
+
 // Health Check
 export const healthCheck = async () => {
   try {

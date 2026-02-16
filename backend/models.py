@@ -101,3 +101,33 @@ class Comment(CommentCreate):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=datetime.utcnow)
     approved: bool = True  # For moderation if needed
+
+
+# Reading Revelation Model
+class RevelationCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    scripture_passage: str = Field(..., min_length=1, max_length=200)
+    revelation: str = Field(..., min_length=1)
+    personal_note: Optional[str] = None
+    published: bool = True
+
+
+class Revelation(RevelationCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    comment_count: int = 0
+
+
+# Revelation Comment Model
+class RevelationCommentCreate(BaseModel):
+    revelation_id: str
+    name: str = Field(..., min_length=1, max_length=100)
+    email: Optional[EmailStr] = None
+    comment: str = Field(..., min_length=1, max_length=1000)
+
+
+class RevelationComment(RevelationCommentCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    approved: bool = True

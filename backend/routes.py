@@ -5,7 +5,9 @@ from models import (
     PrayerRequest, PrayerRequestCreate,
     Donation, DonationCreate,
     Lesson, LessonCreate,
-    Comment, CommentCreate
+    Comment, CommentCreate,
+    Revelation, RevelationCreate,
+    RevelationComment, RevelationCommentCreate
 )
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import List
@@ -340,6 +342,131 @@ async def get_comments(lesson_id: str, limit: int = 100):
         result = []
         for comment in comments:
             comment_obj = Comment(**comment)
+            comment_obj.email = None  # Hide email for privacy
+            result.append(comment_obj)
+        
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching comments: {str(e)}"
+        )
+
+
+# Reading Revelation Endpoints
+@router.post("/revelations", response_model=Revelation, status_code=status.HTTP_201_CREATED)
+async def create_revelation(revelation_data: RevelationCreate):
+    """Create a new revelation post (admin use)"""
+    try:
+        revelation = Revelation(**revelation_data.dict())
+        result = await db.revelations.insert_one(revelation.dict())
+        
+        if not result.inserted_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create revelation"
+            )
+        
+        return revelation
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating revelation: {str(e)}"
+        )
+
+
+@router.get("/revelations", response_model=List[Revelation])
+async def get_revelations(limit: int = 50, published_only: bool = True):
+    """Get all revelation posts"""
+    try:
+        query = {"published": True} if published_only else {}
+        revelations = await db.revelations.find(query).sort("created_at", -1).limit(limit).to_list(limit)
+        
+        # Get comment count for each revelation
+        result = []
+        for revelation in revelations:
+            revelation_obj = Revelation(**revelation)
+            comment_count = await db.revelation_comments.count_documents({"revelation_id": revelation_obj.id})
+            revelation_obj.comment_count = comment_count
+            result.append(revelation_obj)
+        
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching revelations: {str(e)}"
+        )
+
+
+@router.get("/revelations/{revelation_id}", response_model=Revelation)
+async def get_revelation(revelation_id: str):
+    """Get a specific revelation by ID"""
+    try:
+        revelation = await db.revelations.find_one({"id": revelation_id})
+        
+        if not revelation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Revelation not found"
+            )
+        
+        revelation_obj = Revelation(**revelation)
+        comment_count = await db.revelation_comments.count_documents({"revelation_id": revelation_id})
+        revelation_obj.comment_count = comment_count
+        
+        return revelation_obj
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching revelation: {str(e)}"
+        )
+
+
+# Revelation Comment Endpoints
+@router.post("/revelation-comments", response_model=RevelationComment, status_code=status.HTTP_201_CREATED)
+async def create_revelation_comment(comment_data: RevelationCommentCreate):
+    """Submit a comment on a revelation post"""
+    try:
+        # Verify revelation exists
+        revelation = await db.revelations.find_one({"id": comment_data.revelation_id})
+        if not revelation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Revelation not found"
+            )
+        
+        comment = RevelationComment(**comment_data.dict())
+        result = await db.revelation_comments.insert_one(comment.dict())
+        
+        if not result.inserted_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to submit comment"
+            )
+        
+        return comment
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error submitting comment: {str(e)}"
+        )
+
+
+@router.get("/revelation-comments/{revelation_id}", response_model=List[RevelationComment])
+async def get_revelation_comments(revelation_id: str, limit: int = 100):
+    """Get all comments for a specific revelation"""
+    try:
+        query = {"revelation_id": revelation_id, "approved": True}
+        comments = await db.revelation_comments.find(query).sort("created_at", -1).limit(limit).to_list(limit)
+        
+        # Hide email addresses for public display
+        result = []
+        for comment in comments:
+            comment_obj = RevelationComment(**comment)
             comment_obj.email = None  # Hide email for privacy
             result.append(comment_obj)
         
