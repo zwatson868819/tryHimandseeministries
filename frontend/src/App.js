@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Ministries from './pages/Ministries';
+import ReadingRevelation from './pages/ReadingRevelation';
 import Encounters from './pages/Encounters';
 import GetInvolved from './pages/GetInvolved';
 import Contact from './pages/Contact';
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/ministries" element={<Ministries />} />
+          <Route path="/reading-revelation" element={<ReadingRevelation />} />
           <Route path="/encounters" element={<Encounters />} />
           <Route path="/get-involved" element={<GetInvolved />} />
           <Route path="/contact" element={<Contact />} />
