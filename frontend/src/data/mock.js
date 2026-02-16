@@ -33,8 +33,8 @@ export const services = [
   },
   {
     id: 4,
-    title: "Prayer & Counseling",
-    description: "Providing spiritual support, prayer, and biblical counseling to those seeking guidance and hope.",
+    title: "Prayer & Spiritual Support",
+    description: "Providing spiritual support and prayer to those seeking guidance and hope.",
     icon: "Heart"
   }
 ];

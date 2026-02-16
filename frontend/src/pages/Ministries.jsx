@@ -163,8 +163,8 @@ const Ministries = () => {
                 <h2 className="text-4xl font-bold text-white mb-4">Prayer & Spiritual Support</h2>
                 <p className="text-slate-300 text-lg leading-relaxed mb-6">
                   We believe in the power of prayer and the importance of spiritual care. 
-                  Our team is available to pray with you, provide biblical encouragement, 
-                  and offer spiritual guidance during difficult times.
+                  Our team is available to pray with you and provide spiritual encouragement 
+                  during difficult times.
                 </p>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
@@ -173,11 +173,11 @@ const Ministries = () => {
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Biblical counseling and encouragement</p>
+                    <p className="text-slate-400">Biblical encouragement and support</p>
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Crisis intervention and support</p>
+                    <p className="text-slate-400">Prayer support during challenging times</p>
                   </div>
                 </div>
                 <div className="mt-8">
