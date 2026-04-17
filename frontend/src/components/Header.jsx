@@ -31,12 +31,12 @@ const Header = () => {
             />
             <div className="hidden md:block">
               <h1 className="text-xl font-bold text-amber-400">tryHimandsee</h1>
-              <p className="text-xs text-amber-200/80">Ministries</p>
+              <p className="text-xs text-amber-200/80">ministries</p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-6">
             {navLinks.map((link) => (
               <Link
                 key={link.path}

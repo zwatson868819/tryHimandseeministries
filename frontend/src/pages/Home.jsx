@@ -18,6 +18,15 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-amber-900/80"></div>
         </div>
 
+        {/* Logo Background - Large faded logo behind content */}
+        <div className="absolute inset-0 z-5 flex items-center justify-center opacity-5">
+          <img 
+            src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/509g4xo6_IMG_1555.png" 
+            alt="tHsm Background" 
+            className="w-[800px] h-[800px] object-contain"
+          />
+        </div>
+
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8 animate-fade-in">
@@ -76,9 +85,9 @@ const Home = () => {
                 Our <span className="text-amber-400">Mission</span>
               </h2>
               <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                At tryHimandsee Ministries, we believe in the transformative power of God's love. 
+                At tryHimandsee ministries, we believe in the transformative power of God's love. 
                 Our dual mission combines spiritual awakening with practical compassion, 
-                serving the whole person—body, mind, and spirit.
+                serving the whole person: body, mind, and spirit.
               </p>
               <p className="text-slate-300 text-lg leading-relaxed mb-8">
                 Through our outreach programs in Richmond and Henrico, we provide essential 
@@ -199,22 +208,12 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial) => (
-              <div 
-                key={testimonial.id}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-8 hover:border-amber-500/30 transition-all"
-              >
-                <div className="flex items-center justify-center w-12 h-12 bg-amber-500/10 rounded-full mb-6">
-                  <Heart className="text-amber-400" size={24} />
-                </div>
-                <p className="text-slate-300 leading-relaxed mb-6 italic">"{testimonial.text}"</p>
-                <div>
-                  <p className="text-white font-semibold">{testimonial.name}</p>
-                  <p className="text-amber-400 text-sm">{testimonial.role}</p>
-                </div>
-              </div>
-            ))}
+          <div className="text-center py-12">
+            <Heart className="text-amber-400 mx-auto mb-6" size={64} />
+            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+              Stories of transformation and testimonies of God's faithfulness coming soon. 
+              Be part of the story as we serve our community together.
+            </p>
           </div>
         </div>
       </section>

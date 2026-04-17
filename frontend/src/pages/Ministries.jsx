@@ -101,10 +101,6 @@ const Ministries = () => {
                     <p className="text-slate-400">Professional attire for job interviews</p>
                   </div>
                 </div>
-                <div className="mt-8 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <p className="text-amber-400 font-semibold">Available:</p>
-                  <p className="text-slate-300">Wednesdays & Saturdays, 9:00 AM - 1:00 PM</p>
-                </div>
               </div>
             </div>
 
@@ -169,10 +165,6 @@ const Ministries = () => {
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">One-on-one prayer sessions</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
                     <p className="text-slate-400">Biblical encouragement and support</p>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -189,37 +181,6 @@ const Ministries = () => {
                   </a>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Stats */}
-      <section className="py-20 bg-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Our <span className="text-amber-400">Impact</span>
-            </h2>
-            <p className="text-slate-400 text-lg">Making a difference, one life at a time</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-amber-400 mb-2">500+</div>
-              <p className="text-slate-300">Meals Served Monthly</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-amber-400 mb-2">200+</div>
-              <p className="text-slate-300">Families Helped</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-amber-400 mb-2">150+</div>
-              <p className="text-slate-300">Hygiene Kits Distributed</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold text-amber-400 mb-2">50+</div>
-              <p className="text-slate-300">Volunteers Serving</p>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 // Mock data for tryHimandsee Ministries website
 
 export const ministryInfo = {
-  name: "tryHimandsee Ministries",
+  name: "tryHimandsee ministries",
   tagline: "Freely ye have received, freely give",
   verse: "Matthew 10:8",
   mission: "Encouraging people to follow Christ and seek encounters with Him while serving the poor and underserved communities of Richmond and Henrico.",
@@ -86,25 +86,19 @@ export const volunteerOpportunities = [
     id: 1,
     title: "Food Distribution Team",
     description: "Help organize and distribute food to families every Saturday morning.",
-    commitment: "4 hours/week"
+    commitment: ""
   },
   {
     id: 2,
     title: "Clothing Sorter",
     description: "Sort, organize, and prepare clothing donations for distribution.",
-    commitment: "Flexible"
-  },
-  {
-    id: 3,
-    title: "Event Support",
-    description: "Assist with setup, hospitality, and coordination for Encounter nights and special events.",
-    commitment: "Event-based"
+    commitment: ""
   },
   {
     id: 4,
     title: "Prayer Team",
     description: "Join our dedicated prayer warriors interceding for the ministry and community.",
-    commitment: "1 hour/week"
+    commitment: ""
   }
 ];
 

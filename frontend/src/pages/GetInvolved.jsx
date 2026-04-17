@@ -139,12 +139,7 @@ const GetInvolved = () => {
                 key={opp.id}
                 className="bg-slate-950 border border-slate-800 rounded-xl p-6 hover:border-amber-500/50 transition-all"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-bold text-white">{opp.title}</h3>
-                  <span className="px-3 py-1 bg-amber-500/10 text-amber-400 text-xs font-semibold rounded-full">
-                    {opp.commitment}
-                  </span>
-                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{opp.title}</h3>
                 <p className="text-slate-300 leading-relaxed">{opp.description}</p>
               </div>
             ))}
