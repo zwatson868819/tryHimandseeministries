@@ -54,10 +54,6 @@ const Ministries = () => {
                     <p className="text-slate-400">No-questions-asked approach</p>
                   </div>
                 </div>
-                <div className="mt-8 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <p className="text-amber-400 font-semibold">Distribution Times:</p>
-                  <p className="text-slate-300">Saturdays, 9:00 AM - 12:00 PM</p>
-                </div>
               </div>
               <div className="order-1 md:order-2">
                 <img 

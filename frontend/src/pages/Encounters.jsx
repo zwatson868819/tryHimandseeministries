@@ -92,6 +92,38 @@ const Encounters = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-purple-900/70 to-slate-900/90"></div>
         </div>
 
+        {/* Encounter Logo Background - Large repeating pattern */}
+        <div className="absolute inset-0 z-5 opacity-10">
+          <div className="absolute top-10 left-10">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+              alt="Encounter Background" 
+              className="w-64 h-64 object-contain"
+            />
+          </div>
+          <div className="absolute top-10 right-10">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+              alt="Encounter Background" 
+              className="w-64 h-64 object-contain"
+            />
+          </div>
+          <div className="absolute bottom-10 left-1/4">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+              alt="Encounter Background" 
+              className="w-64 h-64 object-contain"
+            />
+          </div>
+          <div className="absolute bottom-10 right-1/4">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+              alt="Encounter Background" 
+              className="w-64 h-64 object-contain"
+            />
+          </div>
+        </div>
+
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">
             <img 
