@@ -21,7 +21,7 @@ const Home = () => {
         {/* Logo Background - Large faded logo behind content */}
         <div className="absolute inset-0 z-5 flex items-center justify-center opacity-5">
           <img 
-            src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/509g4xo6_IMG_1555.png" 
+            src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/1dw759ji_OFFICIALtryHimandseeLogo.png" 
             alt="tHsm Background" 
             className="w-[800px] h-[800px] object-contain"
           />
@@ -31,9 +31,9 @@ const Home = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8 animate-fade-in">
             <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/509g4xo6_IMG_1555.png" 
-              alt="tryHimandsee Ministries" 
-              className="h-32 w-32 mx-auto object-contain mb-6 drop-shadow-2xl"
+              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/1dw759ji_OFFICIALtryHimandseeLogo.png" 
+              alt="tryHimandsee ministries" 
+              className="h-64 w-64 mx-auto object-contain mb-6 drop-shadow-2xl"
             />
           </div>
           
