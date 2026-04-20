@@ -81,12 +81,6 @@ const About = () => {
                 alt="Worship" 
                 className="rounded-2xl shadow-2xl"
               />
-              <div className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-xl">
-                <div className="text-center">
-                  <p className="text-slate-900 text-3xl font-bold">100+</p>
-                  <p className="text-slate-900 text-xs font-semibold">Families Served</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
