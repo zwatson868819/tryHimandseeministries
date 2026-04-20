@@ -8,34 +8,18 @@ const Home = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1509059852496-f3822ae057bf" 
-            alt="Community Outreach" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-amber-900/80"></div>
-        </div>
-
-        {/* Logo Background - Large faded logo behind content */}
-        <div className="absolute inset-0 z-5 flex items-center justify-center opacity-5">
+        {/* Official Logo as Main Background */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
           <img 
             src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/1dw759ji_OFFICIALtryHimandseeLogo.png" 
-            alt="tHsm Background" 
-            className="w-[800px] h-[800px] object-contain"
+            alt="tryHimandsee ministries" 
+            className="w-full h-full object-cover opacity-30"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/70 to-slate-900"></div>
         </div>
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8 animate-fade-in">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/1dw759ji_OFFICIALtryHimandseeLogo.png" 
-              alt="tryHimandsee ministries" 
-              className="h-64 w-64 mx-auto object-contain mb-6 drop-shadow-2xl"
-            />
-          </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in-up">
             <span className="text-amber-400">Freely</span> Received,<br />
