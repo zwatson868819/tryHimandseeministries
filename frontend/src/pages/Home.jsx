@@ -8,14 +8,14 @@ const Home = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Official Logo as Main Background */}
+        {/* Official Logo as Main Background - Larger and Darker */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <img 
             src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/1dw759ji_OFFICIALtryHimandseeLogo.png" 
             alt="tryHimandsee ministries" 
-            className="w-full h-full object-cover opacity-30"
+            className="min-w-[120%] min-h-[120%] object-contain opacity-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/70 to-slate-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900"></div>
         </div>
 
         {/* Content */}
