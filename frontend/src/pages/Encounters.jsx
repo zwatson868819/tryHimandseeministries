@@ -80,50 +80,21 @@ const Encounters = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20">
+    <div className="min-h-screen pt-20 relative">
+      {/* Full Page Encounter Logo Background */}
+      <div className="fixed inset-0 z-0">
+        <img 
+          src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/zwhqi6zt_encounterseriesLOGO.jpeg" 
+          alt="Encounter Background" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-slate-900/85"></div>
+      </div>
+
+      {/* All content with relative positioning to appear above background */}
+      <div className="relative z-10">
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
-            alt="Encounter is Waiting" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-purple-900/70 to-slate-900/90"></div>
-        </div>
-
-        {/* Encounter Logo Background - Large repeating pattern */}
-        <div className="absolute inset-0 z-5 opacity-10">
-          <div className="absolute top-10 left-10">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
-              alt="Encounter Background" 
-              className="w-64 h-64 object-contain"
-            />
-          </div>
-          <div className="absolute top-10 right-10">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
-              alt="Encounter Background" 
-              className="w-64 h-64 object-contain"
-            />
-          </div>
-          <div className="absolute bottom-10 left-1/4">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
-              alt="Encounter Background" 
-              className="w-64 h-64 object-contain"
-            />
-          </div>
-          <div className="absolute bottom-10 right-1/4">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
-              alt="Encounter Background" 
-              className="w-64 h-64 object-contain"
-            />
-          </div>
-        </div>
-
+      <section className="relative py-24 flex items-center justify-center overflow-hidden">
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">
             <img 
@@ -151,7 +122,7 @@ const Encounters = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-20 bg-slate-950">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="text-center text-slate-400 py-12">
@@ -368,7 +339,7 @@ const Encounters = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+      <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Flame className="text-amber-400 mx-auto mb-6" size={56} />
           <h2 className="text-4xl font-bold text-white mb-6">
@@ -383,6 +354,7 @@ const Encounters = () => {
           </p>
         </div>
       </section>
+      </div>
     </div>
   );
 };
