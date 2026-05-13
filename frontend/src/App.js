@@ -14,6 +14,8 @@ import PrayerRequests from './pages/PrayerRequests';
 import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminNews from './pages/AdminNews';
 import './App.css';
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/news" element={<AdminNews />} />
         </Routes>
         <Footer />
         <Toaster position="top-right" />
