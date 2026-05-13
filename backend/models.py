@@ -149,3 +149,28 @@ class PaymentTransaction(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+
+# News/Updates Model
+class NewsCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., min_length=1)
+    image_urls: Optional[list] = []
+    video_urls: Optional[list] = []
+    published: bool = True
+
+
+class News(NewsCreate):
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+# Admin User Model
+class AdminLogin(BaseModel):
+    username: str
+    password: str
+
+
+class AdminUser(BaseModel):
+    username: str
+    hashed_password: str

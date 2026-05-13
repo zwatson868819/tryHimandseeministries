@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends, File, UploadFile
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models import (
     Contact, ContactCreate,
     Volunteer, VolunteerCreate,
@@ -7,15 +8,59 @@ from models import (
     Lesson, LessonCreate,
     Comment, CommentCreate,
     Revelation, RevelationCreate,
-    RevelationComment, RevelationCommentCreate
+    RevelationComment, RevelationCommentCreate,
+    News, NewsCreate,
+    AdminLogin, AdminUser
 )
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from typing import List
-from datetime import datetime
+from typing import List, Optional
+from datetime import datetime, timedelta
 from uuid import uuid4
+from passlib.context import CryptContext
+from jose import JWTError, jwt
 import os
+import csv
+import io
+import base64
 
 router = APIRouter()
+
+# Security configuration
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
+
+# Default admin credentials (username: admin, password: admin123)
+DEFAULT_ADMIN_USERNAME = "admin"
+DEFAULT_ADMIN_PASSWORD_HASH = pwd_context.hash("admin123")
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        return username
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+
+
 
 # Database will be injected via dependency
 db: AsyncIOMotorDatabase = None
@@ -746,3 +791,346 @@ async def stripe_webhook(request: Request):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing webhook: {str(e)}"
         )
+
+
+# Admin Authentication Endpoints
+@router.post("/admin/login")
+async def admin_login(credentials: AdminLogin):
+    """Admin login endpoint"""
+    try:
+        # Check if admin exists in database
+        admin = await db.admin_users.find_one({"username": credentials.username}, {"_id": 0})
+        
+        # If no admin exists, create default admin
+        if not admin:
+            default_admin = {
+                "username": DEFAULT_ADMIN_USERNAME,
+                "hashed_password": DEFAULT_ADMIN_PASSWORD_HASH
+            }
+            await db.admin_users.insert_one(default_admin)
+            admin = default_admin
+        
+        # Verify password
+        if not verify_password(credentials.password, admin["hashed_password"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password"
+            )
+        
+        # Create access token
+        access_token = create_access_token(data={"sub": credentials.username})
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error during login: {str(e)}"
+        )
+
+
+# News/Updates Endpoints
+@router.post("/news", response_model=News, status_code=status.HTTP_201_CREATED)
+async def create_news(news_data: NewsCreate, admin: str = Depends(get_current_admin)):
+    """Create a new news post (admin only)"""
+    try:
+        news = News(**news_data.dict())
+        result = await db.news.insert_one(news.dict())
+        
+        if not result.inserted_id:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create news post"
+            )
+        
+        return news
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating news post: {str(e)}"
+        )
+
+
+@router.get("/news", response_model=List[News])
+async def get_news(limit: int = 50, published_only: bool = True):
+    """Get all news posts"""
+    try:
+        query = {"published": True} if published_only else {}
+        news_posts = await db.news.find(query, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+        return [News(**post) for post in news_posts]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching news: {str(e)}"
+        )
+
+
+@router.get("/news/{news_id}", response_model=News)
+async def get_news_post(news_id: str):
+    """Get a specific news post by ID"""
+    try:
+        news = await db.news.find_one({"id": news_id}, {"_id": 0})
+        
+        if not news:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="News post not found"
+            )
+        
+        return News(**news)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching news post: {str(e)}"
+        )
+
+
+@router.put("/news/{news_id}", response_model=News)
+async def update_news(news_id: str, news_data: NewsCreate, admin: str = Depends(get_current_admin)):
+    """Update a news post (admin only)"""
+    try:
+        existing_news = await db.news.find_one({"id": news_id})
+        
+        if not existing_news:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="News post not found"
+            )
+        
+        update_data = news_data.dict()
+        update_data["updated_at"] = datetime.utcnow()
+        
+        await db.news.update_one(
+            {"id": news_id},
+            {"$set": update_data}
+        )
+        
+        updated_news = await db.news.find_one({"id": news_id}, {"_id": 0})
+        return News(**updated_news)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating news post: {str(e)}"
+        )
+
+
+@router.delete("/news/{news_id}")
+async def delete_news(news_id: str, admin: str = Depends(get_current_admin)):
+    """Delete a news post (admin only)"""
+    try:
+        result = await db.news.delete_one({"id": news_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="News post not found"
+            )
+        
+        return {"message": "News post deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting news post: {str(e)}"
+        )
+
+
+# Admin Dashboard Endpoints
+@router.get("/admin/dashboard/stats")
+async def get_dashboard_stats(admin: str = Depends(get_current_admin)):
+    """Get dashboard statistics (admin only)"""
+    try:
+        # Get counts
+        total_donations = await db.donations.count_documents({"status": "completed"})
+        total_volunteers = await db.volunteers.count_documents({})
+        total_contacts = await db.contacts.count_documents({})
+        total_prayers = await db.prayer_requests.count_documents({})
+        
+        # Calculate total donation amount
+        pipeline = [
+            {"$match": {"status": "completed"}},
+            {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+        ]
+        donation_sum = await db.donations.aggregate(pipeline).to_list(1)
+        total_donation_amount = donation_sum[0]['total'] if donation_sum else 0
+        
+        # Get recent donations count (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        recent_donations = await db.donations.count_documents({
+            "status": "completed",
+            "created_at": {"$gte": thirty_days_ago}
+        })
+        
+        return {
+            "total_donations": total_donations,
+            "total_donation_amount": total_donation_amount,
+            "recent_donations": recent_donations,
+            "total_volunteers": total_volunteers,
+            "total_contacts": total_contacts,
+            "total_prayer_requests": total_prayers
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching dashboard stats: {str(e)}"
+        )
+
+
+@router.get("/admin/donations")
+async def get_donations_admin(
+    admin: str = Depends(get_current_admin),
+    limit: int = 100,
+    donation_type: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    min_amount: Optional[float] = None,
+    max_amount: Optional[float] = None
+):
+    """Get donations with filtering (admin only)"""
+    try:
+        # Build query
+        query = {}
+        
+        if donation_type and donation_type in ["one-time", "monthly"]:
+            query["donation_type"] = donation_type
+        
+        if start_date or end_date:
+            query["created_at"] = {}
+            if start_date:
+                query["created_at"]["$gte"] = datetime.fromisoformat(start_date)
+            if end_date:
+                query["created_at"]["$lte"] = datetime.fromisoformat(end_date)
+        
+        if min_amount is not None or max_amount is not None:
+            query["amount"] = {}
+            if min_amount is not None:
+                query["amount"]["$gte"] = min_amount
+            if max_amount is not None:
+                query["amount"]["$lte"] = max_amount
+        
+        donations = await db.donations.find(query, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+        return donations
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching donations: {str(e)}"
+        )
+
+
+@router.get("/admin/donations/export")
+async def export_donations_csv(admin: str = Depends(get_current_admin)):
+    """Export all donations to CSV (admin only)"""
+    try:
+        from fastapi.responses import StreamingResponse
+        
+        # Get all donations
+        donations = await db.donations.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(["Date", "Name", "Email", "Amount", "Type", "Status", "Transaction ID", "Message"])
+        
+        # Write data
+        for donation in donations:
+            writer.writerow([
+                donation.get("created_at", "").isoformat() if donation.get("created_at") else "",
+                donation.get("name", ""),
+                donation.get("email", ""),
+                donation.get("amount", 0),
+                donation.get("donation_type", ""),
+                donation.get("status", ""),
+                donation.get("transaction_id", ""),
+                donation.get("message", "")
+            ])
+        
+        output.seek(0)
+        
+        return StreamingResponse(
+            iter([output.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=donations.csv"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error exporting donations: {str(e)}"
+        )
+
+
+@router.get("/admin/volunteers")
+async def get_volunteers_admin(admin: str = Depends(get_current_admin), limit: int = 100):
+    """Get all volunteer applications (admin only)"""
+    try:
+        volunteers = await db.volunteers.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+        return volunteers
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching volunteers: {str(e)}"
+        )
+
+
+@router.get("/admin/contacts")
+async def get_contacts_admin(admin: str = Depends(get_current_admin), limit: int = 100):
+    """Get all contact submissions (admin only)"""
+    try:
+        contacts = await db.contacts.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+        return contacts
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching contacts: {str(e)}"
+        )
+
+
+@router.get("/admin/prayer-requests")
+async def get_prayer_requests_admin(admin: str = Depends(get_current_admin), limit: int = 100):
+    """Get all prayer requests with contact info (admin only)"""
+    try:
+        prayers = await db.prayer_requests.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+        return prayers
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching prayer requests: {str(e)}"
+        )
+
+
+# File Upload Endpoint for News Images/Videos
+@router.post("/admin/upload")
+async def upload_file(file: UploadFile = File(...), admin: str = Depends(get_current_admin)):
+    """Upload image or video file (admin only)"""
+    try:
+        # Read file content
+        content = await file.read()
+        
+        # Convert to base64 for storage
+        file_base64 = base64.b64encode(content).decode('utf-8')
+        file_type = file.content_type
+        
+        # Create data URL
+        data_url = f"data:{file_type};base64,{file_base64}"
+        
+        return {"url": data_url, "filename": file.filename, "type": file_type}
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error uploading file: {str(e)}"
+        )
+

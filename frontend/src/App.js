@@ -11,6 +11,9 @@ import GetInvolved from './pages/GetInvolved';
 import Contact from './pages/Contact';
 import Donate from './pages/Donate';
 import PrayerRequests from './pages/PrayerRequests';
+import News from './pages/News';
+import NewsDetail from './pages/NewsDetail';
+import AdminLogin from './pages/AdminLogin';
 import './App.css';
 
 function App() {
@@ -27,6 +30,9 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/prayer-requests" element={<PrayerRequests />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
         </Routes>
         <Footer />
         <Toaster position="top-right" />

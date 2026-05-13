@@ -233,3 +233,170 @@ export const getPaymentStatus = async (sessionId) => {
     throw error;
   }
 };
+
+
+// Admin Authentication API
+export const adminLogin = async (credentials) => {
+  try {
+    const response = await axios.post(`${API}/admin/login`, credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Error during admin login:', error);
+    throw error;
+  }
+};
+
+// News API
+export const getNews = async (limit = 50, publishedOnly = true) => {
+  try {
+    const response = await axios.get(`${API}/news?limit=${limit}&published_only=${publishedOnly}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    throw error;
+  }
+};
+
+export const getNewsPost = async (newsId) => {
+  try {
+    const response = await axios.get(`${API}/news/${newsId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching news post:', error);
+    throw error;
+  }
+};
+
+export const createNews = async (newsData, token) => {
+  try {
+    const response = await axios.post(`${API}/news`, newsData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating news:', error);
+    throw error;
+  }
+};
+
+export const updateNews = async (newsId, newsData, token) => {
+  try {
+    const response = await axios.put(`${API}/news/${newsId}`, newsData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating news:', error);
+    throw error;
+  }
+};
+
+export const deleteNews = async (newsId, token) => {
+  try {
+    const response = await axios.delete(`${API}/news/${newsId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting news:', error);
+    throw error;
+  }
+};
+
+export const uploadFile = async (file, token) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axios.post(`${API}/admin/upload`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+// Admin Dashboard API
+export const getDashboardStats = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/dashboard/stats`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    throw error;
+  }
+};
+
+export const getAdminDonations = async (token, filters = {}) => {
+  try {
+    const params = new URLSearchParams();
+    if (filters.donation_type) params.append('donation_type', filters.donation_type);
+    if (filters.start_date) params.append('start_date', filters.start_date);
+    if (filters.end_date) params.append('end_date', filters.end_date);
+    if (filters.min_amount) params.append('min_amount', filters.min_amount);
+    if (filters.max_amount) params.append('max_amount', filters.max_amount);
+    
+    const response = await axios.get(`${API}/admin/donations?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching admin donations:', error);
+    throw error;
+  }
+};
+
+export const exportDonationsCSV = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/donations/export`, {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob'
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error exporting donations:', error);
+    throw error;
+  }
+};
+
+export const getAdminVolunteers = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/volunteers`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching volunteers:', error);
+    throw error;
+  }
+};
+
+export const getAdminContacts = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/contacts`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching contacts:', error);
+    throw error;
+  }
+};
+
+export const getAdminPrayerRequests = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/prayer-requests`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching prayer requests:', error);
+    throw error;
+  }
+};
