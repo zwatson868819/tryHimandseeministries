@@ -6,6 +6,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
   const location = useLocation();
+  let dropdownTimer = null;
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -49,8 +50,13 @@ const Header = () => {
                 <div 
                   key={link.path}
                   className="relative"
-                  onMouseEnter={() => setShowAboutDropdown(true)}
-                  onMouseLeave={() => setShowAboutDropdown(false)}
+                  onMouseEnter={() => {
+                    if (dropdownTimer) clearTimeout(dropdownTimer);
+                    setShowAboutDropdown(true);
+                  }}
+                  onMouseLeave={() => {
+                    dropdownTimer = setTimeout(() => setShowAboutDropdown(false), 200);
+                  }}
                 >
                   <button
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
@@ -63,11 +69,12 @@ const Header = () => {
                     <ChevronDown size={16} className="ml-1" />
                   </button>
                   {showAboutDropdown && (
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-amber-500/20 rounded-lg shadow-xl overflow-hidden">
+                    <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-amber-500/20 rounded-lg shadow-xl overflow-hidden z-50">
                       {link.dropdown.map((item) => (
                         <Link
                           key={item.path}
                           to={item.path}
+                          onClick={() => setShowAboutDropdown(false)}
                           className={`block px-4 py-3 text-sm transition-colors ${
                             isActive(item.path)
                               ? 'bg-amber-500 text-slate-900 font-semibold'
