@@ -37,7 +37,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 # Admin credentials loaded from environment
 DEFAULT_ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "zwatson")
 DEFAULT_ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Anandotowel@1988*")
-DEFAULT_ADMIN_PASSWORD_HASH = pwd_context.hash(DEFAULT_ADMIN_PASSWORD)
 
 
 def verify_password(plain_password, hashed_password):
@@ -808,7 +807,7 @@ async def admin_login(credentials: AdminLogin):
         if not admin:
             default_admin = {
                 "username": DEFAULT_ADMIN_USERNAME,
-                "hashed_password": DEFAULT_ADMIN_PASSWORD_HASH
+                "hashed_password": pwd_context.hash(DEFAULT_ADMIN_PASSWORD)
             }
             await db.admin_users.insert_one(default_admin)
             admin = default_admin
