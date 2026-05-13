@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAboutDropdown, setShowAboutDropdown] = useState(false);
   const location = useLocation();
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
+    { 
+      name: 'About', 
+      path: '/about',
+      dropdown: [
+        { name: 'About Us', path: '/about' },
+        { name: 'News', path: '/news' }
+      ]
+    },
     { name: 'Ministries', path: '/ministries' },
     { name: 'Encounters', path: '/encounters' },
-    { name: 'News', path: '/news' },
     { name: 'Get Involved', path: '/get-involved' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -38,17 +45,54 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                  isActive(link.path)
-                    ? 'bg-amber-500 text-slate-900'
-                    : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
-                }`}
-              >
-                {link.name}
-              </Link>
+              link.dropdown ? (
+                <div 
+                  key={link.path}
+                  className="relative"
+                  onMouseEnter={() => setShowAboutDropdown(true)}
+                  onMouseLeave={() => setShowAboutDropdown(false)}
+                >
+                  <button
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
+                      isActive(link.path) || location.pathname === '/news'
+                        ? 'bg-amber-500 text-slate-900'
+                        : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
+                    }`}
+                  >
+                    {link.name}
+                    <ChevronDown size={16} className="ml-1" />
+                  </button>
+                  {showAboutDropdown && (
+                    <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-amber-500/20 rounded-lg shadow-xl overflow-hidden">
+                      {link.dropdown.map((item) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          className={`block px-4 py-3 text-sm transition-colors ${
+                            isActive(item.path)
+                              ? 'bg-amber-500 text-slate-900 font-semibold'
+                              : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
+                          }`}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                    isActive(link.path)
+                      ? 'bg-amber-500 text-slate-900'
+                      : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              )
             ))}
             <Link
               to="/donate"
@@ -72,18 +116,40 @@ const Header = () => {
           <div className="lg:hidden pb-4 animate-in slide-in-from-top duration-300">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    isActive(link.path)
-                      ? 'bg-amber-500 text-slate-900'
-                      : 'text-amber-100 hover:bg-amber-500/10'
-                  }`}
-                >
-                  {link.name}
-                </Link>
+                link.dropdown ? (
+                  <div key={link.path} className="space-y-1">
+                    <div className="text-amber-400 font-semibold text-sm px-4 py-2">
+                      {link.name}
+                    </div>
+                    {link.dropdown.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`block px-8 py-2 rounded-lg text-sm transition-colors ${
+                          isActive(item.path)
+                            ? 'bg-amber-500 text-slate-900 font-semibold'
+                            : 'text-amber-100 hover:bg-amber-500/10'
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isActive(link.path)
+                        ? 'bg-amber-500 text-slate-900'
+                        : 'text-amber-100 hover:bg-amber-500/10'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                )
               ))}
               <Link
                 to="/donate"
