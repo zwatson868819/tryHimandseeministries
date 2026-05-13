@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -35,6 +36,15 @@ async def root():
         "status": "running",
         "version": "1.0.0"
     }
+
+# Temporary one-off download for Cloudflare Pages deployment build artifact
+@api_router.get("/download/cloudflare-build")
+async def download_cloudflare_build():
+    return FileResponse(
+        path="/app/tryhimandsee-cloudflare-build.zip",
+        filename="tryhimandsee-cloudflare-build.zip",
+        media_type="application/zip"
+    )
 
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
