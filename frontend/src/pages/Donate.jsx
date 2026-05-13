@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Heart, DollarSign, CreditCard, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, DollarSign, CreditCard, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { submitDonation } from '../services/api';
+import { createPaymentCheckout, getPaymentStatus } from '../services/api';
 
 const Donate = () => {
   const [donationType, setDonationType] = useState('one-time');
@@ -12,8 +12,67 @@ const Donate = () => {
     email: '',
     message: ''
   });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(false);
 
   const presetAmounts = ['25', '50', '100', '250', '500'];
+
+  // Check for payment success on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const success = urlParams.get('success');
+    const canceled = urlParams.get('canceled');
+
+    if (sessionId && success) {
+      pollPaymentStatus(sessionId);
+    } else if (canceled) {
+      toast.error('Payment was canceled. Please try again when ready.');
+      // Clean up URL
+      window.history.replaceState({}, '', '/donate');
+    }
+  }, []);
+
+  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+    const maxAttempts = 5;
+    setCheckingPayment(true);
+
+    if (attempts >= maxAttempts) {
+      toast.error('Payment verification timed out. Please check your email for confirmation.');
+      setCheckingPayment(false);
+      window.history.replaceState({}, '', '/donate');
+      return;
+    }
+
+    try {
+      const status = await getPaymentStatus(sessionId);
+      
+      if (status.payment_status === 'paid') {
+        toast.success('Thank you for your generous donation! Your payment was successful.');
+        setCheckingPayment(false);
+        // Clean up URL
+        window.history.replaceState({}, '', '/donate');
+        // Reset form
+        setAmount('');
+        setCustomAmount('');
+        setDonorInfo({ name: '', email: '', message: '' });
+        return;
+      } else if (status.status === 'expired') {
+        toast.error('Payment session expired. Please try again.');
+        setCheckingPayment(false);
+        window.history.replaceState({}, '', '/donate');
+        return;
+      }
+
+      // Continue polling if still pending
+      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), 2000);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      toast.error('Error verifying payment. Please contact us if you were charged.');
+      setCheckingPayment(false);
+      window.history.replaceState({}, '', '/donate');
+    }
+  };
 
   const handleDonation = async (e) => {
     e.preventDefault();
@@ -259,10 +318,10 @@ const Donate = () => {
                 <div className="flex items-start space-x-3">
                   <CreditCard className="text-amber-400 flex-shrink-0 mt-1" size={24} />
                   <div>
-                    <p className="text-white font-semibold mb-2">Payment Processing</p>
+                    <p className="text-white font-semibold mb-2">Secure Payment Processing</p>
                     <p className="text-slate-300 text-sm">
-                      Secure online payment processing will be integrated soon. For now, please contact us 
-                      directly to make your donation. We accept checks, cash, and online transfers.
+                      Your donation is processed securely through Stripe. We accept all major credit and debit cards.
+                      {checkingPayment && ' Verifying your payment...'}
                     </p>
                   </div>
                 </div>
@@ -271,11 +330,25 @@ const Donate = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={!amount || (amount === 'custom' && !customAmount)}
+                disabled={!amount || (amount === 'custom' && !customAmount) || isProcessing || checkingPayment}
                 className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold text-lg hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                <Check className="mr-2" size={20} />
-                {amount ? `Donate $${amount === 'custom' ? customAmount || '0' : amount}` : 'Select Amount to Continue'}
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="mr-2 animate-spin" size={20} />
+                    Processing...
+                  </>
+                ) : checkingPayment ? (
+                  <>
+                    <Loader2 className="mr-2 animate-spin" size={20} />
+                    Verifying Payment...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2" size={20} />
+                    {amount ? `Proceed to Payment - $${amount === 'custom' ? customAmount || '0' : amount}` : 'Select Amount to Continue'}
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -320,9 +393,9 @@ const Donate = () => {
               <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <DollarSign className="text-amber-400" size={28} />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Sponsor an Event</h3>
+              <h3 className="text-xl font-bold text-white mb-3">Monthly Partnership</h3>
               <p className="text-slate-400">
-                Partner with us to sponsor Encounter nights, food distributions, or special community events.
+                Partner with us through recurring monthly donations to sustain our ministry efforts and reach more families.
               </p>
             </div>
           </div>

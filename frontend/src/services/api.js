@@ -212,3 +212,24 @@ export const healthCheck = async () => {
     throw error;
   }
 };
+
+// Stripe Payment API
+export const createPaymentCheckout = async (paymentData) => {
+  try {
+    const response = await axios.post(`${API}/payments/checkout`, paymentData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating payment checkout:', error);
+    throw error;
+  }
+};
+
+export const getPaymentStatus = async (sessionId) => {
+  try {
+    const response = await axios.get(`${API}/payments/checkout/status/${sessionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching payment status:', error);
+    throw error;
+  }
+};

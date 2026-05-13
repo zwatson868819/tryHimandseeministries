@@ -131,3 +131,21 @@ class RevelationComment(RevelationCommentCreate):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=datetime.utcnow)
     approved: bool = True
+
+
+# Payment Transaction Model for Stripe
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_id: str
+    amount: float
+    currency: str = "usd"
+    donation_type: str  # one-time or monthly
+    name: str
+    email: EmailStr
+    message: Optional[str] = None
+    payment_status: str = "pending"  # pending, paid, failed, expired
+    status: str = "initiated"  # initiated, processing, completed, failed
+    metadata: Optional[dict] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+

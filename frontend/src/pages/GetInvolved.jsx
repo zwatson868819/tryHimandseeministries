@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, HandHeart, Calendar, Check } from 'lucide-react';
+import { Users, HandHeart, Heart, Check } from 'lucide-react';
 import { volunteerOpportunities } from '../data/mock';
 import { toast } from 'sonner';
 import { submitVolunteer } from '../services/api';
@@ -73,7 +73,7 @@ const GetInvolved = () => {
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Volunteer</h3>
               <p className="text-slate-300 leading-relaxed mb-6">
-                Serve alongside us in food distribution, clothing assistance, event support, 
+                Serve alongside us in food distribution, clothing assistance, 
                 and more. Your time and talents make a real impact.
               </p>
               <a 
@@ -103,18 +103,18 @@ const GetInvolved = () => {
 
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center hover:border-amber-500/50 transition-all">
               <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Calendar className="text-amber-400" size={32} />
+                <Heart className="text-amber-400" size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Attend Events</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Prayer Support</h3>
               <p className="text-slate-300 leading-relaxed mb-6">
-                Join us for Encounter nights, community events, and special gatherings. 
-                Experience God's presence and connect with others.
+                Join our prayer team and intercede for those in need. 
+                Submit prayer requests and experience God's presence.
               </p>
               <a 
-                href="/encounters" 
+                href="/prayer-requests" 
                 className="inline-block text-amber-400 font-semibold hover:text-amber-300 transition-colors"
               >
-                View Events →
+                Join Prayer Team →
               </a>
             </div>
           </div>

@@ -11,6 +11,8 @@ from models import (
 )
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import List
+from datetime import datetime
+from uuid import uuid4
 import os
 
 router = APIRouter()
@@ -501,4 +503,246 @@ async def get_revelation_comments(revelation_id: str, limit: int = 100):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching comments: {str(e)}"
+        )
+
+
+# Stripe Payment Integration
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+from fastapi import Request
+from typing import Dict
+
+# Define fixed donation packages for security
+DONATION_PACKAGES = {
+    "small": 25.0,
+    "medium": 50.0,
+    "large": 100.0,
+    "xlarge": 250.0,
+    "premium": 500.0
+}
+
+
+@router.post("/payments/checkout", response_model=CheckoutSessionResponse)
+async def create_donation_checkout(
+    request: Request,
+    package_id: str = None,
+    amount: float = None,
+    donation_type: str = "one-time",
+    name: str = "",
+    email: str = "",
+    message: str = None,
+    origin_url: str = ""
+):
+    """Create a Stripe checkout session for donations"""
+    try:
+        # Get Stripe API key from environment
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Stripe API key not configured"
+            )
+        
+        # Determine the donation amount
+        if package_id and package_id in DONATION_PACKAGES:
+            final_amount = DONATION_PACKAGES[package_id]
+        elif amount and amount > 0:
+            final_amount = float(amount)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Please provide a valid donation amount or package"
+            )
+        
+        # Build success and cancel URLs from frontend origin
+        if not origin_url:
+            origin_url = str(request.base_url).rstrip('/')
+            # Remove /api from the base URL if present
+            origin_url = origin_url.replace('/api', '')
+        
+        success_url = f"{origin_url}/donate?session_id={{CHECKOUT_SESSION_ID}}&success=true"
+        cancel_url = f"{origin_url}/donate?canceled=true"
+        
+        # Initialize Stripe Checkout
+        host_url = str(request.base_url).rstrip('/')
+        webhook_url = f"{host_url}/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Create checkout session request
+        checkout_request = CheckoutSessionRequest(
+            amount=final_amount,
+            currency="usd",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "donation_type": donation_type,
+                "donor_name": name,
+                "donor_email": email,
+                "source": "tryHimandsee_ministries"
+            },
+            payment_methods=["card"]
+        )
+        
+        # Create the checkout session with Stripe
+        session = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Create payment transaction record in database
+        payment_transaction = {
+            "id": str(uuid.uuid4()),
+            "session_id": session.session_id,
+            "amount": final_amount,
+            "currency": "usd",
+            "donation_type": donation_type,
+            "name": name,
+            "email": email,
+            "message": message,
+            "payment_status": "pending",
+            "status": "initiated",
+            "metadata": checkout_request.metadata,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        await db.payment_transactions.insert_one(payment_transaction)
+        
+        return session
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating checkout session: {str(e)}"
+        )
+
+
+@router.get("/payments/checkout/status/{session_id}", response_model=CheckoutStatusResponse)
+async def get_payment_status(session_id: str):
+    """Get the status of a payment checkout session"""
+    try:
+        # Get Stripe API key
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Stripe API key not configured"
+            )
+        
+        # Initialize Stripe Checkout
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url="")
+        
+        # Get checkout status from Stripe
+        checkout_status = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Update payment transaction in database
+        transaction = await db.payment_transactions.find_one({"session_id": session_id})
+        
+        if transaction:
+            # Only update if status has changed to prevent duplicate processing
+            if transaction["payment_status"] != checkout_status.payment_status:
+                update_data = {
+                    "payment_status": checkout_status.payment_status,
+                    "status": "completed" if checkout_status.payment_status == "paid" else "failed" if checkout_status.status == "expired" else "processing",
+                    "updated_at": datetime.utcnow()
+                }
+                
+                await db.payment_transactions.update_one(
+                    {"session_id": session_id},
+                    {"$set": update_data}
+                )
+                
+                # If payment is successful, also create a donation record
+                if checkout_status.payment_status == "paid" and transaction.get("payment_status") != "paid":
+                    donation_record = {
+                        "id": str(uuid.uuid4()),
+                        "amount": transaction["amount"],
+                        "donation_type": transaction["donation_type"],
+                        "name": transaction["name"],
+                        "email": transaction["email"],
+                        "message": transaction.get("message"),
+                        "status": "completed",
+                        "transaction_id": session_id,
+                        "created_at": datetime.utcnow()
+                    }
+                    await db.donations.insert_one(donation_record)
+        
+        return checkout_status
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching payment status: {str(e)}"
+        )
+
+
+@router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events"""
+    try:
+        # Get Stripe API key
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Stripe API key not configured"
+            )
+        
+        # Get raw body and signature
+        body = await request.body()
+        signature = request.headers.get("Stripe-Signature")
+        
+        if not signature:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Missing Stripe signature"
+            )
+        
+        # Initialize Stripe Checkout
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url="")
+        
+        # Handle the webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        # Update payment transaction based on webhook event
+        if webhook_response.session_id:
+            transaction = await db.payment_transactions.find_one({"session_id": webhook_response.session_id})
+            
+            if transaction:
+                update_data = {
+                    "payment_status": webhook_response.payment_status,
+                    "status": "completed" if webhook_response.payment_status == "paid" else "processing",
+                    "updated_at": datetime.utcnow()
+                }
+                
+                await db.payment_transactions.update_one(
+                    {"session_id": webhook_response.session_id},
+                    {"$set": update_data}
+                )
+                
+                # Create donation record if payment successful and not already created
+                if webhook_response.payment_status == "paid":
+                    existing_donation = await db.donations.find_one({"transaction_id": webhook_response.session_id})
+                    if not existing_donation:
+                        donation_record = {
+                            "id": str(uuid.uuid4()),
+                            "amount": transaction["amount"],
+                            "donation_type": transaction["donation_type"],
+                            "name": transaction["name"],
+                            "email": transaction["email"],
+                            "message": transaction.get("message"),
+                            "status": "completed",
+                            "transaction_id": webhook_response.session_id,
+                            "created_at": datetime.utcnow()
+                        }
+                        await db.donations.insert_one(donation_record)
+        
+        return {"status": "success", "event_id": webhook_response.event_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing webhook: {str(e)}"
         )
