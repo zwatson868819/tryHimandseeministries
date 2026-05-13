@@ -55,6 +55,15 @@ async def download_cloudflare_backend():
         media_type="application/zip"
     )
 
+# Temporary one-off download for the dashboard-only deployment (worker.js + schema.sql + guide)
+@api_router.get("/download/cloudflare-dashboard")
+async def download_cloudflare_dashboard():
+    return FileResponse(
+        path="/app/tryhimandsee-cloudflare-dashboard.zip",
+        filename="tryhimandsee-cloudflare-dashboard.zip",
+        media_type="application/zip"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
