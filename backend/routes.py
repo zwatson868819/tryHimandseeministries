@@ -22,6 +22,7 @@ import os
 import csv
 import io
 import base64
+from pydantic import BaseModel
 
 router = APIRouter()
 
@@ -568,16 +569,22 @@ DONATION_PACKAGES = {
 }
 
 
+from pydantic import BaseModel
+
+class PaymentCheckoutRequest(BaseModel):
+    package_id: Optional[str] = None
+    amount: Optional[float] = None
+    donation_type: str = "one-time"
+    name: str
+    email: str
+    message: Optional[str] = None
+    origin_url: str
+
+
 @router.post("/payments/checkout", response_model=CheckoutSessionResponse)
 async def create_donation_checkout(
     request: Request,
-    package_id: str = None,
-    amount: float = None,
-    donation_type: str = "one-time",
-    name: str = "",
-    email: str = "",
-    message: str = None,
-    origin_url: str = ""
+    payment_request: PaymentCheckoutRequest
 ):
     """Create a Stripe checkout session for donations"""
     try:
@@ -590,10 +597,10 @@ async def create_donation_checkout(
             )
         
         # Determine the donation amount
-        if package_id and package_id in DONATION_PACKAGES:
-            final_amount = DONATION_PACKAGES[package_id]
-        elif amount and amount > 0:
-            final_amount = float(amount)
+        if payment_request.package_id and payment_request.package_id in DONATION_PACKAGES:
+            final_amount = DONATION_PACKAGES[payment_request.package_id]
+        elif payment_request.amount and payment_request.amount > 0:
+            final_amount = float(payment_request.amount)
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -601,6 +608,7 @@ async def create_donation_checkout(
             )
         
         # Build success and cancel URLs from frontend origin
+        origin_url = payment_request.origin_url
         if not origin_url:
             origin_url = str(request.base_url).rstrip('/')
             # Remove /api from the base URL if present
@@ -621,9 +629,9 @@ async def create_donation_checkout(
             success_url=success_url,
             cancel_url=cancel_url,
             metadata={
-                "donation_type": donation_type,
-                "donor_name": name,
-                "donor_email": email,
+                "donation_type": payment_request.donation_type,
+                "donor_name": payment_request.name,
+                "donor_email": payment_request.email,
                 "source": "tryHimandsee_ministries"
             },
             payment_methods=["card"]
@@ -634,14 +642,14 @@ async def create_donation_checkout(
         
         # Create payment transaction record in database
         payment_transaction = {
-            "id": str(uuid.uuid4()),
+            "id": str(uuid4()),
             "session_id": session.session_id,
             "amount": final_amount,
             "currency": "usd",
-            "donation_type": donation_type,
-            "name": name,
-            "email": email,
-            "message": message,
+            "donation_type": payment_request.donation_type,
+            "name": payment_request.name,
+            "email": payment_request.email,
+            "message": payment_request.message,
             "payment_status": "pending",
             "status": "initiated",
             "metadata": checkout_request.metadata,
