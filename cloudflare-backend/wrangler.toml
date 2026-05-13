@@ -1,0 +1,29 @@
+name = "tryhimandsee-backend"
+main = "src/index.ts"
+compatibility_date = "2025-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+# CORS origins (comma-separated). Update after deploying frontend to Cloudflare Pages.
+[vars]
+CORS_ORIGINS = "*"
+
+# D1 Database — bind to your D1 instance.
+# Create with: wrangler d1 create tryhimandsee-db
+# Then paste the database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "tryhimandsee-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# R2 bucket for admin media uploads (news/lesson images & videos)
+# Create with: wrangler r2 bucket create tryhimandsee-media
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "tryhimandsee-media"
+
+# Secrets to set via `wrangler secret put <NAME>`:
+#   JWT_SECRET           — random 32+ char string for signing admin JWTs
+#   STRIPE_API_KEY       — your Stripe LIVE secret key (sk_live_...)
+#   STRIPE_WEBHOOK_SECRET — your Stripe webhook signing secret (whsec_...)
+#   ADMIN_SETUP_KEY      — one-time bootstrap key to seed first admin account
+#   R2_PUBLIC_BASE_URL   — public URL for your R2 bucket (e.g. https://media.tryhimandseeministries.org)

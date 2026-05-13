@@ -46,6 +46,15 @@ async def download_cloudflare_build():
         media_type="application/zip"
     )
 
+# Temporary one-off download for the Cloudflare Workers backend project
+@api_router.get("/download/cloudflare-backend")
+async def download_cloudflare_backend():
+    return FileResponse(
+        path="/app/tryhimandsee-cloudflare-backend.zip",
+        filename="tryhimandsee-cloudflare-backend.zip",
+        media_type="application/zip"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
