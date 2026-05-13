@@ -64,6 +64,22 @@ async def download_cloudflare_dashboard():
         media_type="application/zip"
     )
 
+# Worker JS as plain text in browser (copy/paste)
+@api_router.get("/download/worker-js")
+async def view_worker_js():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/worker.js",
+        media_type="text/plain"
+    )
+
+# Schema SQL as plain text in browser (copy/paste)
+@api_router.get("/download/schema-sql")
+async def view_schema_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/schema.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
