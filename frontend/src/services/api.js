@@ -99,16 +99,6 @@ export const getMinistryStats = async () => {
 };
 
 // Encounter Lessons API
-export const createLesson = async (lessonData) => {
-  try {
-    const response = await axios.post(`${API}/lessons`, lessonData);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating lesson:', error);
-    throw error;
-  }
-};
-
 export const getLessons = async (limit = 50, publishedOnly = true) => {
   try {
     const response = await axios.get(`${API}/lessons?limit=${limit}&published_only=${publishedOnly}`);
@@ -235,27 +225,7 @@ export const getPaymentStatus = async (sessionId) => {
 };
 
 
-// Lessons/Encounters Management API
-export const getLessons = async (limit = 50, publishedOnly = true) => {
-  try {
-    const response = await axios.get(`${API}/lessons?limit=${limit}&published_only=${publishedOnly}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching lessons:', error);
-    throw error;
-  }
-};
-
-export const getLesson = async (lessonId) => {
-  try {
-    const response = await axios.get(`${API}/lessons/${lessonId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching lesson:', error);
-    throw error;
-  }
-};
-
+// Lessons/Encounters Admin Management API
 export const createLesson = async (lessonData, token) => {
   try {
     const response = await axios.post(`${API}/lessons`, lessonData, {
