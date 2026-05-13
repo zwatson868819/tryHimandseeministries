@@ -621,6 +621,7 @@ async def get_revelation_comments(revelation_id: str, limit: int = 100):
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 from fastapi import Request
 from typing import Dict
+import stripe as stripe_sdk
 
 # Define fixed donation packages for security
 DONATION_PACKAGES = {
@@ -679,7 +680,57 @@ async def create_donation_checkout(
         
         success_url = f"{origin_url}/donate?session_id={{CHECKOUT_SESSION_ID}}&success=true"
         cancel_url = f"{origin_url}/donate?canceled=true"
-        
+
+        # MONTHLY (subscription) flow — use official Stripe SDK with mode='subscription'
+        if payment_request.donation_type == "monthly":
+            stripe_sdk.api_key = stripe_api_key
+            metadata = {
+                "donation_type": "monthly",
+                "donor_name": payment_request.name,
+                "donor_email": payment_request.email,
+                "source": "tryHimandsee_ministries"
+            }
+            stripe_session = stripe_sdk.checkout.Session.create(
+                mode="subscription",
+                payment_method_types=["card"],
+                line_items=[{
+                    "price_data": {
+                        "currency": "usd",
+                        "product_data": {
+                            "name": "tryHimandsee Ministries — Monthly Partnership"
+                        },
+                        "unit_amount": int(round(final_amount * 100)),
+                        "recurring": {"interval": "month"}
+                    },
+                    "quantity": 1
+                }],
+                customer_email=payment_request.email,
+                success_url=success_url,
+                cancel_url=cancel_url,
+                metadata=metadata,
+                subscription_data={"metadata": metadata}
+            )
+
+            payment_transaction = {
+                "id": str(uuid4()),
+                "session_id": stripe_session.id,
+                "amount": final_amount,
+                "currency": "usd",
+                "donation_type": "monthly",
+                "name": payment_request.name,
+                "email": payment_request.email,
+                "message": payment_request.message,
+                "payment_status": "pending",
+                "status": "initiated",
+                "metadata": metadata,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.payment_transactions.insert_one(payment_transaction)
+
+            return CheckoutSessionResponse(url=stripe_session.url, session_id=stripe_session.id)
+
+        # ONE-TIME flow (existing Emergent wrapper)
         # Initialize Stripe Checkout
         host_url = str(request.base_url).rstrip('/')
         webhook_url = f"{host_url}/webhook/stripe"
