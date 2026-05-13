@@ -70,11 +70,18 @@ const Footer = () => {
             <p className="text-slate-500 text-sm">
               © {new Date().getFullYear()} tryHimandsee Ministries. All rights reserved.
             </p>
-            <div className="flex items-center space-x-1 text-slate-500 text-sm">
+            <div className="flex items-center justify-center space-x-1 text-slate-500 text-sm mb-3">
               <span>Made with</span>
               <Heart size={14} className="text-amber-500 fill-amber-500" />
               <span>to serve His people</span>
             </div>
+            <Link 
+              to="/admin/login" 
+              className="text-slate-600 hover:text-amber-400 text-xs transition-colors inline-block"
+              title="Staff Login"
+            >
+              Staff Login
+            </Link>
           </div>
         </div>
       </div>
