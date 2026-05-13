@@ -141,6 +141,13 @@ const AdminDashboard = () => {
           </div>
           <div className="flex space-x-4">
             <button
+              onClick={() => navigate('/admin/encounters')}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <Newspaper className="mr-2" size={18} />
+              Manage Encounters
+            </button>
+            <button
               onClick={() => navigate('/admin/news')}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center"
             >

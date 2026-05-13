@@ -275,8 +275,8 @@ async def get_ministry_stats():
 
 # Encounter Lesson Endpoints
 @router.post("/lessons", response_model=Lesson, status_code=status.HTTP_201_CREATED)
-async def create_lesson(lesson_data: LessonCreate):
-    """Create a new encounter lesson (admin use)"""
+async def create_lesson(lesson_data: LessonCreate, admin: str = Depends(get_current_admin)):
+    """Create a new encounter lesson (admin only)"""
     try:
         lesson = Lesson(**lesson_data.dict())
         
@@ -356,6 +356,69 @@ async def get_lesson(lesson_id: str):
     except HTTPException:
         raise
     except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching lesson: {str(e)}"
+        )
+
+
+@router.put("/lessons/{lesson_id}", response_model=Lesson)
+async def update_lesson(lesson_id: str, lesson_data: LessonCreate, admin: str = Depends(get_current_admin)):
+    """Update an encounter lesson (admin only)"""
+    try:
+        existing_lesson = await db.lessons.find_one({"id": lesson_id})
+        
+        if not existing_lesson:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Lesson not found"
+            )
+        
+        update_data = lesson_data.dict()
+        update_data["updated_at"] = datetime.utcnow()
+        
+        await db.lessons.update_one(
+            {"id": lesson_id},
+            {"$set": update_data}
+        )
+        
+        updated_lesson = await db.lessons.find_one({"id": lesson_id}, {"_id": 0})
+        return Lesson(**updated_lesson)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating lesson: {str(e)}"
+        )
+
+
+@router.delete("/lessons/{lesson_id}")
+async def delete_lesson(lesson_id: str, admin: str = Depends(get_current_admin)):
+    """Delete an encounter lesson (admin only)"""
+    try:
+        # Also delete associated comments
+        await db.comments.delete_many({"lesson_id": lesson_id})
+        
+        result = await db.lessons.delete_one({"id": lesson_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Lesson not found"
+            )
+        
+        return {"message": "Lesson and associated comments deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting lesson: {str(e)}"
+        )
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching lesson: {str(e)}"

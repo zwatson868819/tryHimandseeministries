@@ -235,6 +235,64 @@ export const getPaymentStatus = async (sessionId) => {
 };
 
 
+// Lessons/Encounters Management API
+export const getLessons = async (limit = 50, publishedOnly = true) => {
+  try {
+    const response = await axios.get(`${API}/lessons?limit=${limit}&published_only=${publishedOnly}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching lessons:', error);
+    throw error;
+  }
+};
+
+export const getLesson = async (lessonId) => {
+  try {
+    const response = await axios.get(`${API}/lessons/${lessonId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching lesson:', error);
+    throw error;
+  }
+};
+
+export const createLesson = async (lessonData, token) => {
+  try {
+    const response = await axios.post(`${API}/lessons`, lessonData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating lesson:', error);
+    throw error;
+  }
+};
+
+export const updateLesson = async (lessonId, lessonData, token) => {
+  try {
+    const response = await axios.put(`${API}/lessons/${lessonId}`, lessonData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating lesson:', error);
+    throw error;
+  }
+};
+
+export const deleteLesson = async (lessonId, token) => {
+  try {
+    const response = await axios.delete(`${API}/lessons/${lessonId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
+    throw error;
+  }
+};
+
+
 // Admin Authentication API
 export const adminLogin = async (credentials) => {
   try {
