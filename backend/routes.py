@@ -28,13 +28,16 @@ router = APIRouter()
 # Security configuration
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
-SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("JWT_SECRET_KEY environment variable must be set")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 
-# Default admin credentials (username: zwatson, password: Anandotowel@1988*)
-DEFAULT_ADMIN_USERNAME = "zwatson"
-DEFAULT_ADMIN_PASSWORD_HASH = "$2b$12$wiwEa.lLh3tw1c.87hcykOQ8Vhzx8XiU/fOSy37yhiAB0rvIyorL."
+# Admin credentials loaded from environment
+DEFAULT_ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "zwatson")
+DEFAULT_ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Anandotowel@1988*")
+DEFAULT_ADMIN_PASSWORD_HASH = pwd_context.hash(DEFAULT_ADMIN_PASSWORD)
 
 
 def verify_password(plain_password, hashed_password):

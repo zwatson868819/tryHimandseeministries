@@ -115,15 +115,6 @@ const AdminLogin = () => {
               )}
             </button>
           </form>
-
-          {/* Default Credentials Info */}
-          <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-            <p className="text-amber-200 text-sm text-center">
-              <span className="font-semibold">Your admin credentials:</span><br />
-              Username: <span className="font-mono">zwatson</span><br />
-              Password: <span className="font-mono">Anandotowel@1988*</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>

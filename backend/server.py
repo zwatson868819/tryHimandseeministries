@@ -5,11 +5,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from routes import router as ministry_router, set_database
 
-
+# Load environment variables FIRST before importing routes
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Now import routes after env vars are loaded
+from routes import router as ministry_router, set_database
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
