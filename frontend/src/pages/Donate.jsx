@@ -83,25 +83,37 @@ const Donate = () => {
       return;
     }
 
+    if (!donorInfo.name || !donorInfo.email) {
+      toast.error('Please provide your name and email');
+      return;
+    }
+
+    setIsProcessing(true);
+
     try {
-      const donationData = {
+      const originUrl = window.location.origin;
+      
+      const paymentData = {
         amount: parseFloat(donationAmount),
         donation_type: donationType,
         name: donorInfo.name,
         email: donorInfo.email,
-        message: donorInfo.message
+        message: donorInfo.message || null,
+        origin_url: originUrl
       };
 
-      await submitDonation(donationData);
-      toast.success(`Thank you for your ${donationType} donation of $${donationAmount}!`);
+      const session = await createPaymentCheckout(paymentData);
       
-      // Reset form
-      setAmount('');
-      setCustomAmount('');
-      setDonorInfo({ name: '', email: '', message: '' });
+      // Redirect to Stripe checkout
+      if (session.url) {
+        window.location.href = session.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error) {
-      toast.error('Failed to process donation. Please try again or contact us directly.');
-      console.error('Donation error:', error);
+      toast.error('Failed to initiate payment. Please try again or contact us directly.');
+      console.error('Payment error:', error);
+      setIsProcessing(false);
     }
   };
 
