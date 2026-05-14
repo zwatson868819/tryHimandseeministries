@@ -405,6 +405,41 @@ export const deleteBlogPost = async (postId, token) => {
   }
 };
 
+// Subscribers API
+export const subscribeToBlog = async (data) => {
+  try {
+    const response = await axios.post(`${API}/subscribers`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error subscribing:', error);
+    throw error;
+  }
+};
+
+export const getSubscribers = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/subscribers`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching subscribers:', error);
+    throw error;
+  }
+};
+
+export const deleteSubscriber = async (id, token) => {
+  try {
+    const response = await axios.delete(`${API}/admin/subscribers/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error removing subscriber:', error);
+    throw error;
+  }
+};
+
 // Admin Dashboard API
 export const getDashboardStats = async (token) => {
   try {

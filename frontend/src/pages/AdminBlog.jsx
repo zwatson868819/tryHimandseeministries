@@ -86,10 +86,10 @@ const AdminBlog = () => {
     try {
       if (editing) {
         await updateBlogPost(editing.id, formData, token);
-        toast.success('Blog post updated');
+        toast.success('Note updated');
       } else {
         await createBlogPost(formData, token);
-        toast.success('Blog post created');
+        toast.success('Note created — subscribers will be emailed');
       }
       setShowForm(false);
       setEditing(null);
@@ -115,7 +115,7 @@ const AdminBlog = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this blog post?')) return;
+    if (!window.confirm('Delete this note?')) return;
     try {
       await deleteBlogPost(id, token);
       toast.success('Deleted');
@@ -148,9 +148,9 @@ const AdminBlog = () => {
               Back to Dashboard
             </button>
             <h1 className="text-4xl font-bold text-white mb-2">
-              Manage <span className="text-amber-400">Blog</span>
+              <span className="text-amber-400">Notes</span> from the Secret Place
             </h1>
-            <p className="text-slate-400">Create, edit, and manage your blog posts</p>
+            <p className="text-slate-400">Manage your personal writings and devotionals</p>
           </div>
           {!showForm && (
             <button
@@ -159,7 +159,7 @@ const AdminBlog = () => {
               className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all flex items-center shadow-lg shadow-amber-500/30"
             >
               <Plus className="mr-2" size={20} />
-              New Blog Post
+              New Note
             </button>
           )}
         </div>
@@ -168,7 +168,7 @@ const AdminBlog = () => {
           <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-8 mb-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-white">
-                {editing ? 'Edit' : 'Create'} Blog Post
+                {editing ? 'Edit' : 'Create'} Note
               </h2>
               <button
                 onClick={() => {
@@ -339,7 +339,7 @@ const AdminBlog = () => {
           <div className="p-6 border-b border-slate-800">
             <h2 className="text-2xl font-bold text-white flex items-center">
               <BookOpen className="text-amber-400 mr-2" size={24} />
-              All Blog Posts ({posts.length})
+              All Notes ({posts.length})
             </h2>
           </div>
 
@@ -351,8 +351,8 @@ const AdminBlog = () => {
           ) : posts.length === 0 ? (
             <div className="p-12 text-center">
               <BookOpen className="text-slate-700 mx-auto mb-4" size={64} />
-              <p className="text-slate-400 text-lg">No blog posts yet</p>
-              <p className="text-slate-500 text-sm mt-2">Click "New Blog Post" to get started</p>
+              <p className="text-slate-400 text-lg">No notes yet</p>
+              <p className="text-slate-500 text-sm mt-2">Click "New Note" to get started</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-800">

@@ -4090,6 +4090,7 @@ app.post("/api/blog", async (c) => {
     return c.json({ detail: "Missing fields" }, 400);
   const id = uuid();
   const t = now();
+  const isPublished = b.published === false ? 0 : 1;
   await c.env.DB.prepare(
     "INSERT INTO blog_posts (id, title, content, excerpt, author, image_urls, video_urls, published, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   ).bind(
@@ -4100,11 +4101,21 @@ app.post("/api/blog", async (c) => {
     b.author ?? null,
     JSON.stringify(b.image_urls ?? []),
     JSON.stringify(b.video_urls ?? []),
-    b.published === false ? 0 : 1,
+    isPublished,
     t,
     t
   ).run();
-  return c.json({ id, ...b, created_at: t, updated_at: t }, 201);
+  let emailResult = null;
+  if (isPublished === 1) {
+    emailResult = await sendBlogNotification(c.env, {
+      id,
+      title: b.title,
+      author: b.author,
+      excerpt: b.excerpt,
+      content: b.content
+    });
+  }
+  return c.json({ id, ...b, created_at: t, updated_at: t, email: emailResult }, 201);
 });
 app.put("/api/blog/:id", async (c) => {
   const admin = await requireAdmin(c);
@@ -4136,6 +4147,116 @@ app.delete("/api/blog/:id", async (c) => {
     return c.json({ detail: "Unauthorized" }, 401);
   await c.env.DB.prepare("DELETE FROM blog_posts WHERE id = ?").bind(c.req.param("id")).run();
   return c.json({ message: "Deleted" });
+});
+async function sendBlogNotification(env2, post) {
+  if (!env2.RESEND_API_KEY || !env2.RESEND_FROM_EMAIL) {
+    return { sent: 0, skipped: true };
+  }
+  const subs = await env2.DB.prepare("SELECT email FROM subscribers").all();
+  const emails = (subs.results || []).map((r) => r.email).filter(Boolean);
+  if (emails.length === 0)
+    return { sent: 0, skipped: true };
+  const siteBase = (env2.SITE_BASE_URL || "").replace(/\/+$/, "") || "https://tryhimandseeministries.org";
+  const postUrl = `${siteBase}/blog/${post.id}`;
+  const preview = (post.excerpt || post.content || "").substring(0, 280).replace(/\n+/g, " ").trim();
+  const byline = post.author ? `<p style="color:#94a3b8;font-size:14px;margin:0 0 16px;">by ${escapeHtml(post.author)}</p>` : "";
+  const html = `<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#0f172a;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f172a;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #f59e0b33;">
+        <tr><td style="padding:32px 32px 16px;text-align:center;">
+          <p style="color:#fbbf24;font-size:12px;letter-spacing:2px;margin:0 0 8px;text-transform:uppercase;">Notes from the Secret Place</p>
+          <h1 style="color:#ffffff;font-size:28px;margin:0 0 8px;line-height:1.3;">${escapeHtml(post.title)}</h1>
+          ${byline}
+        </td></tr>
+        <tr><td style="padding:8px 32px 24px;">
+          <p style="color:#cbd5e1;font-size:16px;line-height:1.6;margin:0;">${escapeHtml(preview)}${preview.length >= 280 ? "..." : ""}</p>
+        </td></tr>
+        <tr><td style="padding:8px 32px 32px;text-align:center;">
+          <a href="${postUrl}" style="display:inline-block;background:#f59e0b;color:#0f172a;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">Read the Note</a>
+        </td></tr>
+        <tr><td style="padding:24px 32px;border-top:1px solid #334155;text-align:center;">
+          <p style="color:#64748b;font-size:12px;margin:0;">
+            You're receiving this because you subscribed at <a href="${siteBase}/blog" style="color:#f59e0b;">tryHimandsee Ministries</a>.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+  let sent = 0;
+  let lastError;
+  const CHUNK = 49;
+  for (let i = 0; i < emails.length; i += CHUNK) {
+    const chunk = emails.slice(i, i + CHUNK);
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env2.RESEND_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          from: env2.RESEND_FROM_EMAIL,
+          to: [env2.RESEND_FROM_EMAIL],
+          // primary recipient (yourself); subscribers in BCC
+          bcc: chunk,
+          subject: `New Note: ${post.title}`,
+          html
+        })
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        lastError = `Resend ${res.status}: ${body}`;
+        console.error(lastError);
+      } else {
+        sent += chunk.length;
+      }
+    } catch (e) {
+      lastError = e?.message || "Email send failed";
+      console.error(lastError);
+    }
+  }
+  return { sent, skipped: false, error: lastError };
+}
+__name(sendBlogNotification, "sendBlogNotification");
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+__name(escapeHtml, "escapeHtml");
+app.post("/api/subscribers", async (c) => {
+  const b = await c.req.json();
+  const email = (b.email || "").trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return c.json({ detail: "Please enter a valid email address" }, 400);
+  }
+  const name = b.name ? String(b.name).trim().substring(0, 100) : null;
+  const existing = await c.env.DB.prepare("SELECT id FROM subscribers WHERE email = ?").bind(email).first();
+  if (existing) {
+    return c.json({ detail: "You're already subscribed \u2014 thank you!" }, 409);
+  }
+  const id = uuid();
+  await c.env.DB.prepare(
+    "INSERT INTO subscribers (id, email, name, created_at) VALUES (?, ?, ?, ?)"
+  ).bind(id, email, name, now()).run();
+  return c.json({ id, email, name, created_at: now() }, 201);
+});
+app.get("/api/admin/subscribers", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin)
+    return c.json({ detail: "Unauthorized" }, 401);
+  const rows = await c.env.DB.prepare(
+    "SELECT id, email, name, created_at FROM subscribers ORDER BY created_at DESC LIMIT 5000"
+  ).all();
+  return c.json(rows.results || []);
+});
+app.delete("/api/admin/subscribers/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin)
+    return c.json({ detail: "Unauthorized" }, 401);
+  await c.env.DB.prepare("DELETE FROM subscribers WHERE id = ?").bind(c.req.param("id")).run();
+  return c.json({ message: "Removed" });
 });
 app.post("/api/comments", async (c) => {
   const b = await c.req.json();

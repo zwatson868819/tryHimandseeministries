@@ -42,7 +42,7 @@ const BlogDetail = () => {
           <h2 className="text-3xl font-bold text-white mb-4">Post Not Found</h2>
           <Link to="/blog" className="text-amber-400 hover:text-amber-300">
             <ArrowLeft className="inline mr-2" size={18} />
-            Back to Blog
+            Back to Notes
           </Link>
         </div>
       </div>
@@ -58,7 +58,7 @@ const BlogDetail = () => {
           className="inline-flex items-center text-amber-400 hover:text-amber-300 mb-8 transition-colors"
         >
           <ArrowLeft className="mr-2" size={18} />
-          Back to Blog
+          Back to Notes
         </Link>
 
         {post.image_urls && post.image_urls.length > 0 && (

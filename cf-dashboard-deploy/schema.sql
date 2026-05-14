@@ -119,3 +119,12 @@ CREATE TABLE IF NOT EXISTS blog_posts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_blog_published ON blog_posts(published, created_at);
+
+CREATE TABLE IF NOT EXISTS subscribers (
+  id         TEXT PRIMARY KEY,
+  email      TEXT NOT NULL UNIQUE,
+  name       TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email);
