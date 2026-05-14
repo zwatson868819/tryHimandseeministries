@@ -594,6 +594,97 @@ app.delete("/api/admin/subscribers/:id", async (c) => {
   return c.json({ message: "Removed" });
 });
 
+// ---------- testimonies ----------
+app.post("/api/testimonies", async (c) => {
+  const b = await c.req.json<any>();
+  const name = (b.name || "").trim();
+  const testimony = (b.testimony || "").trim();
+  if (!name || !testimony) {
+    return c.json({ detail: "Please share your name and testimony" }, 400);
+  }
+  if (testimony.length < 20) {
+    return c.json({ detail: "Please share a bit more — at least a few sentences" }, 400);
+  }
+  const id = uuid();
+  await c.env.DB.prepare(
+    "INSERT INTO testimonies (id, name, email, location, testimony, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', ?)"
+  )
+    .bind(
+      id,
+      name.substring(0, 100),
+      b.email ? String(b.email).trim().substring(0, 200) : null,
+      b.location ? String(b.location).trim().substring(0, 100) : null,
+      testimony.substring(0, 5000),
+      now()
+    )
+    .run();
+  return c.json({ id, message: "Thank you for sharing — your testimony has been received." }, 201);
+});
+
+// Public — only approved
+app.get("/api/testimonies", async (c) => {
+  const limit = Math.min(parseInt(c.req.query("limit") || "20", 10), 100);
+  const rows = await c.env.DB.prepare(
+    "SELECT id, name, location, testimony, approved_at FROM testimonies WHERE status = 'approved' ORDER BY approved_at DESC, created_at DESC LIMIT ?"
+  )
+    .bind(limit)
+    .all();
+  return c.json(rows.results || []);
+});
+
+// Admin — all
+app.get("/api/admin/testimonies", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const status = c.req.query("status");
+  const sql = status
+    ? "SELECT * FROM testimonies WHERE status = ? ORDER BY created_at DESC LIMIT 500"
+    : "SELECT * FROM testimonies ORDER BY created_at DESC LIMIT 500";
+  const rows = status
+    ? await c.env.DB.prepare(sql).bind(status).all()
+    : await c.env.DB.prepare(sql).all();
+  return c.json(rows.results || []);
+});
+
+// Admin — approve / reject / edit
+app.put("/api/admin/testimonies/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  const b = await c.req.json<any>();
+  const existing = await c.env.DB.prepare("SELECT * FROM testimonies WHERE id = ?")
+    .bind(id)
+    .first<any>();
+  if (!existing) return c.json({ detail: "Testimony not found" }, 404);
+
+  const nextStatus = b.status || existing.status;
+  const approvedAt =
+    nextStatus === "approved" && existing.status !== "approved" ? now() : existing.approved_at;
+
+  await c.env.DB.prepare(
+    "UPDATE testimonies SET name = ?, location = ?, testimony = ?, status = ?, approved_at = ? WHERE id = ?"
+  )
+    .bind(
+      b.name ?? existing.name,
+      b.location ?? existing.location,
+      b.testimony ?? existing.testimony,
+      nextStatus,
+      approvedAt,
+      id
+    )
+    .run();
+  return c.json({ id, status: nextStatus, message: "Updated" });
+});
+
+app.delete("/api/admin/testimonies/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  await c.env.DB.prepare("DELETE FROM testimonies WHERE id = ?")
+    .bind(c.req.param("id"))
+    .run();
+  return c.json({ message: "Deleted" });
+});
+
 // ---------- comments ----------
 app.post("/api/comments", async (c) => {
   const b = await c.req.json<any>();

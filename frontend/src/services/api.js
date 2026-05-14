@@ -440,6 +440,64 @@ export const deleteSubscriber = async (id, token) => {
   }
 };
 
+// Testimonies API
+export const submitTestimony = async (data) => {
+  try {
+    const response = await axios.post(`${API}/testimonies`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting testimony:', error);
+    throw error;
+  }
+};
+
+export const getPublicTestimonies = async (limit = 20) => {
+  try {
+    const response = await axios.get(`${API}/testimonies?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching testimonies:', error);
+    throw error;
+  }
+};
+
+export const getAdminTestimonies = async (token, status = null) => {
+  try {
+    const url = status ? `${API}/admin/testimonies?status=${status}` : `${API}/admin/testimonies`;
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching admin testimonies:', error);
+    throw error;
+  }
+};
+
+export const updateTestimony = async (id, data, token) => {
+  try {
+    const response = await axios.put(`${API}/admin/testimonies/${id}`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating testimony:', error);
+    throw error;
+  }
+};
+
+export const deleteTestimony = async (id, token) => {
+  try {
+    const response = await axios.delete(`${API}/admin/testimonies/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting testimony:', error);
+    throw error;
+  }
+};
+
 // Admin Dashboard API
 export const getDashboardStats = async (token) => {
   try {

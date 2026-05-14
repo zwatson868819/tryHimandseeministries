@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests } from '../services/api';
 
@@ -169,6 +169,14 @@ const AdminDashboard = () => {
             >
               <AtSign className="mr-2" size={18} />
               Subscribers
+            </button>
+            <button
+              onClick={() => navigate('/admin/testimonies')}
+              data-testid="admin-manage-testimonies-btn"
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center"
+            >
+              <Sparkles className="mr-2" size={18} />
+              Testimonies
             </button>
             <button
               onClick={handleLogout}

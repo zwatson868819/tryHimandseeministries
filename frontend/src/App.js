@@ -21,6 +21,7 @@ import AdminNews from './pages/AdminNews';
 import AdminEncounters from './pages/AdminEncounters';
 import AdminBlog from './pages/AdminBlog';
 import AdminSubscribers from './pages/AdminSubscribers';
+import AdminTestimonies from './pages/AdminTestimonies';
 import './App.css';
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path="/admin/encounters" element={<AdminEncounters />} />
           <Route path="/admin/blog" element={<AdminBlog />} />
           <Route path="/admin/subscribers" element={<AdminSubscribers />} />
+          <Route path="/admin/testimonies" element={<AdminTestimonies />} />
         </Routes>
         <Footer />
         <Toaster position="top-right" />

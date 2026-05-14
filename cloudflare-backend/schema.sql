@@ -128,3 +128,16 @@ CREATE TABLE IF NOT EXISTS subscribers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_subscribers_email ON subscribers(email);
+
+CREATE TABLE IF NOT EXISTS testimonies (
+  id         TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  email      TEXT,
+  location   TEXT,
+  testimony  TEXT NOT NULL,
+  status     TEXT NOT NULL DEFAULT 'pending',
+  created_at TEXT NOT NULL,
+  approved_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_testimonies_status ON testimonies(status, created_at);

@@ -96,6 +96,14 @@ async def view_subscribers_migration_sql():
         media_type="text/plain"
     )
 
+# Testimonies migration SQL (visitor-submitted stories)
+@api_router.get("/download/testimonies-migration-sql")
+async def view_testimonies_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/testimonies-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 

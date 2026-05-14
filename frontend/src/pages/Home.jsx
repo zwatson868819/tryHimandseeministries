@@ -1,14 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle } from 'lucide-react';
+import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { toast } from 'sonner';
-import { ministryInfo, services, testimonials, upcomingEvents } from '../data/mock';
-import { subscribeToBlog } from '../services/api';
+import { ministryInfo, services, upcomingEvents } from '../data/mock';
+import { subscribeToBlog, getPublicTestimonies } from '../services/api';
 
 const Home = () => {
   const [email, setEmail] = useState('');
   const [subscribing, setSubscribing] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [testimonies, setTestimonies] = useState([]);
+  const [testimonyIndex, setTestimonyIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchT = async () => {
+      try {
+        const data = await getPublicTestimonies(20);
+        setTestimonies(data);
+      } catch (e) {
+        // silently ignore — section just stays empty
+      }
+    };
+    fetchT();
+  }, []);
+
+  useEffect(() => {
+    if (testimonies.length <= 1) return;
+    const id = setInterval(() => {
+      setTestimonyIndex((i) => (i + 1) % testimonies.length);
+    }, 7000);
+    return () => clearInterval(id);
+  }, [testimonies.length]);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -203,25 +225,100 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+      {/* Testimonials Carousel */}
+      <section className="py-20 bg-slate-950" data-testid="home-testimonies-section">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Lives <span className="text-amber-400">Transformed</span>
             </h2>
             <p className="text-slate-400 text-lg">
-              Hear from those whose lives have been touched by God's love through this ministry
+              Stories of God's faithfulness from those touched by this ministry
             </p>
           </div>
 
-          <div className="text-center py-12">
-            <Heart className="text-amber-400 mx-auto mb-6" size={64} />
-            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-              Stories of transformation and testimonies of God's faithfulness coming soon. 
-              Be part of the story as we serve our community together.
-            </p>
-          </div>
+          {testimonies.length === 0 ? (
+            <div className="text-center py-8">
+              <Heart className="text-amber-400 mx-auto mb-6" size={64} />
+              <p className="text-slate-300 text-lg max-w-2xl mx-auto mb-6">
+                Be the first to share your testimony.
+              </p>
+              <Link
+                to="/contact"
+                className="inline-flex items-center px-6 py-3 bg-amber-500/10 border border-amber-500/50 text-amber-400 rounded-lg font-semibold hover:bg-amber-500/20 transition-all"
+              >
+                Share Your Story
+                <ArrowRight className="ml-2" size={18} />
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="relative bg-gradient-to-br from-slate-900 via-amber-900/10 to-slate-900 border border-amber-500/30 rounded-2xl p-8 md:p-12 min-h-[280px] flex items-center" data-testid="home-testimony-card">
+                <Quote className="absolute top-6 left-6 text-amber-500/20" size={64} />
+                <Quote className="absolute bottom-6 right-6 text-amber-500/20 rotate-180" size={64} />
+
+                <div className="relative w-full text-center">
+                  <p className="text-slate-200 text-lg md:text-xl leading-relaxed italic mb-6 max-w-3xl mx-auto whitespace-pre-wrap">
+                    "{testimonies[testimonyIndex].testimony}"
+                  </p>
+                  <div className="flex flex-col items-center">
+                    <p className="text-amber-400 font-bold text-lg">
+                      {testimonies[testimonyIndex].name}
+                    </p>
+                    {testimonies[testimonyIndex].location && (
+                      <p className="text-slate-500 text-sm flex items-center mt-1">
+                        <MapPin size={14} className="mr-1" />
+                        {testimonies[testimonyIndex].location}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {testimonies.length > 1 && (
+                <div className="flex justify-center items-center mt-6 gap-4">
+                  <button
+                    onClick={() => setTestimonyIndex((i) => (i - 1 + testimonies.length) % testimonies.length)}
+                    data-testid="home-testimony-prev"
+                    className="p-2 bg-slate-900 border border-slate-700 rounded-full text-amber-400 hover:bg-slate-800 transition-colors"
+                    aria-label="Previous testimony"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <div className="flex gap-2">
+                    {testimonies.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setTestimonyIndex(i)}
+                        aria-label={`Go to testimony ${i + 1}`}
+                        className={`h-2 rounded-full transition-all ${
+                          i === testimonyIndex ? 'bg-amber-400 w-8' : 'bg-slate-700 w-2 hover:bg-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setTestimonyIndex((i) => (i + 1) % testimonies.length)}
+                    data-testid="home-testimony-next"
+                    className="p-2 bg-slate-900 border border-slate-700 rounded-full text-amber-400 hover:bg-slate-800 transition-colors"
+                    aria-label="Next testimony"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              )}
+
+              <div className="text-center mt-8">
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center text-amber-400 font-semibold hover:text-amber-300 transition-colors"
+                >
+                  Share your own story
+                  <ArrowRight className="ml-2" size={18} />
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

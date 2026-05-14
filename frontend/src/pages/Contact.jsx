@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, Send, MessageCircle } from 'lucide-react';
+import { Mail, MapPin, Send, MessageCircle, Sparkles, CheckCircle } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
 import { toast } from 'sonner';
-import { submitContact } from '../services/api';
+import { submitContact, submitTestimony } from '../services/api';
 
 const Contact = () => {
   const [contactForm, setContactForm] = useState({
@@ -12,6 +12,34 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+
+  const [testimonyForm, setTestimonyForm] = useState({
+    name: '',
+    email: '',
+    location: '',
+    testimony: ''
+  });
+  const [testimonySubmitting, setTestimonySubmitting] = useState(false);
+  const [testimonySubmitted, setTestimonySubmitted] = useState(false);
+
+  const handleTestimonyChange = (e) =>
+    setTestimonyForm({ ...testimonyForm, [e.target.name]: e.target.value });
+
+  const handleTestimonySubmit = async (e) => {
+    e.preventDefault();
+    setTestimonySubmitting(true);
+    try {
+      await submitTestimony(testimonyForm);
+      setTestimonySubmitted(true);
+      toast.success('Thank you for sharing your story!');
+      setTestimonyForm({ name: '', email: '', location: '', testimony: '' });
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'Failed to submit. Please try again.';
+      toast.error(msg);
+    } finally {
+      setTestimonySubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -232,6 +260,123 @@ const Contact = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Share Your Story */}
+      <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-950" data-testid="share-story-section">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <Sparkles className="text-amber-400 mx-auto mb-4" size={48} />
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              Share Your <span className="text-amber-400">Testimony</span>
+            </h2>
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              Has the ministry, an Encounter, or a moment with God touched your life? Share your story with us — it may encourage someone else.
+            </p>
+          </div>
+
+          {testimonySubmitted ? (
+            <div className="bg-slate-900 border border-amber-500/40 rounded-xl p-10 text-center" data-testid="testimony-thanks">
+              <CheckCircle className="text-amber-400 mx-auto mb-4" size={56} />
+              <h3 className="text-2xl font-bold text-white mb-2">Thank you for sharing.</h3>
+              <p className="text-slate-300">
+                Your testimony has been received and will appear on our site after a quick review.
+              </p>
+              <button
+                onClick={() => setTestimonySubmitted(false)}
+                className="mt-6 text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                Share another story →
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleTestimonySubmit}
+              data-testid="testimony-form"
+              className="bg-slate-900 border border-slate-800 rounded-xl p-8 space-y-6"
+            >
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="t-name" className="block text-white font-semibold mb-2">
+                    Your Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="t-name"
+                    name="name"
+                    value={testimonyForm.name}
+                    onChange={handleTestimonyChange}
+                    required
+                    data-testid="testimony-name"
+                    className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-amber-400 transition-colors"
+                    placeholder="First name or initials"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="t-location" className="block text-white font-semibold mb-2">
+                    Location (optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="t-location"
+                    name="location"
+                    value={testimonyForm.location}
+                    onChange={handleTestimonyChange}
+                    data-testid="testimony-location"
+                    className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-amber-400 transition-colors"
+                    placeholder="Richmond, VA"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="t-email" className="block text-white font-semibold mb-2">
+                  Email (optional)
+                </label>
+                <input
+                  type="email"
+                  id="t-email"
+                  name="email"
+                  value={testimonyForm.email}
+                  onChange={handleTestimonyChange}
+                  data-testid="testimony-email"
+                  className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  placeholder="So we can follow up if needed"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="t-text" className="block text-white font-semibold mb-2">
+                  Your Testimony *
+                </label>
+                <textarea
+                  id="t-text"
+                  name="testimony"
+                  value={testimonyForm.testimony}
+                  onChange={handleTestimonyChange}
+                  required
+                  rows="6"
+                  data-testid="testimony-text"
+                  className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-amber-400 transition-colors resize-none"
+                  placeholder="Tell us how God moved..."
+                ></textarea>
+                <p className="text-slate-500 text-sm mt-2">
+                  Your testimony will appear on our website after a brief review.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={testimonySubmitting}
+                data-testid="testimony-submit"
+                className="w-full px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50 flex items-center justify-center"
+              >
+                <Sparkles className="mr-2" size={20} />
+                {testimonySubmitting ? 'Submitting...' : 'Share My Story'}
+              </button>
+            </form>
+          )}
         </div>
       </section>
 
