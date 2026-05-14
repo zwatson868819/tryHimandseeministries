@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { Mail, MapPin, Heart } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
 
 const Footer = () => {
@@ -51,10 +51,6 @@ const Footer = () => {
               <li className="flex items-start space-x-2 text-slate-400 text-sm">
                 <Mail size={16} className="mt-1 text-amber-400 flex-shrink-0" />
                 <span>{ministryInfo.contact.email}</span>
-              </li>
-              <li className="flex items-start space-x-2 text-slate-400 text-sm">
-                <Phone size={16} className="mt-1 text-amber-400 flex-shrink-0" />
-                <span>{ministryInfo.contact.phone}</span>
               </li>
               <li className="flex items-start space-x-2 text-slate-400 text-sm">
                 <MapPin size={16} className="mt-1 text-amber-400 flex-shrink-0" />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, MessageCircle } from 'lucide-react';
+import { Mail, MapPin, Send, MessageCircle } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
 import { toast } from 'sonner';
 import { submitContact } from '../services/api';
@@ -66,18 +66,6 @@ const Contact = () => {
                     <h3 className="text-white font-semibold mb-1">Email Us</h3>
                     <a href={`mailto:${ministryInfo.contact.email}`} className="text-slate-400 hover:text-amber-400 transition-colors">
                       {ministryInfo.contact.email}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4 p-6 bg-slate-900 border border-slate-800 rounded-xl hover:border-amber-500/50 transition-all">
-                  <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="text-amber-400" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold mb-1">Call Us</h3>
-                    <a href={`tel:${ministryInfo.contact.phone}`} className="text-slate-400 hover:text-amber-400 transition-colors">
-                      {ministryInfo.contact.phone}
                     </a>
                   </div>
                 </div>

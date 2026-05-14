@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Users, Flame, HandHeart } from 'lucide-react';
+import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { ministryInfo, services, testimonials, upcomingEvents } from '../data/mock';
+import { subscribeToBlog } from '../services/api';
 
 const Home = () => {
+  const [email, setEmail] = useState('');
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribing(true);
+    try {
+      await subscribeToBlog({ email });
+      setSubscribed(true);
+      toast.success("You're subscribed — welcome to the Secret Place");
+      setEmail('');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'Subscription failed';
+      toast.error(msg);
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -225,6 +248,72 @@ const Home = () => {
             >
               Volunteer With Us
             </Link>
+          </div>
+        </div>
+      </section>
+      {/* Notes from the Secret Place — Subscribe Call-out */}
+      <section className="py-20 bg-slate-950" data-testid="home-notes-cta">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative bg-gradient-to-br from-slate-900 via-amber-900/15 to-slate-900 border border-amber-500/30 rounded-2xl p-8 md:p-12 overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="relative grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <Feather className="text-amber-400 mb-4" size={40} />
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+                  Notes from the<br />
+                  <span className="text-amber-400">Secret Place</span>
+                </h2>
+                <p className="text-slate-300 mb-2 italic text-sm">
+                  "But thou, when thou prayest, enter into thy closet..." — Matthew 6:6
+                </p>
+                <p className="text-slate-400 mb-6">
+                  Personal reflections, devotionals, and everyday writings. Subscribe to receive new notes in your inbox.
+                </p>
+                <Link
+                  to="/blog"
+                  data-testid="home-notes-read-link"
+                  className="inline-flex items-center text-amber-400 font-semibold hover:text-amber-300 transition-colors"
+                >
+                  Read past notes
+                  <ArrowRight className="ml-2" size={18} />
+                </Link>
+              </div>
+
+              <div>
+                {subscribed ? (
+                  <div className="text-center bg-slate-900/60 border border-amber-500/30 rounded-xl p-6">
+                    <CheckCircle className="text-amber-400 mx-auto mb-3" size={40} />
+                    <p className="text-white font-semibold mb-1">You're in.</p>
+                    <p className="text-slate-400 text-sm">Watch your inbox for the next note.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubscribe} className="space-y-3" data-testid="home-notes-subscribe-form">
+                    <label className="flex items-center text-white font-semibold">
+                      <Mail size={18} className="mr-2 text-amber-400" />
+                      Subscribe
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      required
+                      data-testid="home-notes-email-input"
+                      className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-amber-400 transition-colors"
+                    />
+                    <button
+                      type="submit"
+                      disabled={subscribing}
+                      data-testid="home-notes-subscribe-btn"
+                      className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all disabled:opacity-50"
+                    >
+                      {subscribing ? 'Subscribing...' : 'Send Me New Notes'}
+                    </button>
+                    <p className="text-slate-500 text-xs text-center">No spam. Unsubscribe anytime.</p>
+                  </form>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
