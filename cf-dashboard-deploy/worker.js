@@ -4056,6 +4056,87 @@ app.delete("/api/lessons/:id", async (c) => {
   await c.env.DB.prepare("DELETE FROM lessons WHERE id = ?").bind(c.req.param("id")).run();
   return c.json({ message: "Deleted" });
 });
+app.get("/api/blog", async (c) => {
+  const limit = Math.min(parseInt(c.req.query("limit") || "50", 10), 200);
+  const publishedOnly = c.req.query("published_only") !== "false";
+  const sql = publishedOnly ? "SELECT * FROM blog_posts WHERE published = 1 ORDER BY created_at DESC LIMIT ?" : "SELECT * FROM blog_posts ORDER BY created_at DESC LIMIT ?";
+  const rows = await c.env.DB.prepare(sql).bind(limit).all();
+  return c.json(
+    (rows.results || []).map((r) => ({
+      ...r,
+      image_urls: parseJsonArray(r.image_urls),
+      video_urls: parseJsonArray(r.video_urls),
+      published: !!r.published
+    }))
+  );
+});
+app.get("/api/blog/:id", async (c) => {
+  const row = await c.env.DB.prepare("SELECT * FROM blog_posts WHERE id = ?").bind(c.req.param("id")).first();
+  if (!row)
+    return c.json({ detail: "Blog post not found" }, 404);
+  return c.json({
+    ...row,
+    image_urls: parseJsonArray(row.image_urls),
+    video_urls: parseJsonArray(row.video_urls),
+    published: !!row.published
+  });
+});
+app.post("/api/blog", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin)
+    return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json();
+  if (!b.title || !b.content)
+    return c.json({ detail: "Missing fields" }, 400);
+  const id = uuid();
+  const t = now();
+  await c.env.DB.prepare(
+    "INSERT INTO blog_posts (id, title, content, excerpt, author, image_urls, video_urls, published, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).bind(
+    id,
+    b.title,
+    b.content,
+    b.excerpt ?? null,
+    b.author ?? null,
+    JSON.stringify(b.image_urls ?? []),
+    JSON.stringify(b.video_urls ?? []),
+    b.published === false ? 0 : 1,
+    t,
+    t
+  ).run();
+  return c.json({ id, ...b, created_at: t, updated_at: t }, 201);
+});
+app.put("/api/blog/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin)
+    return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  const b = await c.req.json();
+  const existing = await c.env.DB.prepare("SELECT id FROM blog_posts WHERE id = ?").bind(id).first();
+  if (!existing)
+    return c.json({ detail: "Blog post not found" }, 404);
+  await c.env.DB.prepare(
+    "UPDATE blog_posts SET title = ?, content = ?, excerpt = ?, author = ?, image_urls = ?, video_urls = ?, published = ?, updated_at = ? WHERE id = ?"
+  ).bind(
+    b.title,
+    b.content,
+    b.excerpt ?? null,
+    b.author ?? null,
+    JSON.stringify(b.image_urls ?? []),
+    JSON.stringify(b.video_urls ?? []),
+    b.published === false ? 0 : 1,
+    now(),
+    id
+  ).run();
+  return c.json({ id, ...b, updated_at: now() });
+});
+app.delete("/api/blog/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin)
+    return c.json({ detail: "Unauthorized" }, 401);
+  await c.env.DB.prepare("DELETE FROM blog_posts WHERE id = ?").bind(c.req.param("id")).run();
+  return c.json({ message: "Deleted" });
+});
 app.post("/api/comments", async (c) => {
   const b = await c.req.json();
   if (!b.lesson_id || !b.author || !b.text)

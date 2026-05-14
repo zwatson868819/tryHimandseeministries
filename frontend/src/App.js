@@ -13,10 +13,13 @@ import Donate from './pages/Donate';
 import PrayerRequests from './pages/PrayerRequests';
 import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminNews from './pages/AdminNews';
 import AdminEncounters from './pages/AdminEncounters';
+import AdminBlog from './pages/AdminBlog';
 import './App.css';
 
 function App() {
@@ -35,10 +38,13 @@ function App() {
           <Route path="/prayer-requests" element={<PrayerRequests />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/news" element={<AdminNews />} />
           <Route path="/admin/encounters" element={<AdminEncounters />} />
+          <Route path="/admin/blog" element={<AdminBlog />} />
         </Routes>
         <Footer />
         <Toaster position="top-right" />

@@ -80,6 +80,14 @@ async def view_schema_sql():
         media_type="text/plain"
     )
 
+# Blog migration SQL (just the new table)
+@api_router.get("/download/blog-migration-sql")
+async def view_blog_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/blog-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 

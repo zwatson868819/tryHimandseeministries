@@ -6,7 +6,7 @@ const API = `${API_URL}/api`;
 // Contact Form API
 export const submitContact = async (contactData) => {
   try {
-    const response = await axios.post(`${API}/contact`, contactData);
+    const response = await axios.post(`${API}/contacts`, contactData);
     return response.data;
   } catch (error) {
     console.error('Error submitting contact form:', error);
@@ -58,7 +58,7 @@ export const submitPrayerRequest = async (prayerData) => {
 
 export const getPrayerRequests = async (limit = 10, isPublic = true) => {
   try {
-    const response = await axios.get(`${API}/prayer-requests?limit=${limit}&public=${isPublic}`);
+    const response = await axios.get(`${API}/prayer-requests?limit=${limit}&is_public=${isPublic}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching prayer requests:', error);
@@ -335,7 +335,7 @@ export const uploadFile = async (file, token) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await axios.post(`${API}/admin/upload`, formData, {
+    const response = await axios.post(`${API}/upload`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
@@ -344,6 +344,63 @@ export const uploadFile = async (file, token) => {
     return response.data;
   } catch (error) {
     console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+// Blog API
+export const getBlogPosts = async (limit = 50, publishedOnly = true) => {
+  try {
+    const response = await axios.get(`${API}/blog?limit=${limit}&published_only=${publishedOnly}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    throw error;
+  }
+};
+
+export const getBlogPost = async (postId) => {
+  try {
+    const response = await axios.get(`${API}/blog/${postId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    throw error;
+  }
+};
+
+export const createBlogPost = async (postData, token) => {
+  try {
+    const response = await axios.post(`${API}/blog`, postData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating blog post:', error);
+    throw error;
+  }
+};
+
+export const updateBlogPost = async (postId, postData, token) => {
+  try {
+    const response = await axios.put(`${API}/blog/${postId}`, postData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    throw error;
+  }
+};
+
+export const deleteBlogPost = async (postId, token) => {
+  try {
+    const response = await axios.delete(`${API}/blog/${postId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting blog post:', error);
     throw error;
   }
 };

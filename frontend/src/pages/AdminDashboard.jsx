@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests } from '../services/api';
 
@@ -139,7 +139,7 @@ const AdminDashboard = () => {
             </h1>
             <p className="text-slate-400">Manage your ministry data and settings</p>
           </div>
-          <div className="flex space-x-4">
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => navigate('/admin/encounters')}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
@@ -153,6 +153,14 @@ const AdminDashboard = () => {
             >
               <Newspaper className="mr-2" size={18} />
               Manage News
+            </button>
+            <button
+              onClick={() => navigate('/admin/blog')}
+              data-testid="admin-manage-blog-btn"
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center"
+            >
+              <BookOpen className="mr-2" size={18} />
+              Manage Blog
             </button>
             <button
               onClick={handleLogout}

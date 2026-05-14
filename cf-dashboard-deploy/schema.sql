@@ -104,3 +104,18 @@ CREATE INDEX IF NOT EXISTS idx_news_published ON news(published, created_at);
 CREATE INDEX IF NOT EXISTS idx_lessons_published ON lessons(published, created_at);
 CREATE INDEX IF NOT EXISTS idx_donations_status ON donations(status);
 CREATE INDEX IF NOT EXISTS idx_payment_session ON payment_transactions(session_id);
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id          TEXT PRIMARY KEY,
+  title       TEXT NOT NULL,
+  content     TEXT NOT NULL,
+  excerpt     TEXT,
+  author      TEXT,
+  image_urls  TEXT NOT NULL DEFAULT '[]',
+  video_urls  TEXT NOT NULL DEFAULT '[]',
+  published   INTEGER NOT NULL DEFAULT 1,
+  created_at  TEXT NOT NULL,
+  updated_at  TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_blog_published ON blog_posts(published, created_at);
