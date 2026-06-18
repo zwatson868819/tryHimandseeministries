@@ -104,7 +104,7 @@ const NewsDetail = () => {
         {newsPost.image_urls && newsPost.image_urls.length > 1 && (
           <div className="grid md:grid-cols-2 gap-4 mt-8">
             {newsPost.image_urls.slice(1).map((url, index) => (
-              <div key={index} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
+              <div key={url} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
                 <img 
                   src={url} 
                   alt={`${newsPost.title} ${index + 2}`}
@@ -119,7 +119,7 @@ const NewsDetail = () => {
         {newsPost.video_urls && newsPost.video_urls.length > 0 && (
           <div className="mt-8 space-y-4">
             {newsPost.video_urls.map((url, index) => (
-              <div key={index} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
+              <div key={url} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
                 <video 
                   controls 
                   className="w-full h-full"

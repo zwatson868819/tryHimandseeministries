@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${API_URL}/api`;
+const logError = (msg, err) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(msg, err);
+  }
+};
 
 // Contact Form API
 export const submitContact = async (contactData) => {
@@ -9,7 +14,7 @@ export const submitContact = async (contactData) => {
     const response = await axios.post(`${API}/contacts`, contactData);
     return response.data;
   } catch (error) {
-    console.error('Error submitting contact form:', error);
+    logError('Error submitting contact form:', error);
     throw error;
   }
 };
@@ -19,7 +24,7 @@ export const getContacts = async (limit = 50) => {
     const response = await axios.get(`${API}/contact?limit=${limit}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching contacts:', error);
+    logError('Error fetching contacts:', error);
     throw error;
   }
 };
@@ -30,7 +35,7 @@ export const submitVolunteer = async (volunteerData) => {
     const response = await axios.post(`${API}/volunteers`, volunteerData);
     return response.data;
   } catch (error) {
-    console.error('Error submitting volunteer application:', error);
+    logError('Error submitting volunteer application:', error);
     throw error;
   }
 };
@@ -40,7 +45,7 @@ export const getVolunteers = async (limit = 50) => {
     const response = await axios.get(`${API}/volunteers?limit=${limit}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching volunteers:', error);
+    logError('Error fetching volunteers:', error);
     throw error;
   }
 };
@@ -51,7 +56,7 @@ export const submitPrayerRequest = async (prayerData) => {
     const response = await axios.post(`${API}/prayer-requests`, prayerData);
     return response.data;
   } catch (error) {
-    console.error('Error submitting prayer request:', error);
+    logError('Error submitting prayer request:', error);
     throw error;
   }
 };
@@ -61,7 +66,7 @@ export const getPrayerRequests = async (limit = 10, isPublic = true) => {
     const response = await axios.get(`${API}/prayer-requests?limit=${limit}&is_public=${isPublic}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching prayer requests:', error);
+    logError('Error fetching prayer requests:', error);
     throw error;
   }
 };
@@ -72,7 +77,7 @@ export const submitDonation = async (donationData) => {
     const response = await axios.post(`${API}/donations`, donationData);
     return response.data;
   } catch (error) {
-    console.error('Error submitting donation:', error);
+    logError('Error submitting donation:', error);
     throw error;
   }
 };
@@ -82,7 +87,7 @@ export const getDonations = async (limit = 50) => {
     const response = await axios.get(`${API}/donations?limit=${limit}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching donations:', error);
+    logError('Error fetching donations:', error);
     throw error;
   }
 };
@@ -93,7 +98,7 @@ export const getMinistryStats = async () => {
     const response = await axios.get(`${API}/stats`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching ministry stats:', error);
+    logError('Error fetching ministry stats:', error);
     throw error;
   }
 };
@@ -104,7 +109,7 @@ export const getLessons = async (limit = 50, publishedOnly = true) => {
     const response = await axios.get(`${API}/lessons?limit=${limit}&published_only=${publishedOnly}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching lessons:', error);
+    logError('Error fetching lessons:', error);
     throw error;
   }
 };
@@ -114,7 +119,7 @@ export const getLesson = async (lessonId) => {
     const response = await axios.get(`${API}/lessons/${lessonId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching lesson:', error);
+    logError('Error fetching lesson:', error);
     throw error;
   }
 };
@@ -125,7 +130,7 @@ export const submitComment = async (commentData) => {
     const response = await axios.post(`${API}/comments`, commentData);
     return response.data;
   } catch (error) {
-    console.error('Error submitting comment:', error);
+    logError('Error submitting comment:', error);
     throw error;
   }
 };
@@ -135,7 +140,7 @@ export const getComments = async (lessonId, limit = 100) => {
     const response = await axios.get(`${API}/comments/${lessonId}?limit=${limit}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching comments:', error);
+    logError('Error fetching comments:', error);
     throw error;
   }
 };
@@ -146,7 +151,7 @@ export const createRevelation = async (revelationData) => {
     const response = await axios.post(`${API}/revelations`, revelationData);
     return response.data;
   } catch (error) {
-    console.error('Error creating revelation:', error);
+    logError('Error creating revelation:', error);
     throw error;
   }
 };
@@ -156,7 +161,7 @@ export const getRevelations = async (limit = 50, publishedOnly = true) => {
     const response = await axios.get(`${API}/revelations?limit=${limit}&published_only=${publishedOnly}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching revelations:', error);
+    logError('Error fetching revelations:', error);
     throw error;
   }
 };
@@ -166,7 +171,7 @@ export const getRevelation = async (revelationId) => {
     const response = await axios.get(`${API}/revelations/${revelationId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching revelation:', error);
+    logError('Error fetching revelation:', error);
     throw error;
   }
 };
@@ -177,7 +182,7 @@ export const submitRevelationComment = async (commentData) => {
     const response = await axios.post(`${API}/revelation-comments`, commentData);
     return response.data;
   } catch (error) {
-    console.error('Error submitting revelation comment:', error);
+    logError('Error submitting revelation comment:', error);
     throw error;
   }
 };
@@ -187,7 +192,7 @@ export const getRevelationComments = async (revelationId, limit = 100) => {
     const response = await axios.get(`${API}/revelation-comments/${revelationId}?limit=${limit}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching revelation comments:', error);
+    logError('Error fetching revelation comments:', error);
     throw error;
   }
 };
@@ -198,7 +203,7 @@ export const healthCheck = async () => {
     const response = await axios.get(`${API}/`);
     return response.data;
   } catch (error) {
-    console.error('Error checking API health:', error);
+    logError('Error checking API health:', error);
     throw error;
   }
 };
@@ -209,7 +214,7 @@ export const createPaymentCheckout = async (paymentData) => {
     const response = await axios.post(`${API}/payments/checkout`, paymentData);
     return response.data;
   } catch (error) {
-    console.error('Error creating payment checkout:', error);
+    logError('Error creating payment checkout:', error);
     throw error;
   }
 };
@@ -219,7 +224,7 @@ export const getPaymentStatus = async (sessionId) => {
     const response = await axios.get(`${API}/payments/checkout/status/${sessionId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching payment status:', error);
+    logError('Error fetching payment status:', error);
     throw error;
   }
 };
@@ -233,7 +238,7 @@ export const createLesson = async (lessonData, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating lesson:', error);
+    logError('Error creating lesson:', error);
     throw error;
   }
 };
@@ -245,7 +250,7 @@ export const updateLesson = async (lessonId, lessonData, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error updating lesson:', error);
+    logError('Error updating lesson:', error);
     throw error;
   }
 };
@@ -257,7 +262,7 @@ export const deleteLesson = async (lessonId, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error deleting lesson:', error);
+    logError('Error deleting lesson:', error);
     throw error;
   }
 };
@@ -269,7 +274,7 @@ export const adminLogin = async (credentials) => {
     const response = await axios.post(`${API}/admin/login`, credentials);
     return response.data;
   } catch (error) {
-    console.error('Error during admin login:', error);
+    logError('Error during admin login:', error);
     throw error;
   }
 };
@@ -280,7 +285,7 @@ export const getNews = async (limit = 50, publishedOnly = true) => {
     const response = await axios.get(`${API}/news?limit=${limit}&published_only=${publishedOnly}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching news:', error);
+    logError('Error fetching news:', error);
     throw error;
   }
 };
@@ -290,7 +295,7 @@ export const getNewsPost = async (newsId) => {
     const response = await axios.get(`${API}/news/${newsId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching news post:', error);
+    logError('Error fetching news post:', error);
     throw error;
   }
 };
@@ -302,7 +307,7 @@ export const createNews = async (newsData, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating news:', error);
+    logError('Error creating news:', error);
     throw error;
   }
 };
@@ -314,7 +319,7 @@ export const updateNews = async (newsId, newsData, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error updating news:', error);
+    logError('Error updating news:', error);
     throw error;
   }
 };
@@ -326,7 +331,7 @@ export const deleteNews = async (newsId, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error deleting news:', error);
+    logError('Error deleting news:', error);
     throw error;
   }
 };
@@ -343,7 +348,7 @@ export const uploadFile = async (file, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    logError('Error uploading file:', error);
     throw error;
   }
 };
@@ -354,7 +359,7 @@ export const getBlogPosts = async (limit = 50, publishedOnly = true) => {
     const response = await axios.get(`${API}/blog?limit=${limit}&published_only=${publishedOnly}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    logError('Error fetching blog posts:', error);
     throw error;
   }
 };
@@ -364,7 +369,7 @@ export const getBlogPost = async (postId) => {
     const response = await axios.get(`${API}/blog/${postId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching blog post:', error);
+    logError('Error fetching blog post:', error);
     throw error;
   }
 };
@@ -376,7 +381,7 @@ export const createBlogPost = async (postData, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating blog post:', error);
+    logError('Error creating blog post:', error);
     throw error;
   }
 };
@@ -388,7 +393,7 @@ export const updateBlogPost = async (postId, postData, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error updating blog post:', error);
+    logError('Error updating blog post:', error);
     throw error;
   }
 };
@@ -400,7 +405,7 @@ export const deleteBlogPost = async (postId, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error deleting blog post:', error);
+    logError('Error deleting blog post:', error);
     throw error;
   }
 };
@@ -411,7 +416,7 @@ export const subscribeToBlog = async (data) => {
     const response = await axios.post(`${API}/subscribers`, data);
     return response.data;
   } catch (error) {
-    console.error('Error subscribing:', error);
+    logError('Error subscribing:', error);
     throw error;
   }
 };
@@ -423,7 +428,7 @@ export const getSubscribers = async (token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching subscribers:', error);
+    logError('Error fetching subscribers:', error);
     throw error;
   }
 };
@@ -435,7 +440,7 @@ export const deleteSubscriber = async (id, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error removing subscriber:', error);
+    logError('Error removing subscriber:', error);
     throw error;
   }
 };
@@ -446,7 +451,7 @@ export const submitTestimony = async (data) => {
     const response = await axios.post(`${API}/testimonies`, data);
     return response.data;
   } catch (error) {
-    console.error('Error submitting testimony:', error);
+    logError('Error submitting testimony:', error);
     throw error;
   }
 };
@@ -456,7 +461,7 @@ export const getPublicTestimonies = async (limit = 20) => {
     const response = await axios.get(`${API}/testimonies?limit=${limit}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching testimonies:', error);
+    logError('Error fetching testimonies:', error);
     throw error;
   }
 };
@@ -469,7 +474,7 @@ export const getAdminTestimonies = async (token, status = null) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching admin testimonies:', error);
+    logError('Error fetching admin testimonies:', error);
     throw error;
   }
 };
@@ -481,7 +486,7 @@ export const updateTestimony = async (id, data, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error updating testimony:', error);
+    logError('Error updating testimony:', error);
     throw error;
   }
 };
@@ -493,7 +498,7 @@ export const deleteTestimony = async (id, token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error deleting testimony:', error);
+    logError('Error deleting testimony:', error);
     throw error;
   }
 };
@@ -504,7 +509,7 @@ export const getDonationProgress = async () => {
     const response = await axios.get(`${API}/donations/progress`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching progress:', error);
+    logError('Error fetching progress:', error);
     throw error;
   }
 };
@@ -517,7 +522,7 @@ export const updateMonthlyGoal = async (goal, token) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error updating goal:', error);
+    logError('Error updating goal:', error);
     throw error;
   }
 };
@@ -584,7 +589,7 @@ export const getDashboardStats = async (token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
+    logError('Error fetching dashboard stats:', error);
     throw error;
   }
 };
@@ -603,7 +608,7 @@ export const getAdminDonations = async (token, filters = {}) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching admin donations:', error);
+    logError('Error fetching admin donations:', error);
     throw error;
   }
 };
@@ -616,7 +621,7 @@ export const exportDonationsCSV = async (token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error exporting donations:', error);
+    logError('Error exporting donations:', error);
     throw error;
   }
 };
@@ -628,7 +633,7 @@ export const getAdminVolunteers = async (token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching volunteers:', error);
+    logError('Error fetching volunteers:', error);
     throw error;
   }
 };
@@ -640,7 +645,7 @@ export const getAdminContacts = async (token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching contacts:', error);
+    logError('Error fetching contacts:', error);
     throw error;
   }
 };
@@ -652,7 +657,7 @@ export const getAdminPrayerRequests = async (token) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching prayer requests:', error);
+    logError('Error fetching prayer requests:', error);
     throw error;
   }
 };

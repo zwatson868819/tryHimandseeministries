@@ -280,9 +280,9 @@ const Home = () => {
                     <ChevronLeft size={20} />
                   </button>
                   <div className="flex gap-2">
-                    {testimonies.map((_, i) => (
+                    {testimonies.map((t, i) => (
                       <button
-                        key={i}
+                        key={t.id || i}
                         onClick={() => setTestimonyIndex(i)}
                         aria-label={`Go to testimony ${i + 1}`}
                         className={`h-2 rounded-full transition-all ${

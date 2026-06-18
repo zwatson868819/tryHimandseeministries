@@ -93,8 +93,8 @@ const BlogDetail = () => {
 
         {post.image_urls && post.image_urls.length > 1 && (
           <div className="grid md:grid-cols-2 gap-4 mt-8">
-            {post.image_urls.slice(1).map((url, i) => (
-              <div key={i} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
+            {post.image_urls.slice(1).map((url) => (
+              <div key={url} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
                 <img src={url} alt="" className="w-full h-full object-cover" />
               </div>
             ))}
@@ -103,8 +103,8 @@ const BlogDetail = () => {
 
         {post.video_urls && post.video_urls.length > 0 && (
           <div className="mt-8 space-y-4">
-            {post.video_urls.map((url, i) => (
-              <div key={i} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
+            {post.video_urls.map((url) => (
+              <div key={url} className="aspect-video bg-slate-900 rounded-lg overflow-hidden">
                 <video controls className="w-full h-full" src={url}>
                   Your browser does not support the video tag.
                 </video>
