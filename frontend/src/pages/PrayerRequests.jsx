@@ -320,10 +320,6 @@ const PrayerRequests = () => {
               we're here to pray with you and for you.
             </p>
             <div className="space-y-4">
-              <div className="flex items-center justify-center space-x-3 text-amber-400">
-                <Heart size={20} />
-                <span className="font-semibold">Prayer Team meets every Tuesday at 6:00 AM</span>
-              </div>
               <p className="text-slate-400 text-sm">
                 Interested in joining our prayer team? Contact us to learn more.
               </p>
