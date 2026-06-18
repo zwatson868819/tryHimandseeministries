@@ -22,6 +22,8 @@ import AdminEncounters from './pages/AdminEncounters';
 import AdminBlog from './pages/AdminBlog';
 import AdminSubscribers from './pages/AdminSubscribers';
 import AdminTestimonies from './pages/AdminTestimonies';
+import AdminLybtl from './pages/AdminLybtl';
+import AdminLybtlContact from './pages/AdminLybtlContact';
 import './App.css';
 
 function App() {
@@ -49,6 +51,8 @@ function App() {
           <Route path="/admin/blog" element={<AdminBlog />} />
           <Route path="/admin/subscribers" element={<AdminSubscribers />} />
           <Route path="/admin/testimonies" element={<AdminTestimonies />} />
+          <Route path="/admin/lybtl" element={<AdminLybtl />} />
+          <Route path="/admin/lybtl/:id" element={<AdminLybtlContact />} />
         </Routes>
         <Footer />
         <Toaster position="top-right" />

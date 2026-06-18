@@ -112,6 +112,14 @@ async def view_goal_migration_sql():
         media_type="text/plain"
     )
 
+# Loving You Back To Life CRM migration SQL
+@api_router.get("/download/lybtl-migration-sql")
+async def view_lybtl_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/lybtl-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 

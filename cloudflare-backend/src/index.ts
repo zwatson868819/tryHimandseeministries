@@ -731,6 +731,213 @@ app.put("/api/admin/settings/monthly-goal", async (c) => {
   return c.json({ goal, message: "Goal updated" });
 });
 
+// ---------- Loving You Back To Life — Contacts CRM ----------
+
+function mapContactRow(r: any) {
+  if (!r) return r;
+  return { ...r, tags: parseJsonArray(r.tags) };
+}
+
+app.get("/api/admin/lybtl/contacts", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const q = (c.req.query("q") || "").trim().toLowerCase();
+  const sql = q
+    ? `SELECT * FROM loving_you_back_contacts
+       WHERE LOWER(name) LIKE ? OR LOWER(phone) LIKE ? OR LOWER(email) LIKE ? OR LOWER(address) LIKE ?
+       ORDER BY name LIMIT 500`
+    : "SELECT * FROM loving_you_back_contacts ORDER BY name LIMIT 500";
+  const rows = q
+    ? await c.env.DB.prepare(sql).bind(`%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`).all()
+    : await c.env.DB.prepare(sql).all();
+  return c.json((rows.results || []).map(mapContactRow));
+});
+
+app.post("/api/admin/lybtl/contacts", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json<any>();
+  const name = (b.name || "").trim();
+  if (!name) return c.json({ detail: "Name is required" }, 400);
+  const id = uuid();
+  const t = now();
+  await c.env.DB.prepare(
+    "INSERT INTO loving_you_back_contacts (id, name, phone, email, address, birthday, how_we_met, family_notes, photo_url, tags, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  )
+    .bind(
+      id,
+      name,
+      b.phone ?? null,
+      b.email ?? null,
+      b.address ?? null,
+      b.birthday ?? null,
+      b.how_we_met ?? null,
+      b.family_notes ?? null,
+      b.photo_url ?? null,
+      JSON.stringify(Array.isArray(b.tags) ? b.tags : []),
+      t,
+      t
+    )
+    .run();
+  return c.json({ id, ...b, name, created_at: t, updated_at: t }, 201);
+});
+
+app.get("/api/admin/lybtl/contacts/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const row = await c.env.DB.prepare("SELECT * FROM loving_you_back_contacts WHERE id = ?")
+    .bind(c.req.param("id"))
+    .first<any>();
+  if (!row) return c.json({ detail: "Not found" }, 404);
+  return c.json(mapContactRow(row));
+});
+
+app.put("/api/admin/lybtl/contacts/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  const b = await c.req.json<any>();
+  const existing = await c.env.DB.prepare("SELECT id FROM loving_you_back_contacts WHERE id = ?")
+    .bind(id)
+    .first();
+  if (!existing) return c.json({ detail: "Not found" }, 404);
+  await c.env.DB.prepare(
+    "UPDATE loving_you_back_contacts SET name = ?, phone = ?, email = ?, address = ?, birthday = ?, how_we_met = ?, family_notes = ?, photo_url = ?, tags = ?, updated_at = ? WHERE id = ?"
+  )
+    .bind(
+      b.name,
+      b.phone ?? null,
+      b.email ?? null,
+      b.address ?? null,
+      b.birthday ?? null,
+      b.how_we_met ?? null,
+      b.family_notes ?? null,
+      b.photo_url ?? null,
+      JSON.stringify(Array.isArray(b.tags) ? b.tags : []),
+      now(),
+      id
+    )
+    .run();
+  return c.json({ id, ...b, updated_at: now() });
+});
+
+app.delete("/api/admin/lybtl/contacts/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  await c.env.DB.prepare("DELETE FROM next_step_journal WHERE contact_id = ?").bind(id).run();
+  await c.env.DB.prepare("DELETE FROM loving_you_back_contacts WHERE id = ?").bind(id).run();
+  return c.json({ message: "Deleted" });
+});
+
+// Journal entries
+app.get("/api/admin/lybtl/contacts/:id/journal", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const rows = await c.env.DB.prepare(
+    "SELECT * FROM next_step_journal WHERE contact_id = ? ORDER BY created_at DESC LIMIT 500"
+  )
+    .bind(c.req.param("id"))
+    .all();
+  return c.json(rows.results || []);
+});
+
+app.post("/api/admin/lybtl/contacts/:id/journal", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const contactId = c.req.param("id");
+  const b = await c.req.json<any>();
+  const note = (b.note || "").trim();
+  if (!note) return c.json({ detail: "Note is required" }, 400);
+  const id = uuid();
+  await c.env.DB.prepare(
+    "INSERT INTO next_step_journal (id, contact_id, note, follow_up_date, follow_up_reason, status, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?)"
+  )
+    .bind(id, contactId, note, b.follow_up_date ?? null, b.follow_up_reason ?? null, now())
+    .run();
+  return c.json({ id, contact_id: contactId, note, follow_up_date: b.follow_up_date ?? null, follow_up_reason: b.follow_up_reason ?? null, status: "active", created_at: now() }, 201);
+});
+
+app.put("/api/admin/lybtl/journal/:entryId", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json<any>();
+  const id = c.req.param("entryId");
+  const existing = await c.env.DB.prepare("SELECT * FROM next_step_journal WHERE id = ?").bind(id).first<any>();
+  if (!existing) return c.json({ detail: "Not found" }, 404);
+  await c.env.DB.prepare(
+    "UPDATE next_step_journal SET note = ?, follow_up_date = ?, follow_up_reason = ?, status = ? WHERE id = ?"
+  )
+    .bind(
+      b.note ?? existing.note,
+      b.follow_up_date !== undefined ? b.follow_up_date : existing.follow_up_date,
+      b.follow_up_reason !== undefined ? b.follow_up_reason : existing.follow_up_reason,
+      b.status ?? existing.status,
+      id
+    )
+    .run();
+  return c.json({ id, message: "Updated" });
+});
+
+app.delete("/api/admin/lybtl/journal/:entryId", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  await c.env.DB.prepare("DELETE FROM next_step_journal WHERE id = ?").bind(c.req.param("entryId")).run();
+  return c.json({ message: "Deleted" });
+});
+
+// Upcoming follow-ups + birthdays (next 14 days)
+app.get("/api/admin/lybtl/upcoming", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const today = new Date();
+  const todayISO = today.toISOString().slice(0, 10);
+  const future = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  // Follow-ups
+  const fuRows = await c.env.DB.prepare(
+    `SELECT j.id, j.contact_id, j.note, j.follow_up_date, j.follow_up_reason, c.name
+     FROM next_step_journal j JOIN loving_you_back_contacts c ON c.id = j.contact_id
+     WHERE j.status = 'active' AND j.follow_up_date IS NOT NULL
+       AND j.follow_up_date >= ? AND j.follow_up_date <= ?
+     ORDER BY j.follow_up_date ASC LIMIT 200`
+  )
+    .bind(todayISO, future)
+    .all();
+
+  // Birthdays — match MM-DD slice across the 14-day window
+  const allContacts = await c.env.DB.prepare(
+    "SELECT id, name, birthday, phone FROM loving_you_back_contacts WHERE birthday IS NOT NULL AND birthday != ''"
+  ).all();
+  const bdayUpcoming: any[] = [];
+  for (const row of (allContacts.results || []) as any[]) {
+    const bd: string = row.birthday;
+    // Accept either YYYY-MM-DD or MM-DD
+    const mmdd = bd.length >= 10 ? bd.slice(5, 10) : bd;
+    if (!/^\d{2}-\d{2}$/.test(mmdd)) continue;
+    for (let i = 0; i <= 14; i++) {
+      const d = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
+      const key = `${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+      if (key === mmdd) {
+        bdayUpcoming.push({
+          contact_id: row.id,
+          name: row.name,
+          phone: row.phone,
+          date: d.toISOString().slice(0, 10),
+          mmdd,
+        });
+        break;
+      }
+    }
+  }
+  bdayUpcoming.sort((a, b) => a.date.localeCompare(b.date));
+
+  return c.json({
+    follow_ups: fuRows.results || [],
+    birthdays: bdayUpcoming,
+  });
+});
+
 // ---------- comments ----------
 app.post("/api/comments", async (c) => {
   const b = await c.req.json<any>();

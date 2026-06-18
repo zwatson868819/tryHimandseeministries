@@ -522,6 +522,60 @@ export const updateMonthlyGoal = async (goal, token) => {
   }
 };
 
+// Loving You Back To Life — CRM
+const authH = (token) => ({ headers: { Authorization: `Bearer ${token}` } });
+
+export const getLybtlContacts = async (token, q = '') => {
+  const url = q ? `${API}/admin/lybtl/contacts?q=${encodeURIComponent(q)}` : `${API}/admin/lybtl/contacts`;
+  const response = await axios.get(url, authH(token));
+  return response.data;
+};
+
+export const getLybtlContact = async (id, token) => {
+  const response = await axios.get(`${API}/admin/lybtl/contacts/${id}`, authH(token));
+  return response.data;
+};
+
+export const createLybtlContact = async (data, token) => {
+  const response = await axios.post(`${API}/admin/lybtl/contacts`, data, authH(token));
+  return response.data;
+};
+
+export const updateLybtlContact = async (id, data, token) => {
+  const response = await axios.put(`${API}/admin/lybtl/contacts/${id}`, data, authH(token));
+  return response.data;
+};
+
+export const deleteLybtlContact = async (id, token) => {
+  const response = await axios.delete(`${API}/admin/lybtl/contacts/${id}`, authH(token));
+  return response.data;
+};
+
+export const getLybtlJournal = async (contactId, token) => {
+  const response = await axios.get(`${API}/admin/lybtl/contacts/${contactId}/journal`, authH(token));
+  return response.data;
+};
+
+export const addJournalEntry = async (contactId, data, token) => {
+  const response = await axios.post(`${API}/admin/lybtl/contacts/${contactId}/journal`, data, authH(token));
+  return response.data;
+};
+
+export const updateJournalEntry = async (entryId, data, token) => {
+  const response = await axios.put(`${API}/admin/lybtl/journal/${entryId}`, data, authH(token));
+  return response.data;
+};
+
+export const deleteJournalEntry = async (entryId, token) => {
+  const response = await axios.delete(`${API}/admin/lybtl/journal/${entryId}`, authH(token));
+  return response.data;
+};
+
+export const getLybtlUpcoming = async (token) => {
+  const response = await axios.get(`${API}/admin/lybtl/upcoming`, authH(token));
+  return response.data;
+};
+
 // Admin Dashboard API
 export const getDashboardStats = async (token) => {
   try {

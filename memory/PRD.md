@@ -33,6 +33,7 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Custom Kingdom Care image uploaded by user (luxury hygiene flat-lay)
 - New Get Involved hero (community volunteers)
 - New Mission section image (prayer/stained glass)
+- **"Loving You Back To Life" CRM**: outreach contact book with photo, phone, address, birthday, family notes, custom tags (PEW Pantry/Garments of Grace/etc.), "How we met" field, and a per-contact **Next Step Journal** for follow-ups. Upcoming follow-ups + birthdays (14 days) summary on the index. New D1 tables `loving_you_back_contacts` + `next_step_journal`. Wired into `/admin/lybtl` and `/admin/lybtl/:id` with a gradient nav button on the Admin Dashboard.
 
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths

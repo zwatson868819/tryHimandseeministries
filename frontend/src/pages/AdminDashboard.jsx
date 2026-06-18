@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart } from 'lucide-react';
 import { toast } from 'sonner';
 import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal } from '../services/api';
 
@@ -200,6 +200,14 @@ const AdminDashboard = () => {
             >
               <Sparkles className="mr-2" size={18} />
               Testimonies
+            </button>
+            <button
+              onClick={() => navigate('/admin/lybtl')}
+              data-testid="admin-manage-lybtl-btn"
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all flex items-center"
+            >
+              <HandHeart className="mr-2" size={18} />
+              Loving You Back To Life
             </button>
             <button
               onClick={handleLogout}
