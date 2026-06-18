@@ -8,6 +8,56 @@
     }
 }
 
+/* ============================================
+   WARM LIGHT MODE — toggled via .warm-mode on <html>
+   Cream + amber palette for a stained-glass-at-sunrise feel.
+   The amber accents stay the same; only backgrounds + text shift.
+   ============================================ */
+html.warm-mode {
+    background-color: #fef3c7;
+}
+html.warm-mode body,
+html.warm-mode .bg-slate-950,
+html.warm-mode .App {
+    background-color: #fef3c7 !important;
+    color: #451a03;
+}
+html.warm-mode .bg-slate-900 { background-color: #fde68a !important; }
+html.warm-mode .bg-slate-900\/95 { background-color: rgba(253, 230, 138, 0.95) !important; }
+html.warm-mode .bg-slate-900\/90 { background-color: rgba(253, 230, 138, 0.95) !important; }
+html.warm-mode .bg-slate-900\/80 { background-color: rgba(253, 230, 138, 0.85) !important; }
+html.warm-mode .bg-slate-900\/60 { background-color: rgba(253, 230, 138, 0.6) !important; }
+html.warm-mode .bg-slate-900\/50 { background-color: rgba(253, 230, 138, 0.5) !important; }
+html.warm-mode .bg-slate-900\/40 { background-color: rgba(253, 230, 138, 0.4) !important; }
+html.warm-mode .bg-slate-800 { background-color: #fcd34d !important; }
+html.warm-mode .bg-slate-700 { background-color: #f59e0b !important; color: #451a03; }
+html.warm-mode .text-white { color: #451a03 !important; }
+html.warm-mode .text-slate-100 { color: #451a03 !important; }
+html.warm-mode .text-slate-200 { color: #5b2807 !important; }
+html.warm-mode .text-slate-300 { color: #78350f !important; }
+html.warm-mode .text-slate-400 { color: #92400e !important; }
+html.warm-mode .text-slate-500 { color: #a16207 !important; }
+html.warm-mode .text-slate-600 { color: #b45309 !important; }
+html.warm-mode .border-slate-800 { border-color: #fcd34d !important; }
+html.warm-mode .border-slate-700 { border-color: #f59e0b !important; }
+html.warm-mode .border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.45) !important; }
+html.warm-mode .border-amber-500\/30 { border-color: rgba(245, 158, 11, 0.55) !important; }
+/* Heroes with dark gradients — soften */
+html.warm-mode .from-slate-900,
+html.warm-mode .via-slate-900,
+html.warm-mode .to-slate-900 { --tw-gradient-from: #fde68a; --tw-gradient-via: #fde68a; --tw-gradient-to: #fde68a; }
+html.warm-mode .from-slate-950,
+html.warm-mode .via-slate-950,
+html.warm-mode .to-slate-950 { --tw-gradient-from: #fef3c7; --tw-gradient-via: #fef3c7; --tw-gradient-to: #fef3c7; }
+/* Make sure amber accents still pop on warm bg */
+html.warm-mode .text-amber-400,
+html.warm-mode .text-amber-300 { color: #b45309 !important; }
+html.warm-mode .text-amber-100 { color: #78350f !important; }
+html.warm-mode .text-amber-200\/80 { color: #92400e !important; }
+/* Hero overlay gradient on home — fade to cream not navy */
+html.warm-mode .from-slate-900\/70 { --tw-gradient-from: rgba(254, 243, 199, 0.4); }
+html.warm-mode .via-slate-900\/60 { --tw-gradient-via: rgba(254, 243, 199, 0.3); }
+
 /* Cursor sparkle dust */
 .sparkle-dot {
     position: absolute;

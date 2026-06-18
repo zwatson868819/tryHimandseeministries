@@ -58,6 +58,9 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
   - **Find the Dove hunt** — 5 hidden white-dove SVGs across Home, About, Ministries, Donate, Prayer Wall; clicks tracked in localStorage; toast on each find; confetti + Psalm 37:4 when all 5 found; progress badge in footer
   - New endpoints: `POST /api/candles`, `GET /api/candles`, `DELETE /api/admin/candles/:id`, `GET /api/stats/prayer-count`, `DELETE /api/admin/prayer-requests/:id`
   - New SQL migration `candles-migration.sql` (creates `candles` table + index)
+- **Theme + Audio polish (2026-06-18 late evening):**
+  - **Warm Light theme** — toggleable via sun/moon button in the header. Adds `.warm-mode` class to `<html>`, CSS swaps slate backgrounds to cream/amber palette. Persists in localStorage. Default is dark.
+  - **Worship music toggle** — floating speaker button (bottom-left), reads `/audio/worship.mp3`, plays on loop at 25% volume. Shows "Tap for soft worship music" tooltip on first visit. Gracefully tells user "coming soon" if audio file not uploaded yet. README at `/app/frontend/public/audio/README.md` explains where to drop the file.
 
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths

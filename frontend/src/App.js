@@ -28,6 +28,7 @@ import LightACandle from './pages/LightACandle';
 import SparkleCursor from './components/SparkleCursor';
 import KonamiCode from './components/KonamiCode';
 import VerseShuffleButton from './components/VerseShuffleButton';
+import WorshipMusic from './components/WorshipMusic';
 import './App.css';
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
         <SparkleCursor />
         <KonamiCode />
         <VerseShuffleButton />
+        <WorshipMusic />
         <Toaster position="top-right" />
       </div>
     </BrowserRouter>
