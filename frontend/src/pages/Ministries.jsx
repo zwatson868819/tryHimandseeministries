@@ -37,7 +37,7 @@ const Ministries = () => {
                 <h2 className="text-4xl font-bold text-white mb-4">The <span className="text-amber-400">PEW</span> Pantry</h2>
                 <div className="text-slate-300 text-lg leading-relaxed space-y-4">
                   <p>
-                    Growing up, the pew was more than a seat in the sanctuary—it was the place where people came to receive, to rest, and to be renewed. It's where the pastor would <strong className="text-white">provide</strong> spiritual food, <strong className="text-white">encourage</strong> the broken, and be a <strong className="text-white">witness</strong> to the life-changing power of the Gospel.
+                    Growing up, the pew was more than a seat in the sanctuary, it was the place where people came to receive, to rest, and to be renewed. It's where the pastor would <strong className="text-white">provide</strong> spiritual food, <strong className="text-white">encourage</strong> the broken, and be a <strong className="text-white">witness</strong> to the life-changing power of the Gospel.
                   </p>
                   <p>
                     The PEW Pantry carries that same assignment. We aim to <strong className="text-amber-400">PROVIDE</strong> food with dignity, <strong className="text-amber-400">ENCOURAGE</strong> every person we encounter, and be a <strong className="text-amber-400">WITNESS</strong> of God's love in action.
@@ -117,7 +117,7 @@ const Ministries = () => {
                     ))}
                   </ul>
                   <p>
-                    Every item is chosen with respect to quality and comfort. A simple kit can help someone feel prepared for work, school, appointments, or daily life—and remind them that they are seen and valued.
+                    Every item is chosen with respect to quality and comfort. A simple kit can help someone feel prepared for work, school, appointments, or daily life, and remind them that they are seen and valued.
                   </p>
                   <p className="text-amber-400 font-semibold italic">
                     This is care fit for the King's kids.
