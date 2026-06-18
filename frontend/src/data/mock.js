@@ -31,6 +31,12 @@ export const services = [
     icon: "Sparkles"
   },
   {
+    id: 5,
+    title: "Monthly Miracle Runs",
+    description: "Random blessings, eternal impact. We go out monthly to bless 5–10 people through generosity, encouragement, and love.",
+    icon: "Gift"
+  },
+  {
     id: 4,
     title: "Prayer & Spiritual Support",
     description: "Providing spiritual support and prayer to those seeking guidance and hope.",

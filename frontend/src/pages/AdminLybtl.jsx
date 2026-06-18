@@ -15,6 +15,7 @@ const PRESET_TAGS = [
   'PEW Pantry',
   'Garments of Grace',
   'Hygiene Kit',
+  'Monthly Miracle Run',
   'Volunteer',
   'Prayer Partner',
   'Event Attendee',

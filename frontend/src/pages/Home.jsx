@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote, Target, DollarSign } from 'lucide-react';
+import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote, Target, DollarSign, Gift } from 'lucide-react';
 import { toast } from 'sonner';
 import { ministryInfo, services, upcomingEvents } from '../data/mock';
 import { subscribeToBlog, getPublicTestimonies, getDonationProgress } from '../services/api';
@@ -147,7 +147,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {services.map((service) => (
               <div 
                 key={service.id}
@@ -157,6 +157,7 @@ const Home = () => {
                   {service.icon === 'UtensilsCrossed' && <Heart className="text-amber-400" size={28} />}
                   {service.icon === 'Shirt' && <Users className="text-amber-400" size={28} />}
                   {service.icon === 'Sparkles' && <Flame className="text-amber-400" size={28} />}
+                  {service.icon === 'Gift' && <Gift className="text-amber-400" size={28} />}
                   {service.icon === 'Heart' && <HandHeart className="text-amber-400" size={28} />}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{service.title}</h3>

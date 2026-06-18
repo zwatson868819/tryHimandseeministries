@@ -1,5 +1,5 @@
 import React from 'react';
-import { UtensilsCrossed, Shirt, Sparkles, Heart, HandHeart, Users } from 'lucide-react';
+import { UtensilsCrossed, Shirt, Sparkles, Heart, HandHeart, Users, Gift } from 'lucide-react';
 import { services } from '../data/mock';
 
 const Ministries = () => {
@@ -130,6 +130,51 @@ const Ministries = () => {
                   alt="Kingdom Care Hygiene Kits" 
                   className="rounded-2xl shadow-2xl w-full"
                 />
+              </div>
+            </div>
+
+            {/* Monthly Miracle Runs */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <img 
+                  src="/images/monthly-miracle-run.png" 
+                  alt="Monthly Miracle Run — Random blessings, eternal impact" 
+                  className="rounded-2xl shadow-2xl w-full"
+                />
+              </div>
+              <div>
+                <div className="w-16 h-16 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+                  <Gift className="text-amber-400" size={36} />
+                </div>
+                <h2 className="text-4xl font-bold text-white mb-4"><span className="text-amber-400">Monthly</span> Miracle Runs</h2>
+                <div className="text-slate-300 text-lg leading-relaxed space-y-4">
+                  <p>
+                    Each month, we will go out with hearts ready to serve and hands ready to give, <strong className="text-white">to be a blessing on purpose</strong>. Sometimes it's a meal. Sometimes it's prayer. Sometimes it's a gift card, a tank of gas, a word of encouragement, or simply a reminder that <em className="text-amber-400">God has not forgotten them</em>. However He leads, we follow.
+                  </p>
+                  <p>
+                    These Monthly Miracle Runs are part of our commitment to showing the love of God in a practical but unexpected way. If you would like to join us or support the mission, we invite you to connect with us.
+                  </p>
+                  <p className="text-amber-400 font-semibold italic">
+                    Together, we can keep miracles in motion.
+                  </p>
+                  <p className="text-slate-400 text-sm italic">
+                    "Whoever is generous to the poor lends to the Lord, and He will repay them for their deed." &mdash; Proverbs 19:17
+                  </p>
+                </div>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <a 
+                    href="/get-involved" 
+                    className="inline-flex items-center justify-center px-6 py-3 bg-amber-500 text-slate-900 rounded-lg font-semibold hover:bg-amber-400 transition-all"
+                  >
+                    Join the Run
+                  </a>
+                  <a 
+                    href="/donate" 
+                    className="inline-flex items-center justify-center px-6 py-3 bg-transparent border-2 border-amber-400 text-amber-400 rounded-lg font-semibold hover:bg-amber-400/10 transition-all"
+                  >
+                    Support the Mission
+                  </a>
+                </div>
               </div>
             </div>
 
