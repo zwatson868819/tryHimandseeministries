@@ -152,7 +152,7 @@ const Ministries = () => {
                     Each month, we will go out with hearts ready to serve and hands ready to give, <strong className="text-white">to be a blessing on purpose</strong>. Sometimes it's a meal. Sometimes it's prayer. Sometimes it's a gift card, a tank of gas, a word of encouragement, or simply a reminder that <em className="text-amber-400">God has not forgotten them</em>. However He leads, we follow.
                   </p>
                   <p>
-                    These Monthly Miracle Runs are part of our commitment to showing the love of God in a practical but unexpected way. If you would like to join us or support the mission, we invite you to connect with us.
+                    These Monthly Miracle Runs are part of our commitment to show the love of God in a practical but unexpected way. If you would like to join us or support the mission, we invite you to connect with us.
                   </p>
                   <p className="text-amber-400 font-semibold italic">
                     Together, we can keep miracles in motion.
