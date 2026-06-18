@@ -13,7 +13,7 @@ CORS_ORIGINS = "*"
 [[d1_databases]]
 binding = "DB"
 database_name = "tryhimandsee-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "70408856-b32d-498a-8c70-733cf458f7fd"
 
 # R2 bucket for admin media uploads (news/lesson images & videos)
 # Create with: wrangler r2 bucket create tryhimandsee-media
