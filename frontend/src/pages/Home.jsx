@@ -126,9 +126,9 @@ const Home = () => {
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c" 
-                alt="Community Impact" 
-                className="rounded-2xl shadow-2xl"
+                src="/images/mission-prayer.jpg" 
+                alt="Community in Prayer" 
+                className="rounded-2xl shadow-2xl w-full"
               />
             </div>
           </div>
