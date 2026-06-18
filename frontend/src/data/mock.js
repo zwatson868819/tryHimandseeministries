@@ -14,20 +14,20 @@ export const ministryInfo = {
 export const services = [
   {
     id: 1,
-    title: "Food Distribution",
-    description: "Providing nutritious meals and food supplies to families in need throughout Richmond and Henrico communities.",
+    title: "The PEW Pantry",
+    description: "Food given with dignity. Provide. Encourage. Witness — no questions asked.",
     icon: "UtensilsCrossed"
   },
   {
     id: 2,
-    title: "Clothing Assistance",
-    description: "Offering clothing for all ages and seasons to help community members maintain dignity and warmth.",
+    title: "Garments of Grace",
+    description: "Quality clothing shared with hospitality. Clothed in dignity, covered in grace.",
     icon: "Shirt"
   },
   {
     id: 3,
-    title: "Hygiene Kits",
-    description: "Distributing essential hygiene products to promote health and wellness in underserved populations.",
+    title: "Kingdom Care Hygiene Kits",
+    description: "Essential personal-care items that uplift, strengthen, and affirm God-given worth.",
     icon: "Sparkles"
   },
   {

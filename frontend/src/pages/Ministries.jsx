@@ -28,113 +28,107 @@ const Ministries = () => {
       <section className="py-20 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-16">
-            {/* Food Distribution */}
+            {/* The PEW Pantry */}
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
                 <div className="w-16 h-16 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
                   <UtensilsCrossed className="text-amber-400" size={36} />
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-4">Food Distribution</h2>
-                <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                  Our food distribution program provides nutritious meals and groceries to families 
-                  facing food insecurity. Every Saturday, we open our doors to serve those in need 
-                  with dignity and respect.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Weekly food packages for families</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Fresh produce and pantry staples</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">No-questions-asked approach</p>
-                  </div>
+                <h2 className="text-4xl font-bold text-white mb-4">The <span className="text-amber-400">PEW</span> Pantry</h2>
+                <div className="text-slate-300 text-lg leading-relaxed space-y-4">
+                  <p>
+                    Growing up, the pew was more than a seat in the sanctuary—it was the place where people came to receive, to rest, and to be renewed. It's where the pastor would <strong className="text-white">provide</strong> spiritual food, <strong className="text-white">encourage</strong> the broken, and be a <strong className="text-white">witness</strong> to the life-changing power of the Gospel.
+                  </p>
+                  <p>
+                    The PEW Pantry carries that same assignment. We aim to <strong className="text-amber-400">PROVIDE</strong> food with dignity, <strong className="text-amber-400">ENCOURAGE</strong> every person we encounter, and be a <strong className="text-amber-400">WITNESS</strong> of God's love in action.
+                  </p>
+                  <p className="text-amber-400 font-semibold italic">
+                    Provide. Encourage. Witness. No questions asked.
+                  </p>
                 </div>
               </div>
               <div className="order-1 md:order-2">
                 <img 
-                  src="https://images.unsplash.com/photo-1608686207856-001b95cf60ca" 
-                  alt="Food Distribution" 
-                  className="rounded-2xl shadow-2xl"
+                  src="/images/pew-pantry.jpg" 
+                  alt="The PEW Pantry — Food with Dignity" 
+                  className="rounded-2xl shadow-2xl w-full"
                 />
               </div>
             </div>
 
-            {/* Clothing Assistance */}
+            {/* Garments of Grace */}
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <img 
-                  src="https://images.unsplash.com/photo-1593113598332-cd288d649433" 
-                  alt="Clothing Distribution" 
-                  className="rounded-2xl shadow-2xl"
+                  src="/images/garments-of-grace.jpg" 
+                  alt="Garments of Grace — Clothed in Dignity" 
+                  className="rounded-2xl shadow-2xl w-full"
                 />
               </div>
               <div>
                 <div className="w-16 h-16 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
                   <Shirt className="text-amber-400" size={36} />
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-4">Clothing Assistance</h2>
-                <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                  We provide quality clothing for all ages and seasons, helping community members 
-                  maintain dignity while meeting their basic needs. Our clothing closet operates 
-                  year-round to serve families.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Clothing for all ages and sizes</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Seasonal items including coats and boots</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Professional attire for job interviews</p>
-                  </div>
+                <h2 className="text-4xl font-bold text-white mb-4"><span className="text-amber-400">Garments</span> of Grace</h2>
+                <div className="text-slate-300 text-lg leading-relaxed space-y-4">
+                  <p>
+                    Just as God covers us with His grace, we aim to extend that same covering to our community through quality clothing, warm hospitality, and Christ-centered encouragement.
+                  </p>
+                  <p>
+                    Every garment we share is a reminder that you are seen, valued, and worthy. <em className="text-white">And worthiness should be worn.</em>
+                  </p>
+                  <p>
+                    Garments of Grace gives confidence, comfort, and care.
+                  </p>
+                  <p className="text-amber-400 font-semibold italic">
+                    Clothed in dignity. Covered in grace.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Hygiene Kits */}
+            {/* Kingdom Care Hygiene Kits */}
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="order-2 md:order-1">
                 <div className="w-16 h-16 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
                   <Sparkles className="text-amber-400" size={36} />
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-4">Hygiene Kits</h2>
-                <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                  Our hygiene kit program provides essential personal care items to individuals 
-                  and families, promoting health, wellness, and dignity within our community.
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Complete hygiene essentials</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Personal care products for all ages</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full mt-2"></div>
-                    <p className="text-slate-400">Special kits for women and children</p>
-                  </div>
-                </div>
-                <div className="mt-8 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <p className="text-amber-400 font-semibold">Kit Contents Include:</p>
-                  <p className="text-slate-300">Soap, shampoo, toothpaste, deodorant, and more</p>
+                <h2 className="text-4xl font-bold text-white mb-4"><span className="text-amber-400">Kingdom Care</span> Hygiene Kits</h2>
+                <div className="text-slate-300 text-lg leading-relaxed space-y-4">
+                  <p>
+                    Through basic care and spiritual love, we aim to provide essential hygiene items that uplift, strengthen, and remind each recipient of their God-given worth.
+                  </p>
+                  <p className="text-white font-semibold">Each hygiene kit includes a selection of personal-care essentials such as:</p>
+                  <ul className="space-y-2 ml-1">
+                    {[
+                      'Toothpaste & toothbrush',
+                      'Soap or body wash',
+                      'Deodorant',
+                      'Lotion',
+                      'Feminine hygiene items',
+                      'Wipes',
+                      'Shampoo & conditioner',
+                      'Seasonal or special-care items as available',
+                    ].map((item) => (
+                      <li key={item} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-amber-400 rounded-full mt-2.5 flex-shrink-0"></div>
+                        <span className="text-slate-300">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p>
+                    Every item is chosen with respect to quality and comfort. A simple kit can help someone feel prepared for work, school, appointments, or daily life—and remind them that they are seen and valued.
+                  </p>
+                  <p className="text-amber-400 font-semibold italic">
+                    This is care fit for the King's kids.
+                  </p>
                 </div>
               </div>
               <div className="order-1 md:order-2">
                 <img 
-                  src="https://images.unsplash.com/photo-1652971876875-05db98fab376" 
-                  alt="Hygiene Kits" 
-                  className="rounded-2xl shadow-2xl"
+                  src="/images/kingdom-care.jpg" 
+                  alt="Kingdom Care Hygiene Kits" 
+                  className="rounded-2xl shadow-2xl w-full"
                 />
               </div>
             </div>
