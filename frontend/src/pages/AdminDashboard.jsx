@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests } from '../services/api';
+import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal } from '../services/api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -14,6 +14,9 @@ const AdminDashboard = () => {
   const [prayers, setPrayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('donations');
+  const [progress, setProgress] = useState(null);
+  const [editingGoal, setEditingGoal] = useState(false);
+  const [goalInput, setGoalInput] = useState('');
   const [filters, setFilters] = useState({
     donation_type: '',
     start_date: '',
@@ -35,12 +38,13 @@ const AdminDashboard = () => {
   const fetchAllData = async (adminToken) => {
     try {
       setLoading(true);
-      const [statsData, donationsData, volunteersData, contactsData, prayersData] = await Promise.all([
+      const [statsData, donationsData, volunteersData, contactsData, prayersData, progressData] = await Promise.all([
         getDashboardStats(adminToken),
         getAdminDonations(adminToken),
         getAdminVolunteers(adminToken),
         getAdminContacts(adminToken),
-        getAdminPrayerRequests(adminToken)
+        getAdminPrayerRequests(adminToken),
+        getDonationProgress()
       ]);
       
       setStats(statsData);
@@ -48,6 +52,8 @@ const AdminDashboard = () => {
       setVolunteers(volunteersData);
       setContacts(contactsData);
       setPrayers(prayersData);
+      setProgress(progressData);
+      setGoalInput(String(progressData?.goal ?? 1000));
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       if (error.response?.status === 401) {
@@ -64,6 +70,23 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
     navigate('/admin/login');
+  };
+
+  const handleSaveGoal = async () => {
+    const goal = parseFloat(goalInput);
+    if (!Number.isFinite(goal) || goal <= 0) {
+      toast.error('Goal must be a positive number');
+      return;
+    }
+    try {
+      await updateMonthlyGoal(goal, token);
+      const updated = await getDonationProgress();
+      setProgress(updated);
+      setEditingGoal(false);
+      toast.success('Monthly goal updated');
+    } catch (e) {
+      toast.error('Failed to update goal');
+    }
   };
 
   const handleFilterChange = (e) => {
@@ -187,6 +210,72 @@ const AdminDashboard = () => {
             </button>
           </div>
         </div>
+
+        {/* Monthly Goal Card */}
+        {progress && (
+          <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-6 mb-8" data-testid="admin-goal-card">
+            <div className="flex justify-between items-start mb-4 flex-wrap gap-3">
+              <div className="flex items-center">
+                <Target className="text-amber-400 mr-3" size={28} />
+                <div>
+                  <h3 className="text-white font-bold text-lg">{progress.month} Outreach Goal</h3>
+                  <p className="text-slate-400 text-sm">
+                    ${Math.round(progress.raised).toLocaleString()} raised of ${Math.round(progress.goal).toLocaleString()} ({progress.percent}%)
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {editingGoal ? (
+                  <>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                      <input
+                        type="number"
+                        min="1"
+                        step="50"
+                        value={goalInput}
+                        onChange={(e) => setGoalInput(e.target.value)}
+                        data-testid="admin-goal-input"
+                        className="pl-7 pr-3 py-2 w-32 bg-slate-950 border border-slate-700 rounded text-white"
+                      />
+                    </div>
+                    <button
+                      onClick={handleSaveGoal}
+                      data-testid="admin-goal-save"
+                      className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center"
+                    >
+                      <Check size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingGoal(false);
+                        setGoalInput(String(progress.goal));
+                      }}
+                      className="px-3 py-2 bg-slate-700 text-white rounded hover:bg-slate-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setEditingGoal(true)}
+                    data-testid="admin-goal-edit"
+                    className="px-4 py-2 bg-amber-500 text-slate-900 rounded font-semibold hover:bg-amber-400 transition-colors flex items-center"
+                  >
+                    <Edit className="mr-2" size={16} />
+                    Edit Goal
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-700 ease-out"
+                style={{ width: `${Math.max(progress.percent, progress.percent > 0 ? 2 : 0)}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">

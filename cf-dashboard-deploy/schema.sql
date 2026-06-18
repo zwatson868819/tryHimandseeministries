@@ -141,3 +141,8 @@ CREATE TABLE IF NOT EXISTS testimonies (
 );
 
 CREATE INDEX IF NOT EXISTS idx_testimonies_status ON testimonies(status, created_at);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);

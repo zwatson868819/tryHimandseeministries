@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote, Target, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 import { ministryInfo, services, upcomingEvents } from '../data/mock';
-import { subscribeToBlog, getPublicTestimonies } from '../services/api';
+import { subscribeToBlog, getPublicTestimonies, getDonationProgress } from '../services/api';
 
 const Home = () => {
   const [email, setEmail] = useState('');
@@ -11,17 +11,11 @@ const Home = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [testimonies, setTestimonies] = useState([]);
   const [testimonyIndex, setTestimonyIndex] = useState(0);
+  const [progress, setProgress] = useState(null);
 
   useEffect(() => {
-    const fetchT = async () => {
-      try {
-        const data = await getPublicTestimonies(20);
-        setTestimonies(data);
-      } catch (e) {
-        // silently ignore — section just stays empty
-      }
-    };
-    fetchT();
+    getPublicTestimonies(20).then(setTestimonies).catch(() => {});
+    getDonationProgress().then(setProgress).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -321,6 +315,61 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      {/* Monthly Donation Goal */}
+      {progress && (
+        <section className="py-16 bg-slate-900" data-testid="home-donation-goal">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-gradient-to-br from-slate-950 via-amber-900/10 to-slate-950 border border-amber-500/30 rounded-2xl p-8 md:p-10">
+              <div className="text-center mb-6">
+                <Target className="text-amber-400 mx-auto mb-3" size={40} />
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">
+                  <span className="text-amber-400">{progress.month}</span> Outreach Goal
+                </h2>
+                <p className="text-slate-400 text-sm">
+                  Together we serve the underserved of Richmond & Henrico
+                </p>
+              </div>
+
+              <div className="mb-3 flex justify-between items-end">
+                <div className="text-white">
+                  <span className="text-3xl md:text-4xl font-bold text-amber-400" data-testid="goal-raised-amount">
+                    ${Math.round(progress.raised).toLocaleString()}
+                  </span>
+                  <span className="text-slate-400 ml-2">
+                    raised of ${Math.round(progress.goal).toLocaleString()} goal
+                  </span>
+                </div>
+                <div className="text-amber-400 font-bold text-2xl" data-testid="goal-percent">
+                  {progress.percent}%
+                </div>
+              </div>
+
+              <div className="w-full h-6 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-1000 ease-out flex items-center justify-end pr-2"
+                  style={{ width: `${Math.max(progress.percent, progress.percent > 0 ? 3 : 0)}%` }}
+                  data-testid="goal-progress-bar"
+                >
+                  {progress.percent >= 15 && (
+                    <DollarSign className="text-slate-900" size={14} />
+                  )}
+                </div>
+              </div>
+
+              <div className="text-center mt-6">
+                <Link
+                  to="/donate"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all shadow-lg shadow-amber-500/20"
+                >
+                  <Heart className="mr-2" size={18} />
+                  Help Us Reach the Goal
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-slate-900 via-amber-900/20 to-slate-900">

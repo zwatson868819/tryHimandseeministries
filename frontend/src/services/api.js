@@ -498,6 +498,30 @@ export const deleteTestimony = async (id, token) => {
   }
 };
 
+// Donation goal progress
+export const getDonationProgress = async () => {
+  try {
+    const response = await axios.get(`${API}/donations/progress`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching progress:', error);
+    throw error;
+  }
+};
+
+export const updateMonthlyGoal = async (goal, token) => {
+  try {
+    const response = await axios.put(`${API}/admin/settings/monthly-goal`,
+      { goal },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating goal:', error);
+    throw error;
+  }
+};
+
 // Admin Dashboard API
 export const getDashboardStats = async (token) => {
   try {

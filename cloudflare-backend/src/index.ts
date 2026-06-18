@@ -685,6 +685,52 @@ app.delete("/api/admin/testimonies/:id", async (c) => {
   return c.json({ message: "Deleted" });
 });
 
+// ---------- donation goal / progress ----------
+async function getGoal(env: Bindings): Promise<number> {
+  const row = await env.DB.prepare("SELECT value FROM settings WHERE key = 'monthly_goal'").first<
+    { value: string }
+  >();
+  const v = row ? parseFloat(row.value) : 1000;
+  return Number.isFinite(v) && v > 0 ? v : 1000;
+}
+
+app.get("/api/donations/progress", async (c) => {
+  const goal = await getGoal(c.env);
+  // Start of current calendar month in UTC
+  const now = new Date();
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+
+  const row = await c.env.DB.prepare(
+    "SELECT COALESCE(SUM(amount), 0) AS total FROM donations WHERE status = 'completed' AND created_at >= ?"
+  )
+    .bind(monthStart)
+    .first<{ total: number }>();
+  const raised = row?.total ?? 0;
+  const percent = Math.min(100, Math.round((raised / goal) * 100));
+  return c.json({
+    goal,
+    raised,
+    percent,
+    month: now.toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" }),
+  });
+});
+
+app.put("/api/admin/settings/monthly-goal", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json<any>();
+  const goal = parseFloat(b.goal);
+  if (!Number.isFinite(goal) || goal <= 0) {
+    return c.json({ detail: "Goal must be a positive number" }, 400);
+  }
+  await c.env.DB.prepare(
+    "INSERT INTO settings (key, value) VALUES ('monthly_goal', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value"
+  )
+    .bind(String(goal))
+    .run();
+  return c.json({ goal, message: "Goal updated" });
+});
+
 // ---------- comments ----------
 app.post("/api/comments", async (c) => {
   const b = await c.req.json<any>();

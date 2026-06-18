@@ -104,6 +104,14 @@ async def view_testimonies_migration_sql():
         media_type="text/plain"
     )
 
+# Goal thermometer migration SQL (settings table for monthly donation goal)
+@api_router.get("/download/goal-migration-sql")
+async def view_goal_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/goal-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
