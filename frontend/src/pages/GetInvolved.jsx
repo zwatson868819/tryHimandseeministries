@@ -38,8 +38,8 @@ const GetInvolved = () => {
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-20">
           <img 
-            src="https://images.unsplash.com/photo-1652971876875-05db98fab376" 
-            alt="Volunteers" 
+            src="/images/get-involved-hero.jpg" 
+            alt="Volunteers serving the community" 
             className="w-full h-full object-cover"
           />
         </div>
