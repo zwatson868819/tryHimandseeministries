@@ -34,7 +34,7 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/509g4xo6_IMG_1555.png" 
+              src="/images/header-logo.png" 
               alt="tryHimandsee Ministries" 
               className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110"
             />

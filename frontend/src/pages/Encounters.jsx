@@ -84,7 +84,7 @@ const Encounters = () => {
       {/* Full Page Encounter Logo Background */}
       <div className="fixed inset-0 z-0">
         <img 
-          src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/zwhqi6zt_encounterseriesLOGO.jpeg" 
+          src="/images/encounter-series-logo.jpeg" 
           alt="Encounter Background" 
           className="w-full h-full object-cover"
         />
@@ -98,7 +98,7 @@ const Encounters = () => {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">
             <img 
-              src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+              src="/images/encounter-logo.jpeg" 
               alt="Encounter Logo" 
               className="h-32 w-32 mx-auto object-contain drop-shadow-2xl"
             />

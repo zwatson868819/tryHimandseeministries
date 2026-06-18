@@ -50,7 +50,7 @@ const Home = () => {
         {/* Official Logo as Main Background - Larger and Darker */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           <img 
-            src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/1dw759ji_OFFICIALtryHimandseeLogo.png" 
+            src="/images/main-logo.png" 
             alt="tryHimandsee ministries" 
             className="min-w-[120%] min-h-[120%] object-contain opacity-50"
           />
@@ -181,7 +181,7 @@ const Home = () => {
       <section className="py-20 bg-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <img 
-            src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+            src="/images/encounter-logo.jpeg" 
             alt="Encounter Background" 
             className="w-full h-full object-cover"
           />
@@ -191,7 +191,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2">
               <img 
-                src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/6c37qiei_IMG_1554.jpeg" 
+                src="/images/encounter-logo.jpeg" 
                 alt="Encounter is Waiting" 
                 className="rounded-2xl shadow-2xl"
               />

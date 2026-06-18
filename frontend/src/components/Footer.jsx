@@ -12,7 +12,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <img 
-                src="https://customer-assets.emergentagent.com/job_himandsee-faith/artifacts/509g4xo6_IMG_1555.png" 
+                src="/images/header-logo.png" 
                 alt="tHsm" 
                 className="h-10 w-10 object-contain"
               />
