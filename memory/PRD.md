@@ -33,7 +33,9 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Custom Kingdom Care image uploaded by user (luxury hygiene flat-lay)
 - New Get Involved hero (community volunteers)
 - New Mission section image (prayer/stained glass)
-- **"Loving You Back To Life" CRM**: outreach contact book with photo, phone, address, birthday, family notes, custom tags (PEW Pantry/Garments of Grace/etc.), "How we met" field, and a per-contact **Next Step Journal** for follow-ups. Upcoming follow-ups + birthdays (14 days) summary on the index. New D1 tables `loving_you_back_contacts` + `next_step_journal`. Wired into `/admin/lybtl` and `/admin/lybtl/:id` with a gradient nav button on the Admin Dashboard.
+- **"Loving You Back To Life" CRM**: outreach contact book with photo, phone, address, birthday, family notes, custom tags (PEW Pantry/Garments of Grace/etc.), "How we met" field, and a per-contact **Next Step Journal** for follow-ups. Upcoming follow-ups + birthdays (14 days) summary on the index. New D1 tables `loving_you_back_contacts` + `next_step_journal`. Wired into `/admin/lybtl` and `/admin/lybtl/:id` with a gradient nav button on the Admin Dashboard. **LIVE & VERIFIED — contacts can be added** ✅
+- **CI/CD via GitHub Actions** (`.github/workflows/cloudflare-pages.yml`): every push to `main` auto-deploys both the Worker (compiled from `cloudflare-backend/src/index.ts`) and the Pages frontend (built with the correct Worker URL baked in inline). Requires GitHub Secrets `CLOUDFLARE_API_TOKEN` (Pages:Edit + Workers Scripts:Edit) and `CLOUDFLARE_ACCOUNT_ID`. No more manual zip uploads or "read-only editor" issues.
+- Code-review safe fixes: console.error gated behind NODE_ENV in `api.js`; array-index keys replaced with stable IDs/URLs in `Home`/`NewsDetail`/`BlogDetail`.
 
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
