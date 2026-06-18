@@ -661,3 +661,52 @@ export const getAdminPrayerRequests = async (token) => {
     throw error;
   }
 };
+
+// --- Site enhancements: Impact stats, Prayer wall counter, Admin "Today" summary ---
+
+export const getImpactStats = async () => {
+  try {
+    const response = await axios.get(`${API}/stats/impact`);
+    return response.data;
+  } catch (error) {
+    logError('Error fetching impact stats:', error);
+    throw error;
+  }
+};
+
+export const updateImpactStats = async (payload) => {
+  try {
+    const token = localStorage.getItem('admin_token');
+    const response = await axios.put(`${API}/admin/stats/impact`, payload, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error updating impact stats:', error);
+    throw error;
+  }
+};
+
+export const recordPrayer = async (prayerId) => {
+  try {
+    const response = await axios.post(`${API}/prayer-requests/${prayerId}/pray`);
+    return response.data;
+  } catch (error) {
+    logError('Error recording prayer:', error);
+    throw error;
+  }
+};
+
+export const getAdminTodaySummary = async () => {
+  try {
+    const token = localStorage.getItem('admin_token');
+    const response = await axios.get(`${API}/admin/today-summary`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error fetching today summary:', error);
+    throw error;
+  }
+};
+

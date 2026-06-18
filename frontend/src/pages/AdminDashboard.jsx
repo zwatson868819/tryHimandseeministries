@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart, TrendingUp, Gift } from 'lucide-react';
 import { toast } from 'sonner';
-import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal } from '../services/api';
+import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal, getAdminTodaySummary, getImpactStats, updateImpactStats } from '../services/api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -17,6 +17,10 @@ const AdminDashboard = () => {
   const [progress, setProgress] = useState(null);
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState('');
+  const [todaySummary, setTodaySummary] = useState(null);
+  const [impact, setImpact] = useState(null);
+  const [editingImpact, setEditingImpact] = useState(false);
+  const [impactInputs, setImpactInputs] = useState({ lives_touched: '', kits_given: '', miracle_runs: '' });
   const [filters, setFilters] = useState({
     donation_type: '',
     start_date: '',
@@ -38,13 +42,15 @@ const AdminDashboard = () => {
   const fetchAllData = async (adminToken) => {
     try {
       setLoading(true);
-      const [statsData, donationsData, volunteersData, contactsData, prayersData, progressData] = await Promise.all([
+      const [statsData, donationsData, volunteersData, contactsData, prayersData, progressData, today, impactData] = await Promise.all([
         getDashboardStats(adminToken),
         getAdminDonations(adminToken),
         getAdminVolunteers(adminToken),
         getAdminContacts(adminToken),
         getAdminPrayerRequests(adminToken),
-        getDonationProgress()
+        getDonationProgress(),
+        getAdminTodaySummary().catch(() => null),
+        getImpactStats().catch(() => null),
       ]);
       
       setStats(statsData);
@@ -54,6 +60,15 @@ const AdminDashboard = () => {
       setPrayers(prayersData);
       setProgress(progressData);
       setGoalInput(String(progressData?.goal ?? 1000));
+      setTodaySummary(today);
+      setImpact(impactData);
+      if (impactData) {
+        setImpactInputs({
+          lives_touched: String(impactData.lives_touched ?? 0),
+          kits_given: String(impactData.kits_given ?? 0),
+          miracle_runs: String(impactData.miracle_runs ?? 0),
+        });
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       if (error.response?.status === 401) {
@@ -86,6 +101,23 @@ const AdminDashboard = () => {
       toast.success('Monthly goal updated');
     } catch (e) {
       toast.error('Failed to update goal');
+    }
+  };
+
+  const handleSaveImpact = async () => {
+    const payload = {
+      lives_touched: parseInt(impactInputs.lives_touched, 10) || 0,
+      kits_given: parseInt(impactInputs.kits_given, 10) || 0,
+      miracle_runs: parseInt(impactInputs.miracle_runs, 10) || 0,
+    };
+    try {
+      await updateImpactStats(payload);
+      const updated = await getImpactStats();
+      setImpact(updated);
+      setEditingImpact(false);
+      toast.success('Impact counters updated');
+    } catch {
+      toast.error('Failed to update impact counters');
     }
   };
 
@@ -218,6 +250,138 @@ const AdminDashboard = () => {
             </button>
           </div>
         </div>
+
+        {/* Today at a Glance */}
+        {todaySummary && (
+          <div
+            data-testid="admin-today-card"
+            className="bg-gradient-to-r from-slate-900 via-amber-900/10 to-slate-900 border border-amber-500/30 rounded-xl p-6 mb-6"
+          >
+            <div className="flex items-center mb-4">
+              <TrendingUp className="text-amber-400 mr-3" size={26} />
+              <div>
+                <h3 className="text-white font-bold text-lg">Today at a Glance</h3>
+                <p className="text-slate-400 text-sm">Activity in the last 24 hours</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-amber-400">{todaySummary.new_donations}</p>
+                <p className="text-xs text-slate-400 mt-1">New donations</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-400">${Math.round(todaySummary.new_donation_amount || 0).toLocaleString()}</p>
+                <p className="text-xs text-slate-400 mt-1">Raised today</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-pink-400">{todaySummary.new_prayer_requests}</p>
+                <p className="text-xs text-slate-400 mt-1">Prayer requests</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-400">{todaySummary.new_contacts}</p>
+                <p className="text-xs text-slate-400 mt-1">New CRM contacts</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-purple-400">{todaySummary.new_subscribers}</p>
+                <p className="text-xs text-slate-400 mt-1">New subscribers</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-orange-400">{todaySummary.followups_due_today}</p>
+                <p className="text-xs text-slate-400 mt-1">Follow-ups due</p>
+              </div>
+            </div>
+            {todaySummary.new_testimonies_pending > 0 && (
+              <div className="mt-4 pt-4 border-t border-amber-500/20 flex items-center justify-between flex-wrap gap-2">
+                <p className="text-amber-300 text-sm">
+                  <Sparkles className="inline mr-1" size={14} />
+                  {todaySummary.new_testimonies_pending} new testimon{todaySummary.new_testimonies_pending === 1 ? 'y' : 'ies'} awaiting moderation
+                </p>
+                <button
+                  onClick={() => navigate('/admin/testimonies')}
+                  className="text-amber-400 text-sm font-semibold hover:text-amber-300"
+                >
+                  Review &rarr;
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Impact Counters (Homepage Miracle Counter) */}
+        {impact && (
+          <div
+            data-testid="admin-impact-card"
+            className="bg-slate-900 border border-amber-500/30 rounded-xl p-6 mb-6"
+          >
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <div className="flex items-center">
+                <Gift className="text-amber-400 mr-3" size={26} />
+                <div>
+                  <h3 className="text-white font-bold text-lg">Homepage Impact Counter</h3>
+                  <p className="text-slate-400 text-sm">Numbers shown in the &ldquo;Miracles in Motion&rdquo; section on the homepage</p>
+                </div>
+              </div>
+              {editingImpact ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleSaveImpact}
+                    data-testid="admin-impact-save"
+                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                  >
+                    <Check size={16} className="mr-1" /> Save
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingImpact(false);
+                      setImpactInputs({
+                        lives_touched: String(impact.lives_touched ?? 0),
+                        kits_given: String(impact.kits_given ?? 0),
+                        miracle_runs: String(impact.miracle_runs ?? 0),
+                      });
+                    }}
+                    className="px-3 py-2 bg-slate-700 text-white rounded hover:bg-slate-600"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditingImpact(true)}
+                  data-testid="admin-impact-edit"
+                  className="px-3 py-2 bg-slate-800 text-amber-400 rounded hover:bg-slate-700 flex items-center"
+                >
+                  <Edit size={16} className="mr-1" /> Edit
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { key: 'lives_touched', label: 'Lives Touched' },
+                { key: 'kits_given', label: 'Hygiene Kits Given' },
+                { key: 'miracle_runs', label: 'Miracle Runs Completed' },
+              ].map(({ key, label }) => (
+                <div key={key} className="bg-slate-950 border border-slate-800 rounded-lg p-4">
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">{label}</p>
+                  {editingImpact ? (
+                    <input
+                      type="number"
+                      min="0"
+                      value={impactInputs[key]}
+                      onChange={(e) => setImpactInputs({ ...impactInputs, [key]: e.target.value })}
+                      data-testid={`admin-impact-${key}`}
+                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-3xl font-bold text-amber-400"
+                    />
+                  ) : (
+                    <p className="text-3xl font-bold text-amber-400">{impact[key]?.toLocaleString?.() ?? 0}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500 mt-3">
+              Tip: Set any to <strong>0</strong> to hide the section on the homepage. The &ldquo;Donations Received&rdquo; tile pulls live from completed Stripe payments.
+            </p>
+          </div>
+        )}
 
         {/* Monthly Goal Card */}
         {progress && (

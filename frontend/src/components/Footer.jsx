@@ -1,12 +1,29 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Heart } from 'lucide-react';
+import { Mail, MapPin, Heart, BookOpen } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
+import { getVerseOfTheDay } from '../data/verses';
 
 const Footer = () => {
+  const verse = getVerseOfTheDay();
   return (
     <footer className="bg-slate-950 border-t border-amber-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Verse of the Day */}
+        <div
+          data-testid="verse-of-the-day"
+          className="mb-10 bg-gradient-to-r from-amber-900/10 via-slate-900/50 to-amber-900/10 border border-amber-500/20 rounded-xl px-6 py-5 flex items-start gap-4"
+        >
+          <BookOpen className="text-amber-400 flex-shrink-0 mt-1" size={22} />
+          <div>
+            <p className="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-2">
+              Verse of the Day
+            </p>
+            <p className="text-slate-200 italic leading-relaxed">&ldquo;{verse.text}&rdquo;</p>
+            <p className="text-amber-400 text-sm font-semibold mt-2">&mdash; {verse.ref}</p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>

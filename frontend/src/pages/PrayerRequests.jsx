@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Send, Heart, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { submitPrayerRequest, getPrayerRequests } from '../services/api';
+import { submitPrayerRequest, getPrayerRequests, recordPrayer } from '../services/api';
+
+const PRAYED_STORAGE_KEY = 'prayedFor';
+const getPrayedSet = () => {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(PRAYED_STORAGE_KEY) || '[]'));
+  } catch {
+    return new Set();
+  }
+};
+const savePrayedSet = (set) => {
+  localStorage.setItem(PRAYED_STORAGE_KEY, JSON.stringify(Array.from(set)));
+};
 
 const PrayerRequests = () => {
   const [prayerForm, setPrayerForm] = useState({
@@ -12,6 +24,7 @@ const PrayerRequests = () => {
   });
   const [prayerRequests, setPrayerRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [prayedSet, setPrayedSet] = useState(() => getPrayedSet());
 
   useEffect(() => {
     fetchPrayerRequests();
@@ -48,6 +61,38 @@ const PrayerRequests = () => {
       ...prayerForm,
       [name]: type === 'checkbox' ? checked : value
     });
+  };
+
+  const handlePrayClick = async (requestId) => {
+    if (prayedSet.has(requestId)) return;
+    // Optimistic update — increment locally before round trip
+    setPrayerRequests((prev) =>
+      prev.map((r) =>
+        r.id === requestId ? { ...r, pray_count: (r.pray_count || 0) + 1 } : r
+      )
+    );
+    const next = new Set(prayedSet);
+    next.add(requestId);
+    setPrayedSet(next);
+    savePrayedSet(next);
+    try {
+      const { pray_count } = await recordPrayer(requestId);
+      setPrayerRequests((prev) =>
+        prev.map((r) => (r.id === requestId ? { ...r, pray_count } : r))
+      );
+    } catch {
+      // Roll back if request failed
+      setPrayerRequests((prev) =>
+        prev.map((r) =>
+          r.id === requestId ? { ...r, pray_count: Math.max(0, (r.pray_count || 1) - 1) } : r
+        )
+      );
+      const rollback = new Set(prayedSet);
+      rollback.delete(requestId);
+      setPrayedSet(rollback);
+      savePrayedSet(rollback);
+      toast.error('Could not record your prayer. Please try again.');
+    }
   };
 
   return (
@@ -220,12 +265,30 @@ const PrayerRequests = () => {
                       </div>
                     </div>
                   </div>
-                  <p className="text-slate-300 leading-relaxed italic">"{request.request}"</p>
-                  <div className="mt-4 pt-4 border-t border-slate-800">
-                    <button className="text-amber-400 text-sm font-semibold hover:text-amber-300 transition-colors flex items-center">
-                      <Heart size={16} className="mr-1" />
-                      Praying
+                  <p className="text-slate-300 leading-relaxed italic">&ldquo;{request.request}&rdquo;</p>
+                  <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => handlePrayClick(request.id)}
+                      disabled={prayedSet.has(request.id)}
+                      data-testid={`pray-btn-${request.id}`}
+                      className={`text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                        prayedSet.has(request.id)
+                          ? 'text-amber-300 cursor-default'
+                          : 'text-amber-400 hover:text-amber-300'
+                      }`}
+                    >
+                      <Heart
+                        size={16}
+                        className={prayedSet.has(request.id) ? 'fill-amber-400 text-amber-400' : ''}
+                      />
+                      {prayedSet.has(request.id) ? 'I prayed' : 'I will pray'}
                     </button>
+                    {(request.pray_count || 0) > 0 && (
+                      <span className="text-slate-500 text-xs">
+                        {request.pray_count} {request.pray_count === 1 ? 'person prayed' : 'people prayed'}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))

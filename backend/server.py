@@ -120,6 +120,14 @@ async def view_lybtl_migration_sql():
         media_type="text/plain"
     )
 
+# Site enhancements migration (Prayer Wall counter + Impact stats)
+@api_router.get("/download/site-enhancements-migration-sql")
+async def view_site_enhancements_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/site-enhancements-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 

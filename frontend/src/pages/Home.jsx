@@ -4,6 +4,7 @@ import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle,
 import { toast } from 'sonner';
 import { ministryInfo, services, upcomingEvents } from '../data/mock';
 import { subscribeToBlog, getPublicTestimonies, getDonationProgress } from '../services/api';
+import MiracleCounter from '../components/MiracleCounter';
 
 const Home = () => {
   const [email, setEmail] = useState('');
@@ -136,6 +137,8 @@ const Home = () => {
       </section>
 
       {/* Services Section */}
+      <MiracleCounter />
+
       <section className="py-20 bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

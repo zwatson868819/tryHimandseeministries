@@ -1,0 +1,25 @@
+{
+  "name": "tryHimandsee ministries",
+  "short_name": "tryHimandsee",
+  "description": "Outreach ministry to Richmond and Henrico — encouraging people to follow Christ and seek encounters with Him.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#f59e0b",
+  "categories": ["lifestyle", "social", "nonprofit"],
+  "icons": [
+    {
+      "src": "/images/header-logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/header-logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

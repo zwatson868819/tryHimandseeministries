@@ -1,7 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, DollarSign, CreditCard, Check, Loader2 } from 'lucide-react';
+import { Heart, DollarSign, CreditCard, Check, Loader2, Gift, Sparkles, UtensilsCrossed, HandHeart } from 'lucide-react';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 import { createPaymentCheckout, getPaymentStatus } from '../services/api';
+
+// Compute what a given dollar amount "buys" for the impact preview card.
+const computeImpact = (rawAmount) => {
+  const amt = Math.max(0, Number(rawAmount) || 0);
+  return {
+    kits: Math.floor(amt / 25),
+    weeklyGroceries: Math.floor(amt / 50),
+    miracles: Math.floor(amt / 100),
+    gasTanks: Math.floor(amt / 40),
+  };
+};
+
+const fireConfetti = () => {
+  const fire = (particleRatio, opts) => {
+    confetti({
+      origin: { y: 0.6 },
+      colors: ['#fbbf24', '#f59e0b', '#fde68a', '#ffffff'],
+      ...opts,
+      particleCount: Math.floor(220 * particleRatio),
+    });
+  };
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+  fire(0.1, { spread: 120, startVelocity: 45 });
+};
 
 const Donate = () => {
   const [donationType, setDonationType] = useState('one-time');
@@ -49,6 +77,9 @@ const Donate = () => {
       
       if (status.payment_status === 'paid') {
         toast.success('Thank you for your generous donation! Your payment was successful.');
+        fireConfetti();
+        setTimeout(fireConfetti, 350);
+        setTimeout(fireConfetti, 700);
         setCheckingPayment(false);
         // Clean up URL
         window.history.replaceState({}, '', '/donate');
@@ -273,6 +304,44 @@ const Donate = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Live Impact Preview — shows what their amount buys */}
+                {(() => {
+                  const currentAmount = amount === 'custom' ? customAmount : amount;
+                  const impact = computeImpact(currentAmount);
+                  const lines = [
+                    impact.kits > 0 && { Icon: Sparkles, label: `${impact.kits} hygiene ${impact.kits === 1 ? 'kit' : 'kits'} for families in need` },
+                    impact.weeklyGroceries > 0 && { Icon: UtensilsCrossed, label: `${impact.weeklyGroceries} week${impact.weeklyGroceries === 1 ? '' : 's'} of groceries for a family of four` },
+                    impact.miracles > 0 && { Icon: Gift, label: `${impact.miracles} Monthly Miracle Run blessing${impact.miracles === 1 ? '' : 's'}` },
+                    impact.gasTanks > 0 && { Icon: HandHeart, label: `${impact.gasTanks} tank${impact.gasTanks === 1 ? '' : 's'} of gas for a neighbor` },
+                  ].filter(Boolean);
+                  if (!currentAmount || Number(currentAmount) <= 0) return null;
+                  return (
+                    <div
+                      data-testid="donation-impact-preview"
+                      className="mt-5 bg-gradient-to-r from-amber-900/10 via-slate-900/40 to-amber-900/10 border border-amber-500/30 rounded-lg p-5 animate-in fade-in duration-300"
+                    >
+                      <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-3">
+                        Your ${currentAmount} could provide
+                      </p>
+                      <ul className="space-y-2">
+                        {lines.length > 0 ? (
+                          lines.map(({ Icon, label }) => (
+                            <li key={label} className="flex items-start gap-3 text-slate-200">
+                              <Icon className="text-amber-400 flex-shrink-0 mt-0.5" size={18} />
+                              <span>{label}</span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="flex items-start gap-3 text-slate-300">
+                            <Heart className="text-amber-400 flex-shrink-0 mt-0.5" size={18} />
+                            <span>A word of encouragement and prayer for someone in need</span>
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Donor Information */}

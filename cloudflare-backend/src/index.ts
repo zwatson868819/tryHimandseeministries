@@ -165,7 +165,7 @@ app.get("/api/prayer-requests", async (c) => {
   const limit = Math.min(parseInt(c.req.query("limit") || "10", 10), 100);
   const isPublic = c.req.query("is_public") !== "false";
   const rows = await c.env.DB.prepare(
-    `SELECT id, name, request, is_public, created_at FROM prayer_requests
+    `SELECT id, name, request, is_public, created_at, COALESCE(pray_count, 0) as pray_count FROM prayer_requests
      WHERE is_public = ? ORDER BY created_at DESC LIMIT ?`
   )
     .bind(isPublic ? 1 : 0, limit)
@@ -173,6 +173,49 @@ app.get("/api/prayer-requests", async (c) => {
   return c.json(
     (rows.results || []).map((r: any) => ({ ...r, is_public: !!r.is_public }))
   );
+});
+
+// Increment "praying" counter on a public prayer request. No auth — public action.
+app.post("/api/prayer-requests/:id/pray", async (c) => {
+  const id = c.req.param("id");
+  const existing = await c.env.DB.prepare(
+    "SELECT id, is_public FROM prayer_requests WHERE id = ?"
+  )
+    .bind(id)
+    .first<{ id: string; is_public: number }>();
+  if (!existing) return c.json({ detail: "Not found" }, 404);
+  if (!existing.is_public) return c.json({ detail: "Not public" }, 403);
+  await c.env.DB.prepare(
+    "UPDATE prayer_requests SET pray_count = COALESCE(pray_count, 0) + 1 WHERE id = ?"
+  )
+    .bind(id)
+    .run();
+  const row = await c.env.DB.prepare(
+    "SELECT COALESCE(pray_count, 0) as pray_count FROM prayer_requests WHERE id = ?"
+  )
+    .bind(id)
+    .first<{ pray_count: number }>();
+  return c.json({ id, pray_count: row?.pray_count ?? 0 });
+});
+
+// Public impact stats: combines admin-editable settings + live counts.
+app.get("/api/stats/impact", async (c) => {
+  const settingRows = await c.env.DB.prepare(
+    "SELECT key, value FROM settings WHERE key IN ('impact_lives_touched','impact_kits_given','impact_miracle_runs')"
+  ).all();
+  const settings: Record<string, string> = {};
+  for (const row of (settingRows.results || []) as any[]) {
+    settings[row.key] = row.value;
+  }
+  const donations = await c.env.DB.prepare(
+    "SELECT COUNT(*) as n FROM donations WHERE status = 'completed'"
+  ).first<{ n: number }>();
+  return c.json({
+    lives_touched: parseInt(settings["impact_lives_touched"] || "0", 10),
+    kits_given: parseInt(settings["impact_kits_given"] || "0", 10),
+    miracle_runs: parseInt(settings["impact_miracle_runs"] || "0", 10),
+    total_donations: donations?.n ?? 0,
+  });
 });
 
 // ---------- news ----------
@@ -1113,6 +1156,87 @@ app.get("/api/admin/dashboard/stats", async (c) => {
     total_donations: donations?.n ?? 0,
     total_donation_amount: totalDon?.total ?? 0,
   });
+});
+
+// "Today" summary card — events in the last 24 hours + pending follow-ups for today.
+app.get("/api/admin/today-summary", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+
+  const [donCount, donSum, newPrayers, newContacts, newSubs, newTest, followups] = await Promise.all([
+    c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM donations WHERE status = 'completed' AND created_at >= ?"
+    )
+      .bind(since)
+      .first<{ n: number }>(),
+    c.env.DB.prepare(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE status = 'completed' AND created_at >= ?"
+    )
+      .bind(since)
+      .first<{ total: number }>(),
+    c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM prayer_requests WHERE created_at >= ?"
+    )
+      .bind(since)
+      .first<{ n: number }>(),
+    c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM loving_you_back_contacts WHERE created_at >= ?"
+    )
+      .bind(since)
+      .first<{ n: number }>()
+      .catch(() => ({ n: 0 })),
+    c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM subscribers WHERE created_at >= ?"
+    )
+      .bind(since)
+      .first<{ n: number }>(),
+    c.env.DB.prepare(
+      "SELECT COUNT(*) as n FROM testimonies WHERE created_at >= ? AND status = 'pending'"
+    )
+      .bind(since)
+      .first<{ n: number }>(),
+    c.env.DB.prepare(
+      `SELECT COUNT(*) as n FROM next_step_journal
+       WHERE status = 'active' AND follow_up_date IS NOT NULL
+       AND follow_up_date >= ? AND follow_up_date < ?`
+    )
+      .bind(todayStart.toISOString(), todayEnd.toISOString())
+      .first<{ n: number }>()
+      .catch(() => ({ n: 0 })),
+  ]);
+
+  return c.json({
+    new_donations: donCount?.n ?? 0,
+    new_donation_amount: donSum?.total ?? 0,
+    new_prayer_requests: newPrayers?.n ?? 0,
+    new_contacts: newContacts?.n ?? 0,
+    new_subscribers: newSubs?.n ?? 0,
+    new_testimonies_pending: newTest?.n ?? 0,
+    followups_due_today: followups?.n ?? 0,
+  });
+});
+
+// Admin-editable impact counters (Miracle Counter on homepage).
+app.put("/api/admin/stats/impact", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json<{ lives_touched?: number; kits_given?: number; miracle_runs?: number }>();
+  const upsert = async (key: string, value: number) => {
+    await c.env.DB.prepare(
+      "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value"
+    )
+      .bind(key, String(value))
+      .run();
+  };
+  if (typeof b.lives_touched === "number") await upsert("impact_lives_touched", b.lives_touched);
+  if (typeof b.kits_given === "number") await upsert("impact_kits_given", b.kits_given);
+  if (typeof b.miracle_runs === "number") await upsert("impact_miracle_runs", b.miracle_runs);
+  return c.json({ ok: true });
 });
 
 app.get("/api/admin/contacts", async (c) => {
