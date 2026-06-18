@@ -1239,6 +1239,16 @@ app.put("/api/admin/stats/impact", async (c) => {
   return c.json({ ok: true });
 });
 
+// Admin: delete a prayer request
+app.delete("/api/admin/prayer-requests/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  await c.env.DB.prepare("DELETE FROM prayer_requests WHERE id = ?")
+    .bind(c.req.param("id"))
+    .run();
+  return c.json({ ok: true });
+});
+
 app.get("/api/admin/contacts", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json({ detail: "Unauthorized" }, 401);

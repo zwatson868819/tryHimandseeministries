@@ -710,3 +710,16 @@ export const getAdminTodaySummary = async () => {
   }
 };
 
+export const deletePrayerRequest = async (prayerId) => {
+  try {
+    const token = localStorage.getItem('admin_token');
+    const response = await axios.delete(`${API}/admin/prayer-requests/${prayerId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error deleting prayer request:', error);
+    throw error;
+  }
+};
+

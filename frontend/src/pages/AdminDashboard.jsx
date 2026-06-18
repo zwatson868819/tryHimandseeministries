@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart, TrendingUp, Gift } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart, TrendingUp, Gift, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal, getAdminTodaySummary, getImpactStats, updateImpactStats } from '../services/api';
+import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal, getAdminTodaySummary, getImpactStats, updateImpactStats, deletePrayerRequest } from '../services/api';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -118,6 +118,17 @@ const AdminDashboard = () => {
       toast.success('Impact counters updated');
     } catch {
       toast.error('Failed to update impact counters');
+    }
+  };
+
+  const handleDeletePrayer = async (prayerId) => {
+    if (!window.confirm('Delete this prayer request? This cannot be undone.')) return;
+    try {
+      await deletePrayerRequest(prayerId);
+      setPrayers((prev) => prev.filter((p) => p.id !== prayerId));
+      toast.success('Prayer request deleted');
+    } catch {
+      toast.error('Failed to delete prayer request');
     }
   };
 
@@ -735,12 +746,13 @@ const AdminDashboard = () => {
                       <th className="pb-3 text-slate-400 font-semibold">Email</th>
                       <th className="pb-3 text-slate-400 font-semibold">Request</th>
                       <th className="pb-3 text-slate-400 font-semibold">Status</th>
+                      <th className="pb-3 text-slate-400 font-semibold text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {prayers.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="py-8 text-center text-slate-500">
+                        <td colSpan="6" className="py-8 text-center text-slate-500">
                           No prayer requests
                         </td>
                       </tr>
@@ -755,6 +767,17 @@ const AdminDashboard = () => {
                             <span className="px-2 py-1 rounded text-xs font-semibold bg-green-500/20 text-green-400">
                               {prayer.status}
                             </span>
+                          </td>
+                          <td className="py-3 text-right">
+                            <button
+                              onClick={() => handleDeletePrayer(prayer.id)}
+                              data-testid={`delete-prayer-${prayer.id}`}
+                              title="Delete prayer request"
+                              className="inline-flex items-center px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded text-sm transition-colors"
+                            >
+                              <Trash2 size={14} className="mr-1" />
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))
