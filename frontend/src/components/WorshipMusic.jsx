@@ -12,10 +12,14 @@ const WorshipMusic = () => {
   const [showLabel, setShowLabel] = useState(false);
 
   useEffect(() => {
-    // Probe whether the audio file exists. If not, we keep the button visible
-    // but show a friendlier "coming soon" state.
+    // Cloudflare Pages serves index.html (HTTP 200) for any missing path.
+    // So a plain `r.ok` check isn't enough — we must verify the response is
+    // actually an audio file via Content-Type.
     fetch(AUDIO_SRC, { method: 'HEAD' })
-      .then((r) => setHasAudio(r.ok))
+      .then((r) => {
+        const type = r.headers.get('content-type') || '';
+        setHasAudio(r.ok && type.startsWith('audio/'));
+      })
       .catch(() => setHasAudio(false));
   }, []);
 
