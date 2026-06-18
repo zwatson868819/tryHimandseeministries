@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote, Target, DollarSign, Gift } from 'lucide-react';
+import { HiddenDove, DoveProgress } from '../components/DoveHunt';
 import { toast } from 'sonner';
 import { ministryInfo, services, upcomingEvents } from '../data/mock';
 import { subscribeToBlog, getPublicTestimonies, getDonationProgress } from '../services/api';
@@ -56,12 +57,37 @@ const Home = () => {
             className="min-w-[120%] min-h-[120%] object-contain opacity-50"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900"></div>
+
+          {/* Drifting golden particles for soul */}
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-full overflow-hidden pointer-events-none">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <span
+                key={i}
+                className="drifting-particle"
+                style={{
+                  left: `${(i * 7) + Math.random() * 6}%`,
+                  animationDuration: `${7 + (i % 5) * 1.5}s`,
+                  animationDelay: `${(i * 0.7) % 8}s`,
+                  '--drift': `${(Math.random() - 0.5) * 80}px`,
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Subtle flame glow behind the title */}
+          <div
+            aria-hidden="true"
+            className="hero-flame absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(245, 158, 11, 0.12) 35%, rgba(245, 158, 11, 0) 70%)',
+            }}
+          />
           
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in-up">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in-up relative">
             <span className="text-amber-400">Freely</span> Received,<br />
             <span className="text-amber-400">Freely</span> Give
           </h1>
@@ -97,6 +123,10 @@ const Home = () => {
           <div className="w-6 h-10 border-2 border-amber-400 rounded-full flex justify-center">
             <div className="w-1 h-3 bg-amber-400 rounded-full mt-2"></div>
           </div>
+        </div>
+        {/* Hidden dove #1 — bottom-right of hero */}
+        <div className="absolute bottom-4 right-4 z-20">
+          <HiddenDove id={1} />
         </div>
       </section>
 

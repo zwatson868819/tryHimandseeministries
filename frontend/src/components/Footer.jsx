@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { ministryInfo } from '../data/mock';
 import { getVerseOfTheDay } from '../data/verses';
 import { shareVerse } from '../lib/shareVerse';
+import { DoveProgress } from './DoveHunt';
 
 const Footer = () => {
   const verse = getVerseOfTheDay();
@@ -106,6 +107,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-800">
+          <DoveProgress />
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-slate-500 text-sm">
               © {new Date().getFullYear()} tryHimandsee Ministries. All rights reserved.

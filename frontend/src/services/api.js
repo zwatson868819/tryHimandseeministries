@@ -723,3 +723,36 @@ export const deletePrayerRequest = async (prayerId) => {
   }
 };
 
+
+// --- Candle Wall ---
+
+export const lightCandle = async (payload) => {
+  try {
+    const response = await axios.post(`${API}/candles`, payload);
+    return response.data;
+  } catch (error) {
+    logError('Error lighting candle:', error);
+    throw error;
+  }
+};
+
+export const getCandles = async (limit = 200) => {
+  try {
+    const response = await axios.get(`${API}/candles?limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    logError('Error fetching candles:', error);
+    throw error;
+  }
+};
+
+export const getPrayerCount = async () => {
+  try {
+    const response = await axios.get(`${API}/stats/prayer-count`);
+    return response.data;
+  } catch (error) {
+    logError('Error fetching prayer count:', error);
+    throw error;
+  }
+};
+

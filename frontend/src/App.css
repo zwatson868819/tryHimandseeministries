@@ -8,6 +8,61 @@
     }
 }
 
+/* Cursor sparkle dust */
+.sparkle-dot {
+    position: absolute;
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fde68a 0%, #fbbf24 45%, rgba(251, 191, 36, 0) 75%);
+    pointer-events: none;
+    animation: sparkle-rise 0.9s ease-out forwards;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6));
+}
+@keyframes sparkle-rise {
+    0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, -20px))) scale(0.3); }
+}
+
+/* Soft, looping flame breathing for the hero */
+@keyframes flame-breathe {
+    0%, 100% { transform: scale(1) translateY(0); opacity: 0.55; }
+    50%      { transform: scale(1.08) translateY(-3px); opacity: 0.85; }
+}
+.hero-flame {
+    animation: flame-breathe 3.4s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+/* Golden particles drifting up in the hero */
+@keyframes drift-up {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-220px) translateX(var(--drift, 20px)); opacity: 0; }
+}
+.drifting-particle {
+    position: absolute;
+    bottom: -10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fde68a 0%, #f59e0b 60%, transparent 100%);
+    animation: drift-up linear infinite;
+    pointer-events: none;
+    filter: blur(0.5px);
+}
+
+/* Candle flicker for the Light A Candle wall */
+@keyframes candle-flicker {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.5)); }
+    50%      { transform: scale(1.06); filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.9)); }
+}
+.candle-flame {
+    display: inline-block;
+    animation: candle-flicker 2.4s ease-in-out infinite;
+}
+
 @keyframes fade-in-up {
     from {
         opacity: 0;

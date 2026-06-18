@@ -128,6 +128,14 @@ async def view_site_enhancements_migration_sql():
         media_type="text/plain"
     )
 
+# Candle Wall migration
+@api_router.get("/download/candles-migration-sql")
+async def view_candles_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/candles-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 

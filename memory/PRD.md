@@ -47,6 +47,17 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
   - **Admin Impact Counter editor** — the admin can type in lives_touched / kits_given / miracle_runs and the homepage ticker updates immediately.
   - New endpoints: `POST /api/prayer-requests/:id/pray`, `GET /api/stats/impact`, `PUT /api/admin/stats/impact`, `GET /api/admin/today-summary`.
   - New SQL migration `site-enhancements-migration.sql` (adds `pray_count` column + seeds 0-value impact settings).
+- **Memorable & fun pack (2026-06-18 evening):**
+  - **Hero flame breathing animation** + 14 drifting golden particles for soul on the homepage hero
+  - **Sparkle cursor trail** (desktop only, respects `prefers-reduced-motion`) — gold dust follows the pointer
+  - **Light a Candle wall** at `/light-a-candle` — anonymous prayer candles with name + optional 200-char intention, flickering candle animation, persistent in new D1 `candles` table. Total counter at top, recent-200 wall below. Admin can delete.
+  - **Live prayer count** badge on the Prayer Wall ("X prayers offered on this wall") with pulsing live dot, refreshes every 30s
+  - **Wheel of Blessing** on the Donate page — 12-slice spinning wheel with emoji blessings (free encouragement prompts + impact equivalents), 4-second spin with confetti pop on result
+  - **Konami code easter egg** — type ↑↑↓↓←→←→BA anywhere on the site for a 4-second confetti rain + "You found a secret blessing! God loves you 🕊️" toast
+  - **Random Verse floating button** — gold orb in bottom-right of every page, opens modal with random Scripture, "Another verse" reshuffles, "Share" generates a quote card
+  - **Find the Dove hunt** — 5 hidden white-dove SVGs across Home, About, Ministries, Donate, Prayer Wall; clicks tracked in localStorage; toast on each find; confetti + Psalm 37:4 when all 5 found; progress badge in footer
+  - New endpoints: `POST /api/candles`, `GET /api/candles`, `DELETE /api/admin/candles/:id`, `GET /api/stats/prayer-count`, `DELETE /api/admin/prayer-requests/:id`
+  - New SQL migration `candles-migration.sql` (creates `candles` table + index)
 
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths

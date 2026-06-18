@@ -24,6 +24,10 @@ import AdminSubscribers from './pages/AdminSubscribers';
 import AdminTestimonies from './pages/AdminTestimonies';
 import AdminLybtl from './pages/AdminLybtl';
 import AdminLybtlContact from './pages/AdminLybtlContact';
+import LightACandle from './pages/LightACandle';
+import SparkleCursor from './components/SparkleCursor';
+import KonamiCode from './components/KonamiCode';
+import VerseShuffleButton from './components/VerseShuffleButton';
 import './App.css';
 
 function App() {
@@ -40,6 +44,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/donate" element={<Donate />} />
           <Route path="/prayer-requests" element={<PrayerRequests />} />
+          <Route path="/light-a-candle" element={<LightACandle />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/blog" element={<Blog />} />
@@ -55,6 +60,9 @@ function App() {
           <Route path="/admin/lybtl/:id" element={<AdminLybtlContact />} />
         </Routes>
         <Footer />
+        <SparkleCursor />
+        <KonamiCode />
+        <VerseShuffleButton />
         <Toaster position="top-right" />
       </div>
     </BrowserRouter>

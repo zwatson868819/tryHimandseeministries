@@ -1249,6 +1249,46 @@ app.delete("/api/admin/prayer-requests/:id", async (c) => {
   return c.json({ ok: true });
 });
 
+// Public: total "I prayed" interactions across all prayer requests.
+app.get("/api/stats/prayer-count", async (c) => {
+  const row = await c.env.DB.prepare(
+    "SELECT COALESCE(SUM(pray_count), 0) as total FROM prayer_requests WHERE is_public = 1"
+  ).first<{ total: number }>();
+  return c.json({ total: row?.total ?? 0 });
+});
+
+// Public Candle Wall — anonymous "Light a candle" page.
+app.post("/api/candles", async (c) => {
+  const b = await c.req.json<{ name?: string; intention?: string }>();
+  const name = (b.name || "Anonymous").slice(0, 40).trim() || "Anonymous";
+  const intention = (b.intention || "").slice(0, 200).trim();
+  const id = crypto.randomUUID();
+  await c.env.DB.prepare(
+    "INSERT INTO candles (id, name, intention, created_at) VALUES (?, ?, ?, ?)"
+  )
+    .bind(id, name, intention, new Date().toISOString())
+    .run();
+  return c.json({ id, name, intention, created_at: new Date().toISOString() });
+});
+
+app.get("/api/candles", async (c) => {
+  const limit = Math.min(parseInt(c.req.query("limit") || "200", 10), 500);
+  const rows = await c.env.DB.prepare(
+    "SELECT id, name, intention, created_at FROM candles ORDER BY created_at DESC LIMIT ?"
+  )
+    .bind(limit)
+    .all();
+  const count = await c.env.DB.prepare("SELECT COUNT(*) as n FROM candles").first<{ n: number }>();
+  return c.json({ total: count?.n ?? 0, candles: rows.results || [] });
+});
+
+app.delete("/api/admin/candles/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  await c.env.DB.prepare("DELETE FROM candles WHERE id = ?").bind(c.req.param("id")).run();
+  return c.json({ ok: true });
+});
+
 app.get("/api/admin/contacts", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json({ detail: "Unauthorized" }, 401);

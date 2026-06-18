@@ -3,6 +3,8 @@ import { Heart, DollarSign, CreditCard, Check, Loader2, Gift, Sparkles, Utensils
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 import { createPaymentCheckout, getPaymentStatus } from '../services/api';
+import WheelOfBlessing from '../components/WheelOfBlessing';
+import { HiddenDove } from '../components/DoveHunt';
 
 // Compute what a given dollar amount "buys" for the impact preview card.
 const computeImpact = (rawAmount) => {
@@ -433,6 +435,16 @@ const Donate = () => {
               </button>
             </form>
           </div>
+        </div>
+      </section>
+
+      {/* Wheel of Blessing */}
+      <section className="py-16 bg-gradient-to-br from-slate-950 via-amber-900/10 to-slate-950 relative">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <WheelOfBlessing />
+        </div>
+        <div className="absolute bottom-4 right-4">
+          <HiddenDove id={4} />
         </div>
       </section>
 

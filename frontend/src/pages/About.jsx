@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, Heart, Target, Award } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
+import { HiddenDove } from '../components/DoveHunt';
 
 const About = () => {
   const values = [
@@ -173,7 +174,7 @@ const About = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-br from-slate-950 via-amber-900/20 to-slate-950">
+      <section className="py-20 bg-gradient-to-br from-slate-950 via-amber-900/20 to-slate-950 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
             Join Us in This <span className="text-amber-400">Journey</span>
@@ -196,6 +197,10 @@ const About = () => {
               Get Involved
             </a>
           </div>
+        </div>
+        {/* Hidden dove #2 */}
+        <div className="absolute bottom-4 left-4">
+          <HiddenDove id={2} />
         </div>
       </section>
     </div>

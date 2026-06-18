@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Send, Heart, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { submitPrayerRequest, getPrayerRequests, recordPrayer } from '../services/api';
+import { submitPrayerRequest, getPrayerRequests, recordPrayer, getPrayerCount } from '../services/api';
+import { HiddenDove } from '../components/DoveHunt';
 
 const PRAYED_STORAGE_KEY = 'prayedFor';
 const getPrayedSet = () => {
@@ -25,9 +26,15 @@ const PrayerRequests = () => {
   const [prayerRequests, setPrayerRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [prayedSet, setPrayedSet] = useState(() => getPrayedSet());
+  const [globalPrayerCount, setGlobalPrayerCount] = useState(null);
 
   useEffect(() => {
     fetchPrayerRequests();
+    getPrayerCount().then((d) => setGlobalPrayerCount(d.total)).catch(() => {});
+    const interval = setInterval(() => {
+      getPrayerCount().then((d) => setGlobalPrayerCount(d.total)).catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchPrayerRequests = async () => {
@@ -225,7 +232,7 @@ const PrayerRequests = () => {
       </section>
 
       {/* Recent Prayer Requests (Community Wall) */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-slate-900 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -234,6 +241,20 @@ const PrayerRequests = () => {
             <p className="text-slate-400 text-lg">
               Join us in praying for these requests from our community
             </p>
+            {globalPrayerCount !== null && globalPrayerCount > 0 && (
+              <div
+                data-testid="global-prayer-count"
+                className="mt-5 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-2"
+              >
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-400" />
+                </span>
+                <span className="text-amber-300 text-sm font-semibold">
+                  {globalPrayerCount.toLocaleString()} prayers offered on this wall
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
@@ -329,7 +350,7 @@ const PrayerRequests = () => {
       </section>
 
       {/* Scripture & Encouragement */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-slate-900 relative">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-6">
             <p className="text-slate-300 text-xl italic leading-relaxed">
@@ -341,6 +362,9 @@ const PrayerRequests = () => {
               - Philippians 4:6-7
             </p>
           </div>
+        </div>
+        <div className="absolute bottom-4 right-4">
+          <HiddenDove id={5} />
         </div>
       </section>
     </div>

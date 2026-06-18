@@ -1,6 +1,7 @@
 import React from 'react';
 import { UtensilsCrossed, Shirt, Sparkles, Heart, HandHeart, Users, Gift } from 'lucide-react';
 import { services } from '../data/mock';
+import { HiddenDove } from '../components/DoveHunt';
 
 const Ministries = () => {
   return (
@@ -222,8 +223,8 @@ const Ministries = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-gradient-to-br from-slate-950 via-amber-900/20 to-slate-950">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-20 bg-gradient-to-br from-slate-950 via-amber-900/20 to-slate-950 relative">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <HandHeart className="text-amber-400 mx-auto mb-6" size={56} />
           <h2 className="text-4xl font-bold text-white mb-6">
             Help Us <span className="text-amber-400">Serve More</span>
@@ -245,6 +246,9 @@ const Ministries = () => {
             >
               Volunteer Today
             </a>
+          </div>
+          <div className="absolute bottom-4 right-4">
+            <HiddenDove id={3} />
           </div>
         </div>
       </section>
