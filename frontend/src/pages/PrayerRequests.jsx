@@ -51,15 +51,36 @@ const PrayerRequests = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Client-side validation so we never hit a 400 from the server.
+    const request = (prayerForm.request || '').trim();
+    if (!request) {
+      toast.error('Please write your prayer request before submitting.');
+      return;
+    }
+    const displayName = prayerForm.isAnonymous
+      ? 'Anonymous'
+      : (prayerForm.name || '').trim() || 'Anonymous';
+    // Transform form state → backend schema (name, email, request, is_public).
+    // "Submit anonymously" means: post to the public wall with name hidden,
+    // not "keep private" — visitors can still pray over it.
+    const payload = {
+      name: displayName,
+      email: (prayerForm.email || '').trim() || null,
+      request,
+      is_public: true,
+    };
     try {
-      await submitPrayerRequest(prayerForm);
+      await submitPrayerRequest(payload);
       toast.success('Your prayer request has been submitted. We are praying for you!');
       setPrayerForm({ name: '', email: '', request: '', isAnonymous: false });
-      // Refresh prayer wall
       fetchPrayerRequests();
     } catch (error) {
-      toast.error('Failed to submit prayer request. Please try again.');
-      console.error('Prayer request error:', error);
+      const msg = error?.response?.data?.detail || error?.message;
+      toast.error(
+        msg
+          ? `Could not submit prayer request: ${msg}`
+          : 'Could not submit prayer request. Please check your connection and try again.'
+      );
     }
   };
 
