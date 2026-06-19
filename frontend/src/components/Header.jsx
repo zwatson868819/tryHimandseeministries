@@ -47,7 +47,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-1">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div 
@@ -114,7 +114,7 @@ const Header = () => {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="xl:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             <ThemeToggle />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -127,7 +127,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden pb-4 animate-in slide-in-from-top duration-300">
+          <div className="lg:hidden pb-4 animate-in slide-in-from-top duration-300">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 link.dropdown ? (
