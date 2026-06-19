@@ -47,7 +47,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6">
+          <nav className="hidden xl:flex items-center space-x-1">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div 
@@ -62,14 +62,14 @@ const Header = () => {
                   }}
                 >
                   <button
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
+                    className={`px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
                       isActive(link.path) || location.pathname === '/news'
                         ? 'bg-amber-500 text-slate-900'
                         : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
                     }`}
                   >
                     {link.name}
-                    <ChevronDown size={16} className="ml-1" />
+                    <ChevronDown size={14} className="ml-0.5" />
                   </button>
                   {showAboutDropdown && (
                     <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-amber-500/20 rounded-lg shadow-xl overflow-hidden z-50">
@@ -94,7 +94,7 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  className={`px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                     isActive(link.path)
                       ? 'bg-amber-500 text-slate-900'
                       : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
@@ -106,7 +106,7 @@ const Header = () => {
             ))}
             <Link
               to="/donate"
-              className="ml-4 px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
+              className="ml-2 px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 whitespace-nowrap"
             >
               Donate
             </Link>
@@ -114,7 +114,7 @@ const Header = () => {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center">
+          <div className="xl:hidden flex items-center">
             <ThemeToggle />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -127,7 +127,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden pb-4 animate-in slide-in-from-top duration-300">
+          <div className="xl:hidden pb-4 animate-in slide-in-from-top duration-300">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 link.dropdown ? (
