@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, MessageCircle, Calendar, Send, User, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { getRevelations, getRevelationComments, submitRevelationComment } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const ReadingRevelation = () => {
   const [revelations, setRevelations] = useState([]);
@@ -81,6 +82,11 @@ const ReadingRevelation = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="Reading Revelation"
+        description="A community study through the Book of Revelation with reflections, insights, and conversation."
+        path="/reading-revelation"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-10">

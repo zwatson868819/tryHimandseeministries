@@ -2,6 +2,7 @@ import React from 'react';
 import { Users, Heart, Target, Award } from 'lucide-react';
 import { ministryInfo } from '../data/mock';
 import { HiddenDove } from '../components/DoveHunt';
+import PageMeta from '../components/PageMeta';
 
 const About = () => {
   const values = [
@@ -29,6 +30,11 @@ const About = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="About Our Mission"
+        description="Learn about tryHimandsee ministries — our calling to encourage encounters with Christ while serving the poor and underserved of Richmond and Henrico through food, clothing, and Monthly Miracle Runs."
+        path="/about"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-20">

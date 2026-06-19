@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import { createPaymentCheckout, getPaymentStatus } from '../services/api';
 import WheelOfBlessing from '../components/WheelOfBlessing';
 import { HiddenDove } from '../components/DoveHunt';
+import PageMeta from '../components/PageMeta';
 
 // Compute what a given dollar amount "buys" for the impact preview card.
 const computeImpact = (rawAmount) => {
@@ -159,6 +160,11 @@ const Donate = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="Give a Gift"
+        description="Support tryHimandsee ministries with a one-time or monthly donation. Every gift fuels food, clothing, hygiene kits, and Monthly Miracle Runs serving Richmond &amp; Henrico."
+        path="/donate"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-10">

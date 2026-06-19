@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Feather, Calendar, User, ArrowRight, Loader2, Mail, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { getBlogPosts, subscribeToBlog } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const Blog = () => {
   const [posts, setPosts] = useState([]);
@@ -53,6 +54,11 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen pt-20" data-testid="blog-page">
+      <PageMeta
+        title="Notes from the Secret Place"
+        description="Devotional writings from tryHimandsee ministries on faith, encounter with Christ, and outreach. Subscribe for new posts by email."
+        path="/blog"
+      />
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-10">
           <img

@@ -2,10 +2,16 @@ import React from 'react';
 import { UtensilsCrossed, Shirt, Sparkles, Heart, HandHeart, Users, Gift } from 'lucide-react';
 import { services } from '../data/mock';
 import { HiddenDove } from '../components/DoveHunt';
+import PageMeta from '../components/PageMeta';
 
 const Ministries = () => {
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="Our Ministries"
+        description="Five outreach ministries: The PEW Pantry (food), Garments of Grace (clothing), Kingdom Care Hygiene Kits, Monthly Miracle Runs, and Prayer &amp; Spiritual Support. Serving Richmond &amp; Henrico in the love of Christ."
+        path="/ministries"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-20">

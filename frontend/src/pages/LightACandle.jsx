@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Flame, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { lightCandle, getCandles } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const LIT_STORAGE_KEY = 'lit_candle_at';
 
@@ -59,6 +60,11 @@ const LightACandle = () => {
 
   return (
     <div className="min-h-screen bg-slate-950">
+      <PageMeta
+        title="Light a Candle"
+        description="Light a candle of prayer for yourself, a loved one, or someone you&rsquo;ve never met. A wall of intentions rising before the Father."
+        path="/light-a-candle"
+      />
       {/* Hero */}
       <section className="relative pt-32 pb-16 overflow-hidden bg-gradient-to-b from-amber-950/30 to-slate-950">
         <div className="absolute inset-0 opacity-20" style={{

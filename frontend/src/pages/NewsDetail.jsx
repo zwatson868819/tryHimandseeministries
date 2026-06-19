@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Calendar, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getNewsPost } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const NewsDetail = () => {
   const { id } = useParams();
@@ -61,6 +62,13 @@ const NewsDetail = () => {
 
   return (
     <div className="min-h-screen pt-20 bg-slate-950">
+      <PageMeta
+        title={newsPost.title}
+        description={(newsPost.content || '').replace(/<[^>]+>/g, '').slice(0, 160) || `Read about &ldquo;${newsPost.title}&rdquo; from tryHimandsee ministries.`}
+        image={newsPost.image_urls?.[0]}
+        path={`/news/${newsPost.id}`}
+        type="article"
+      />
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back Link */}
         <Link 

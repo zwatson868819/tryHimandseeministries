@@ -3,6 +3,7 @@ import { Send, Heart, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { submitPrayerRequest, getPrayerRequests, recordPrayer, getPrayerCount } from '../services/api';
 import { HiddenDove } from '../components/DoveHunt';
+import PageMeta from '../components/PageMeta';
 
 const PRAYED_STORAGE_KEY = 'prayedFor';
 const getPrayedSet = () => {
@@ -104,6 +105,11 @@ const PrayerRequests = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="Prayer Wall"
+        description="Submit your prayer request or pray over others on our community wall. The Lord is near to all who call on Him in truth."
+        path="/prayer-requests"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-20">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Flame, MessageCircle, Calendar, Send, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLessons, getComments, submitComment } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const Encounters = () => {
   const [lessons, setLessons] = useState([]);
@@ -81,6 +82,11 @@ const Encounters = () => {
 
   return (
     <div className="min-h-screen pt-20 relative">
+      <PageMeta
+        title="Encounters with Christ"
+        description="Stories, lessons, and devotional teachings about meeting Jesus in everyday life. Encounter the love and presence of God through real-life testimonies."
+        path="/encounters"
+      />
       {/* Full Page Encounter Logo Background */}
       <div className="fixed inset-0 z-0">
         <img 

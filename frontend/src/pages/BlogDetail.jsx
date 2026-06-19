@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Calendar, User, ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getBlogPost } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -51,6 +52,13 @@ const BlogDetail = () => {
 
   return (
     <div className="min-h-screen pt-20 bg-slate-950" data-testid="blog-detail-page">
+      <PageMeta
+        title={post.title}
+        description={(post.content || '').replace(/<[^>]+>/g, '').slice(0, 160) || `Read &ldquo;${post.title}&rdquo; — a devotional from tryHimandsee ministries.`}
+        image={post.image_urls?.[0]}
+        path={`/blog/${post.id}`}
+        type="article"
+      />
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           to="/blog"

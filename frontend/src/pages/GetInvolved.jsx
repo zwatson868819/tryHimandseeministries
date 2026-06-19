@@ -3,6 +3,7 @@ import { Users, HandHeart, Heart, Check } from 'lucide-react';
 import { volunteerOpportunities } from '../data/mock';
 import { toast } from 'sonner';
 import { submitVolunteer } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const GetInvolved = () => {
   const [volunteerForm, setVolunteerForm] = useState({
@@ -34,6 +35,11 @@ const GetInvolved = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="Get Involved"
+        description="Join the mission: volunteer with The PEW Pantry, Garments of Grace, Kingdom Care, Monthly Miracle Runs, or our Prayer Team. Serve with us in Richmond &amp; Henrico."
+        path="/get-involved"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-20">

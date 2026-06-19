@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Copy, Check, Download, Share2, MessageCircle, Mail, Facebook, Instagram, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { buildShareCard, downloadShareCard, shareCardNative } from '../lib/shareKit';
+import PageMeta from '../components/PageMeta';
 
 const SITE = 'https://tryhimandseeministries.org';
 
@@ -137,6 +138,11 @@ const ShareKit = () => {
 
   return (
     <div className="min-h-screen bg-slate-950">
+      <PageMeta
+        title="Share the Mission"
+        description="Pre-written messages and a branded share image to spread the word about tryHimandsee ministries. SMS, email, Facebook, Instagram, ready to copy and send."
+        path="/share"
+      />
       {/* Hero */}
       <section className="relative pt-32 pb-12 bg-gradient-to-b from-amber-950/30 to-slate-950">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

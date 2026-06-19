@@ -3,6 +3,7 @@ import { Mail, MapPin, Send, MessageCircle, Sparkles, CheckCircle } from 'lucide
 import { ministryInfo } from '../data/mock';
 import { toast } from 'sonner';
 import { submitContact, submitTestimony } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const Contact = () => {
   const [contactForm, setContactForm] = useState({
@@ -62,6 +63,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="Contact Us"
+        description="Reach out to tryHimandsee ministries about volunteering, partnership, prayer, or sharing your testimony. We&rsquo;d love to connect."
+        path="/contact"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

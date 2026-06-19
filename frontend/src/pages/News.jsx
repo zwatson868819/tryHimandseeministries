@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Newspaper, Calendar, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getNews } from '../services/api';
+import PageMeta from '../components/PageMeta';
 
 const News = () => {
   const [newsPosts, setNewsPosts] = useState([]);
@@ -35,6 +36,11 @@ const News = () => {
 
   return (
     <div className="min-h-screen pt-20">
+      <PageMeta
+        title="News &amp; Updates"
+        description="Latest news, outreach stories, and ministry updates from tryHimandsee ministries."
+        path="/news"
+      />
       {/* Hero Section */}
       <section className="relative py-24 bg-slate-900">
         <div className="absolute inset-0 opacity-10">

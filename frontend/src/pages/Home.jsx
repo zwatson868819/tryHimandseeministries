@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote, Target, DollarSign, Gift } from 'lucide-react';
 import { HiddenDove, DoveProgress } from '../components/DoveHunt';
+import PageMeta from '../components/PageMeta';
 import { toast } from 'sonner';
 import { ministryInfo, services, upcomingEvents } from '../data/mock';
 import { subscribeToBlog, getPublicTestimonies, getDonationProgress } from '../services/api';
@@ -47,6 +48,12 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
+      <PageMeta
+        title="Random Blessings, Eternal Impact"
+        description="tryHimandsee ministries serves Richmond &amp; Henrico through food, clothing, hygiene kits, and Monthly Miracle Runs. Encouraging encounters with Christ and meeting practical needs."
+        image="/images/header-logo.png"
+        path="/"
+      />
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Official Logo as Main Background - Larger and Darker */}
