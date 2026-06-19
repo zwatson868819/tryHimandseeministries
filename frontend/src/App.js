@@ -25,6 +25,7 @@ import AdminTestimonies from './pages/AdminTestimonies';
 import AdminLybtl from './pages/AdminLybtl';
 import AdminLybtlContact from './pages/AdminLybtlContact';
 import LightACandle from './pages/LightACandle';
+import ShareKit from './pages/ShareKit';
 import SparkleCursor from './components/SparkleCursor';
 import KonamiCode from './components/KonamiCode';
 import VerseShuffleButton from './components/VerseShuffleButton';
@@ -46,6 +47,7 @@ function App() {
           <Route path="/donate" element={<Donate />} />
           <Route path="/prayer-requests" element={<PrayerRequests />} />
           <Route path="/light-a-candle" element={<LightACandle />} />
+          <Route path="/share" element={<ShareKit />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/blog" element={<Blog />} />

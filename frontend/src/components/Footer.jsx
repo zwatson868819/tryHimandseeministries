@@ -86,6 +86,8 @@ const Footer = () => {
               <li><Link to="/donate" className="text-slate-400 hover:text-amber-300 text-sm transition-colors">Make a Donation</Link></li>
               <li><Link to="/get-involved" className="text-slate-400 hover:text-amber-300 text-sm transition-colors">Volunteer</Link></li>
               <li><Link to="/prayer-requests" className="text-slate-400 hover:text-amber-300 text-sm transition-colors">Prayer Requests</Link></li>
+              <li><Link to="/light-a-candle" className="text-slate-400 hover:text-amber-300 text-sm transition-colors">Light a Candle</Link></li>
+              <li><Link to="/share" className="text-amber-400 hover:text-amber-300 text-sm font-semibold transition-colors">&rarr; Share the mission</Link></li>
             </ul>
           </div>
 
