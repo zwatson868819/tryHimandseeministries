@@ -2,19 +2,19 @@ import React, { useState, useRef } from 'react';
 import { Gift, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-// 12 blessings — each a short, joyful encouragement or impact fact.
+// 12 blessings — each a short, joyful encouragement prompt to bless someone today.
 const BLESSINGS = [
   { label: 'Pray for a stranger today', emoji: '🙏' },
   { label: 'Smile at someone you don\u2019t know', emoji: '😊' },
-  { label: '$5 can buy a granola bar for a hungry friend', emoji: '🍞' },
+  { label: 'Bring a meal to a neighbor today', emoji: '🍞' },
   { label: 'Text a friend "I prayed for you"', emoji: '💬' },
   { label: 'God has not forgotten you', emoji: '🕊️' },
   { label: 'Carry an extra hygiene kit in your trunk', emoji: '✨' },
-  { label: '$25 = one full hygiene kit', emoji: '🧴' },
-  { label: 'Listen — really listen — to someone today', emoji: '👂' },
-  { label: '$50 = one week of groceries for a family', emoji: '🛒' },
+  { label: 'Pay for the person behind you in line', emoji: '☕' },
+  { label: 'Listen, really listen, to someone today', emoji: '👂' },
+  { label: 'Send a Scripture to someone you love', emoji: '📖' },
   { label: 'Forgive someone in your heart', emoji: '💛' },
-  { label: '$100 = a full Miracle Run blessing', emoji: '🎁' },
+  { label: 'Volunteer at the next Miracle Run', emoji: '🎁' },
   { label: 'You are loved beyond measure', emoji: '❤️' },
 ];
 
@@ -83,22 +83,28 @@ const WheelOfBlessing = () => {
           style={{
             transform: `rotate(${angle}deg)`,
             transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.18, 0.99)' : 'none',
-            background: 'conic-gradient(from -90deg, ' +
+            background: 'conic-gradient(from 0deg, ' +
               BLESSINGS.map((_, i) =>
                 `${i % 2 === 0 ? '#1e293b' : '#451a03'} ${(i * sliceAngle).toFixed(2)}deg ${((i + 1) * sliceAngle).toFixed(2)}deg`
               ).join(', ') + ')',
           }}
         >
           {BLESSINGS.map((b, i) => {
-            // Position emoji at center of slice
-            const rot = i * sliceAngle + sliceAngle / 2;
+            // Center of slice i, measured clockwise from 12 o'clock (top).
+            const centerDeg = i * sliceAngle + sliceAngle / 2;
+            // Convert to standard math angle: -90° offset (because conic 0° = top, but cos/sin use 3 o'clock = 0°)
+            const rad = (centerDeg - 90) * (Math.PI / 180);
+            const radius = 105; // distance from wheel center in px (works for w-72/w-80)
+            const x = Math.cos(rad) * radius;
+            const y = Math.sin(rad) * radius;
             return (
               <div
                 key={b.label}
-                className="absolute left-1/2 top-1/2 origin-bottom-left text-2xl select-none"
+                className="absolute text-2xl select-none pointer-events-none"
                 style={{
-                  transform: `rotate(${rot}deg) translate(-50%, -110px)`,
-                  pointerEvents: 'none',
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: 'translate(-50%, -50%)',
                 }}
               >
                 {b.emoji}
