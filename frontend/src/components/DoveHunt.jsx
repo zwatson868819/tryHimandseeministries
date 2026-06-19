@@ -22,7 +22,7 @@ const writeFound = (set) => {
 
 // A clickable hidden dove SVG. Pass `id` (1..5) and optional className for
 // positioning.
-export const HiddenDove = ({ id, className = '', size = 18 }) => {
+export const HiddenDove = ({ id, className = '', size = 28 }) => {
   const [found, setFound] = useState(() => readFound().has(String(id)));
   const announcedFinishRef = useRef(false);
 
@@ -66,7 +66,7 @@ export const HiddenDove = ({ id, className = '', size = 18 }) => {
       onClick={onClick}
       aria-label="Hidden dove"
       data-testid={`hidden-dove-${id}`}
-      className={`opacity-25 hover:opacity-90 transition-opacity p-1 ${className}`}
+      className={`opacity-60 hover:opacity-100 transition-all hover:scale-125 p-1 ${className}`}
       style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
     >
       <svg
@@ -74,11 +74,18 @@ export const HiddenDove = ({ id, className = '', size = 18 }) => {
         width={size}
         height={size}
         viewBox="0 0 64 64"
-        fill="#fef3c7"
+        fill="#fbbf24"
+        stroke="#451a03"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
         aria-hidden="true"
+        style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }}
       >
-        <path d="M32 8c-4 0-8 2-10 5-2 4-2 8 1 11l-7 6c-2 2-2 5 0 7l3 3c2 1 4 1 6 0l5-4 2 3c1 2 3 3 5 3h6c2 0 4-1 5-3l5-8c2-3 1-7-2-9l-7-5c1-4-1-8-5-9-2-1-5 0-7 0z" />
-        <circle cx="38" cy="20" r="1.5" fill="#0f172a" />
+        {/* Stylized dove silhouette — body, wing arc, beak, eye */}
+        <path d="M8 38c2-6 8-10 14-10 4 0 6 1 9 3l4-6c2-3 6-5 10-5 5 0 8 3 9 7 1 5-2 9-6 10l-6 2-2 5c-2 4-7 7-12 7-7 0-13-4-17-9-2-2-3-3-3-4z" />
+        <path d="M28 28c3-3 8-5 13-3 3 1 5 3 6 6" fill="none" />
+        <circle cx="49" cy="22" r="1.3" fill="#451a03" stroke="none" />
+        <path d="M58 23l5-1-4 3z" fill="#f59e0b" />
       </svg>
     </button>
   );
