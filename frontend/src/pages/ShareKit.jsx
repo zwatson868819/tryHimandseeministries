@@ -9,7 +9,7 @@ const SNIPPETS = {
   sms: {
     label: 'Text message (SMS)',
     Icon: MessageCircle,
-    text: `Hey — wanted to share something close to my heart. I'm part of tryHimandsee ministries, serving Richmond & Henrico through food, clothing, and Monthly Miracle Runs. Take a look: ${SITE}`,
+    text: `Hey, wanted to share something close to my heart. I'm part of tryHimandsee ministries, serving Richmond & Henrico through food, clothing, and Monthly Miracle Runs. Take a look: ${SITE}`,
     accent: 'from-green-500/20 to-green-600/10 border-green-500/30',
   },
   email: {
@@ -17,7 +17,7 @@ const SNIPPETS = {
     Icon: Mail,
     text: `Hi friend,
 
-I wanted to share a ministry that's been on my heart — tryHimandsee ministries. We serve the poor and underserved in Richmond and Henrico through food, clothing, hygiene kits, and Monthly Miracle Runs where we go out to bless people with whatever the Lord lays on our hearts that day — a meal, prayer, a gift card, encouragement.
+I wanted to share a ministry that's been on my heart, tryHimandsee ministries. We serve the poor and underserved in Richmond and Henrico through food, clothing, hygiene kits, and Monthly Miracle Runs where we go out to bless people with whatever the Lord lays on our hearts that day, a meal, prayer, a gift card, encouragement.
 
 Our heart is simple: freely we have received, freely we give (Matthew 10:8).
 
@@ -33,11 +33,11 @@ Grace and peace,`,
     Icon: Facebook,
     text: `Friends, I want to share something close to my heart.
 
-tryHimandsee ministries is an outreach in Richmond & Henrico — we serve the underserved with food (The PEW Pantry), clothing (Garments of Grace), hygiene kits (Kingdom Care), and Monthly Miracle Runs where we step out and bless strangers however the Lord leads.
+tryHimandsee ministries is an outreach in Richmond & Henrico, we serve the underserved with food (The PEW Pantry), clothing (Garments of Grace), hygiene kits (Kingdom Care), and Monthly Miracle Runs where we step out and bless strangers however the Lord leads.
 
 If you've ever wanted to make a small but eternal difference, join us, donate, or even just light a candle of prayer on our wall.
 
-"Freely ye have received, freely give." — Matthew 10:8
+"Freely ye have received, freely give.", Matthew 10:8
 
 ${SITE}
 
@@ -49,9 +49,9 @@ ${SITE}
     Icon: Instagram,
     text: `Random blessings. Eternal impact. ✨
 
-tryHimandsee ministries — Richmond & Henrico outreach serving food, clothing, hygiene kits, and Monthly Miracle Runs.
+tryHimandsee ministries, Richmond & Henrico outreach serving food, clothing, hygiene kits, and Monthly Miracle Runs.
 
-"Freely ye have received, freely give." — Matthew 10:8 🕊️
+"Freely ye have received, freely give.", Matthew 10:8 🕊️
 
 Link in bio → ${SITE}
 
@@ -122,7 +122,7 @@ const ShareKit = () => {
   const handleNativeShare = async () => {
     try {
       const result = await shareCardNative(
-        `Random blessings, eternal impact. tryHimandsee ministries — Richmond & Henrico. ${SITE}`
+        `Random blessings, eternal impact. tryHimandsee ministries, Richmond & Henrico. ${SITE}`
       );
       if (result === 'unsupported') {
         await downloadShareCard();
@@ -147,7 +147,7 @@ const ShareKit = () => {
             Share the <span className="text-amber-400">Mission</span>
           </h1>
           <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
-            One evening of sharing can grow our community for years. Below is a ready-made share kit &mdash; a branded image plus pre-written posts for SMS, email, Facebook, and Instagram. Tap, copy, send.
+            One evening of sharing can grow our community for years. Below is a ready-made share kit , a branded image plus pre-written posts for SMS, email, Facebook, and Instagram. Tap, copy, send.
           </p>
         </div>
       </section>
@@ -212,7 +212,7 @@ const ShareKit = () => {
           <p className="text-white text-lg leading-relaxed italic">
             &ldquo;Let your light shine before others, that they may see your good deeds and glorify your Father in heaven.&rdquo;
           </p>
-          <p className="text-amber-400 text-sm font-semibold mt-3">&mdash; Matthew 5:16</p>
+          <p className="text-amber-400 text-sm font-semibold mt-3">, Matthew 5:16</p>
         </div>
       </section>
     </div>

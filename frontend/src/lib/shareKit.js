@@ -77,7 +77,7 @@ export const buildShareCard = () => {
   ctx.fillStyle = '#5b2807';
   ctx.font = '28px Georgia, serif';
   ctx.textAlign = 'center';
-  const tagline = 'Encouraging encounters with Christ — serving Richmond & Henrico through food, clothing, and Monthly Miracle Runs.';
+  const tagline = 'Encouraging encounters with Christ, serving Richmond & Henrico through food, clothing, and Monthly Miracle Runs.';
   const lines = wrap(ctx, tagline, w - 200);
   let y = 380;
   for (const line of lines) {
@@ -88,7 +88,7 @@ export const buildShareCard = () => {
   // Scripture / call
   ctx.fillStyle = '#92400e';
   ctx.font = 'italic 26px Georgia, serif';
-  ctx.fillText('"Freely ye have received, freely give." — Matthew 10:8', w / 2, y + 30);
+  ctx.fillText('"Freely ye have received, freely give.", Matthew 10:8', w / 2, y + 30);
 
   // URL footer
   ctx.fillStyle = '#3a1d04';
