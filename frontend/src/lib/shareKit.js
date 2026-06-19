@@ -77,7 +77,7 @@ export const buildShareCard = () => {
   ctx.fillStyle = '#5b2807';
   ctx.font = '28px Georgia, serif';
   ctx.textAlign = 'center';
-  const tagline = 'Encouraging encounters with Christ, serving Richmond & Henrico through food, clothing, and Monthly Miracle Runs.';
+  const tagline = 'Encouraging encounters with Christ, serving Richmond & Henrico through food, clothing, Monthly Miracle Runs, and more!';
   const lines = wrap(ctx, tagline, w - 200);
   let y = 380;
   for (const line of lines) {
