@@ -3,12 +3,14 @@ import { BookOpen, Shuffle, X, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getVerseOfTheDay } from '../data/verses';
 import { shareVerse } from '../lib/shareVerse';
+import { useNearBottom } from '../hooks/useNearBottom';
 
 // Small floating button (bottom-right) that opens a modal showing a random verse.
 // Clicking "Another verse" reshuffles. Clicking "Share" generates a quote card.
 const VerseShuffleButton = () => {
   const [open, setOpen] = useState(false);
   const [verse, setVerse] = useState(null);
+  const nearBottom = useNearBottom(180);
 
   const pickRandom = useCallback(() => {
     // The verses module exports a getter only — pick another based on a random offset.
@@ -55,7 +57,8 @@ const VerseShuffleButton = () => {
         data-testid="random-verse-btn"
         aria-label="Show a random Scripture"
         title="A random word from the Lord"
-        className="fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all flex items-center justify-center hover:scale-110"
+        style={{ bottom: nearBottom ? '8.5rem' : '1.5rem' }}
+        className="fixed right-6 z-[60] w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all flex items-center justify-center hover:scale-110 duration-300"
       >
         <BookOpen size={22} />
       </button>

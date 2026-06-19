@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, VolumeX, Music } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNearBottom } from '../hooks/useNearBottom';
 
 const AUDIO_SRC = '/audio/worship.mp3';
 const STORAGE_KEY = 'worship_music_pref';
@@ -10,6 +11,7 @@ const WorshipMusic = () => {
   const [playing, setPlaying] = useState(false);
   const [hasAudio, setHasAudio] = useState(true);
   const [showLabel, setShowLabel] = useState(false);
+  const nearBottom = useNearBottom(180);
 
   useEffect(() => {
     // Cloudflare Pages serves index.html (HTTP 200) for any missing path.
@@ -56,7 +58,11 @@ const WorshipMusic = () => {
   return (
     <>
       <audio ref={audioRef} src={AUDIO_SRC} loop preload="none" aria-hidden="true" />
-      <div className="fixed bottom-6 left-6 z-[60] flex items-center gap-2" data-testid="worship-music-widget">
+      <div
+        className="fixed left-6 z-[60] flex items-center gap-2 transition-all duration-300"
+        style={{ bottom: nearBottom ? '8.5rem' : '1.5rem' }}
+        data-testid="worship-music-widget"
+      >
         {showLabel && (
           <span className="hidden sm:inline-block bg-slate-900/90 border border-amber-500/30 text-amber-300 text-xs font-medium px-3 py-1.5 rounded-lg animate-in fade-in duration-500">
             Tap for soft worship music
