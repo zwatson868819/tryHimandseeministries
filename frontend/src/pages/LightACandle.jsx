@@ -141,8 +141,25 @@ const LightACandle = () => {
       </section>
 
       {/* Wall */}
-      <section className="py-12 bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-12 relative overflow-hidden" style={{ background: 'radial-gradient(ellipse at top, #0a0f1a 0%, #020617 70%)' }}>
+        {/* Twinkling background stars */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+          {Array.from({ length: 60 }).map((_, i) => (
+            <span
+              key={i}
+              className="absolute rounded-full bg-amber-200/40"
+              style={{
+                width: `${1 + Math.random() * 2}px`,
+                height: `${1 + Math.random() * 2}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                opacity: 0.3 + Math.random() * 0.5,
+                animation: `candle-flicker ${2 + Math.random() * 4}s ease-in-out ${Math.random() * 4}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <h2 className="text-2xl font-bold text-white text-center mb-2">The Wall</h2>
           <p className="text-slate-400 text-center text-sm mb-10">
             Most recent first &middot; showing up to 200
@@ -160,10 +177,15 @@ const LightACandle = () => {
                 <div
                   key={c.id}
                   data-testid={`candle-${c.id}`}
-                  className="group bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/20 rounded-lg p-4 flex flex-col items-center text-center hover:border-amber-500/60 transition-all"
+                  className="group rounded-lg p-4 flex flex-col items-center text-center transition-all"
+                  style={{
+                    background: 'linear-gradient(180deg, rgba(15,23,42,0.75) 0%, rgba(2,6,23,0.95) 100%)',
+                    border: '1px solid rgba(251, 191, 36, 0.25)',
+                    boxShadow: '0 0 20px rgba(251, 191, 36, 0.18), inset 0 1px 0 rgba(251, 191, 36, 0.1)',
+                  }}
                 >
-                  <span className="text-3xl mb-2 candle-flame" role="img" aria-label="lit candle">🕯️</span>
-                  <p className="text-amber-400 text-sm font-semibold truncate w-full">{c.name || 'Anonymous'}</p>
+                  <span className="text-3xl mb-2 candle-flame drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" role="img" aria-label="lit candle">🕯️</span>
+                  <p className="text-amber-300 text-sm font-semibold truncate w-full">{c.name || 'Anonymous'}</p>
                   {c.intention && (
                     <p className="text-slate-400 text-xs mt-2 italic line-clamp-3">&ldquo;{c.intention}&rdquo;</p>
                   )}

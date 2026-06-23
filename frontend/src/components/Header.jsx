@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import { BreathingPrayerTrigger } from './BreathingPrayer';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -110,6 +111,7 @@ const Header = () => {
             >
               Donate
             </Link>
+            <BreathingPrayerTrigger className="ml-1" />
             <ThemeToggle />
           </nav>
 

@@ -341,9 +341,9 @@ const Donate = () => {
                             </li>
                           ))
                         ) : (
-                          <li className="flex items-start gap-3 text-slate-300">
-                            <Heart className="text-amber-400 flex-shrink-0 mt-0.5" size={18} />
-                            <span>A word of encouragement and prayer for someone in need</span>
+                          <li className="flex items-start gap-3 text-slate-200">
+                            <Gift className="text-amber-400 flex-shrink-0 mt-0.5" size={18} />
+                            <span>Items for our Blessing Bags or Monthly Miracle Runs</span>
                           </li>
                         )}
                       </ul>
