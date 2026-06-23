@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Heart, Users, Flame, HandHeart, Feather, Mail, CheckCircle, MapPin, ChevronLeft, ChevronRight, Quote, Target, DollarSign, Gift } from 'lucide-react';
 import { HiddenDove, DoveProgress } from '../components/DoveHunt';
 import PageMeta from '../components/PageMeta';
-import StainedGlassOverlay from '../components/StainedGlassOverlay';
 import { toast } from 'sonner';
 import { ministryInfo, services, upcomingEvents } from '../data/mock';
 import { subscribeToBlog, getPublicTestimonies, getDonationProgress } from '../services/api';
@@ -65,12 +64,6 @@ const Home = () => {
             className="min-w-[120%] min-h-[120%] object-contain opacity-50"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900"></div>
-
-          {/* Stained glass overlay — looks like cathedral light on the hero */}
-          <StainedGlassOverlay
-            className="inset-0 w-full h-full"
-            style={{ mixBlendMode: 'screen' }}
-          />
 
           {/* Drifting golden particles for soul */}
           <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-full overflow-hidden pointer-events-none">

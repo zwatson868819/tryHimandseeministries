@@ -135,10 +135,9 @@ export const BreathingPrayerTrigger = ({ className = '' }) => {
         data-testid="breathing-prayer-trigger"
         title="Take a sacred 60-second pause"
         aria-label="Take a sacred pause"
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/40 hover:border-amber-400 hover:bg-amber-500/10 text-amber-300 text-sm font-medium transition-all ${className}`}
+        className={`w-10 h-10 rounded-full flex items-center justify-center border border-amber-500/30 hover:border-amber-400 transition-all bg-slate-900/40 hover:bg-amber-500/10 text-amber-400 ${className}`}
       >
-        <Wind size={16} />
-        <span className="hidden sm:inline">Sacred pause</span>
+        <Wind size={18} />
       </button>
       <BreathingPrayer open={open} onClose={() => setOpen(false)} />
     </>

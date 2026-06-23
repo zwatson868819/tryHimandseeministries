@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Mountain } from 'lucide-react';
 import PageMeta from '../components/PageMeta';
 
-// Matthew 5:3-12 — the eight Beatitudes from the Sermon on the Mount.
+// Matthew 5:3-12, the eight Beatitudes from the Sermon on the Mount.
 const BEATITUDES = [
   {
     text: 'Blessed are the poor in spirit, for theirs is the kingdom of heaven.',
@@ -17,22 +17,22 @@ const BEATITUDES = [
   {
     text: 'Blessed are the meek, for they shall inherit the earth.',
     ref: 'Matthew 5:5',
-    reflection: 'Meekness is strength surrendered. The gentle, the un-proud, the un-grasping — these are the ones to whom the Father quietly gives everything.',
+    reflection: 'Meekness is strength surrendered. The gentle, the un-proud, the un-grasping, these are the ones to whom the Father quietly gives everything.',
   },
   {
     text: 'Blessed are those who hunger and thirst for righteousness, for they shall be filled.',
     ref: 'Matthew 5:6',
-    reflection: 'The deep ache for things to be right, for justice, for holiness — God Himself plants this hunger, and He alone satisfies it.',
+    reflection: 'The deep ache for things to be right, for justice, for holiness, God Himself plants this hunger, and He alone satisfies it.',
   },
   {
     text: 'Blessed are the merciful, for they shall obtain mercy.',
     ref: 'Matthew 5:7',
-    reflection: 'Mercy creates an open circuit. What we extend, we receive back — multiplied. The merciful live in mercy&rsquo;s atmosphere.',
+    reflection: 'Mercy creates an open circuit. What we extend, we receive back, multiplied. The merciful live in mercy&rsquo;s atmosphere.',
   },
   {
     text: 'Blessed are the pure in heart, for they shall see God.',
     ref: 'Matthew 5:8',
-    reflection: 'Purity of heart is singleness of love — to want one thing: Him. To the undivided heart, God becomes visible everywhere.',
+    reflection: 'Purity of heart is singleness of love, to want one thing: Him. To the undivided heart, God becomes visible everywhere.',
   },
   {
     text: 'Blessed are the peacemakers, for they shall be called sons of God.',
@@ -42,7 +42,7 @@ const BEATITUDES = [
   {
     text: 'Blessed are those who are persecuted for righteousness&rsquo; sake, for theirs is the kingdom of heaven.',
     ref: 'Matthew 5:10',
-    reflection: 'When standing for Christ costs you, you stand in good company with every saint and prophet. The kingdom is not just promised — it is already yours.',
+    reflection: 'When standing for Christ costs you, you stand in good company with every saint and prophet. The kingdom is not just promised, it is already yours.',
   },
 ];
 
