@@ -1,5 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Wind, X } from 'lucide-react';
+import { Wind, X, Bell, BellOff } from 'lucide-react';
+
+// Plays a soft meditation-bell tone using Web Audio API. No audio file needed.
+// A sine carrier at the fundamental + a quick decay envelope creates a gentle
+// "ting" reminiscent of a singing bowl.
+const playChime = (ctx, frequency = 440) => {
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const harmonic = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.value = frequency;
+  harmonic.type = 'sine';
+  harmonic.frequency.value = frequency * 2.76; // slight inharmonic gives bell timbre
+  const harmonicGain = ctx.createGain();
+  harmonicGain.gain.value = 0.12;
+
+  // Soft attack + long exponential decay
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.18, now + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
+
+  osc.connect(gain);
+  harmonic.connect(harmonicGain).connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(now);
+  harmonic.start(now);
+  osc.stop(now + 2.5);
+  harmonic.stop(now + 2.5);
+};
 
 // Guided 60-second breathing prayer overlay. Five cycles, each cycle pairs
 // an inhale phrase with an exhale phrase from a different Scripture so the
@@ -25,13 +55,30 @@ const BreathingPrayer = ({ open, onClose }) => {
   const [phase, setPhase] = useState('inhale');
   const [cycleIdx, setCycleIdx] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(60);
+  const [chimeOn, setChimeOn] = useState(true);
   const timerRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const chimeOnRef = useRef(true);
+
+  useEffect(() => {
+    chimeOnRef.current = chimeOn;
+  }, [chimeOn]);
 
   useEffect(() => {
     if (!open) return;
     setPhase('inhale');
     setCycleIdx(0);
     setSecondsLeft(60);
+
+    // Initialize AudioContext lazily on user-gesture (open is triggered by click)
+    if (!audioCtxRef.current && typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      audioCtxRef.current = new Ctx();
+    }
+    // Play opening chime
+    if (audioCtxRef.current && chimeOnRef.current) {
+      try { playChime(audioCtxRef.current, 528); } catch {}
+    }
 
     let phaseIdx = 0;
     let cycleN = 0;
@@ -42,7 +89,15 @@ const BreathingPrayer = ({ open, onClose }) => {
         cycleN = (cycleN + 1) % CYCLES.length;
         setCycleIdx(cycleN);
       }
-      setPhase(PHASES[phaseIdx].name);
+      const nextPhase = PHASES[phaseIdx].name;
+      setPhase(nextPhase);
+      // Soft chime on inhale (higher) and exhale (lower) — skip hold + rest
+      if (audioCtxRef.current && chimeOnRef.current) {
+        try {
+          if (nextPhase === 'inhale') playChime(audioCtxRef.current, 528); // C5-ish
+          else if (nextPhase === 'exhale') playChime(audioCtxRef.current, 396); // G4-ish
+        } catch {}
+      }
       timerRef.current = setTimeout(next, PHASES[phaseIdx].ms);
     };
     timerRef.current = setTimeout(next, PHASES[0].ms);
@@ -87,14 +142,25 @@ const BreathingPrayer = ({ open, onClose }) => {
       data-testid="breathing-prayer-overlay"
       className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md overflow-y-auto"
     >
-      <button
-        onClick={onClose}
-        aria-label="Close"
-        data-testid="breathing-prayer-close"
-        className="absolute top-6 right-6 text-slate-400 hover:text-white p-2 z-10"
-      >
-        <X size={26} />
-      </button>
+      <div className="absolute top-6 right-6 flex items-center gap-1 z-10">
+        <button
+          onClick={() => setChimeOn((v) => !v)}
+          aria-label={chimeOn ? 'Mute chime' : 'Unmute chime'}
+          title={chimeOn ? 'Mute chime' : 'Play chime'}
+          data-testid="breathing-prayer-chime-toggle"
+          className="text-slate-400 hover:text-amber-300 p-2"
+        >
+          {chimeOn ? <Bell size={22} /> : <BellOff size={22} />}
+        </button>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          data-testid="breathing-prayer-close"
+          className="text-slate-400 hover:text-white p-2"
+        >
+          <X size={26} />
+        </button>
+      </div>
 
       <div className="min-h-full flex flex-col items-center justify-center px-6 py-12">
         <p className="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-2">
