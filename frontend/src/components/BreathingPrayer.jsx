@@ -1,44 +1,57 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Wind, X } from 'lucide-react';
 
-// Guided 60-second breathing prayer overlay.
-// Inhale: "Be still" (4s) — Hold (2s) — Exhale: "and know that I am God" (6s)
-// Loops for ~5 cycles, then closes.
+// Guided 60-second breathing prayer overlay. Five cycles, each cycle pairs
+// an inhale phrase with an exhale phrase from a different Scripture so the
+// user hears variety, not just one verse repeated.
 
-const CYCLE_MS = 12000; // total inhale + hold + exhale + rest
+const CYCLES = [
+  { inhale: 'Be still',                exhale: 'and know that I am God',           ref: 'Psalm 46:10' },
+  { inhale: 'The Lord is my shepherd', exhale: 'I shall not want',                 ref: 'Psalm 23:1' },
+  { inhale: 'Cast your cares on Him',  exhale: 'for He cares for you',             ref: '1 Peter 5:7' },
+  { inhale: 'Come to me',              exhale: 'and I will give you rest',         ref: 'Matthew 11:28' },
+  { inhale: 'My grace is sufficient',  exhale: 'for you',                          ref: '2 Corinthians 12:9' },
+  { inhale: 'Peace I leave with you',  exhale: 'My peace I give to you',           ref: 'John 14:27' },
+];
+
+const PHASES = [
+  { name: 'inhale', ms: 4000 },
+  { name: 'hold',   ms: 1500 },
+  { name: 'exhale', ms: 5000 },
+  { name: 'rest',   ms: 1500 },
+];
 
 const BreathingPrayer = ({ open, onClose }) => {
   const [phase, setPhase] = useState('inhale');
+  const [cycleIdx, setCycleIdx] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(60);
   const timerRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     setPhase('inhale');
+    setCycleIdx(0);
     setSecondsLeft(60);
 
-    const phases = [
-      { name: 'inhale', ms: 4000 },
-      { name: 'hold', ms: 2000 },
-      { name: 'exhale', ms: 5000 },
-      { name: 'rest', ms: 1000 },
-    ];
-    let idx = 0;
+    let phaseIdx = 0;
+    let cycleN = 0;
     const next = () => {
-      idx = (idx + 1) % phases.length;
-      setPhase(phases[idx].name);
-      timerRef.current = setTimeout(next, phases[idx].ms);
+      phaseIdx = (phaseIdx + 1) % PHASES.length;
+      // When we complete a full cycle (rest → inhale), advance to next verse
+      if (phaseIdx === 0) {
+        cycleN = (cycleN + 1) % CYCLES.length;
+        setCycleIdx(cycleN);
+      }
+      setPhase(PHASES[phaseIdx].name);
+      timerRef.current = setTimeout(next, PHASES[phaseIdx].ms);
     };
-    timerRef.current = setTimeout(next, phases[0].ms);
+    timerRef.current = setTimeout(next, PHASES[0].ms);
 
     const startedAt = Date.now();
     const tick = setInterval(() => {
       const remaining = 60 - Math.floor((Date.now() - startedAt) / 1000);
-      if (remaining <= 0) {
-        onClose();
-      } else {
-        setSecondsLeft(remaining);
-      }
+      if (remaining <= 0) onClose();
+      else setSecondsLeft(remaining);
     }, 250);
 
     return () => {
@@ -57,11 +70,12 @@ const BreathingPrayer = ({ open, onClose }) => {
 
   if (!open) return null;
 
+  const cycle = CYCLES[cycleIdx];
   const phaseText = {
-    inhale: 'Breathe in… Be still',
-    hold: '…',
-    exhale: 'Breathe out… and know that I am God',
-    rest: ' ',
+    inhale: `Breathe in… ${cycle.inhale}`,
+    hold:   '…',
+    exhale: `Breathe out… ${cycle.exhale}`,
+    rest:   ' ',
   }[phase];
 
   // Circle scale per phase
@@ -71,55 +85,57 @@ const BreathingPrayer = ({ open, onClose }) => {
     <div
       role="dialog"
       data-testid="breathing-prayer-overlay"
-      className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center px-6"
+      className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md overflow-y-auto"
     >
       <button
         onClick={onClose}
         aria-label="Close"
         data-testid="breathing-prayer-close"
-        className="absolute top-6 right-6 text-slate-400 hover:text-white p-2"
+        className="absolute top-6 right-6 text-slate-400 hover:text-white p-2 z-10"
       >
         <X size={26} />
       </button>
 
-      <p className="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-2">
-        A Sacred Pause
-      </p>
-      <p className="text-slate-300 text-sm mb-8">{secondsLeft}s remaining</p>
+      <div className="min-h-full flex flex-col items-center justify-center px-6 py-12">
+        <p className="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-2">
+          A Sacred Pause
+        </p>
+        <p className="text-slate-300 text-sm mb-6">{secondsLeft}s remaining</p>
 
-      <div
-        aria-hidden="true"
-        className="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center"
-      >
-        {/* Soft outer glow */}
         <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: 'radial-gradient(circle, rgba(251,191,36,0.18) 0%, rgba(251,191,36,0) 70%)',
-            transform: `scale(${scale * 1.4})`,
-            transition: 'transform 4s cubic-bezier(0.45, 0, 0.55, 1)',
-          }}
-        />
-        {/* The breathing orb */}
-        <div
-          className="rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 shadow-[0_0_60px_rgba(251,191,36,0.4)]"
-          style={{
-            width: '60%',
-            height: '60%',
-            transform: `scale(${scale})`,
-            transition: 'transform 4s cubic-bezier(0.45, 0, 0.55, 1)',
-          }}
-        />
+          aria-hidden="true"
+          className="relative w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center flex-shrink-0"
+        >
+          {/* Soft outer glow */}
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(251,191,36,0.18) 0%, rgba(251,191,36,0) 70%)',
+              transform: `scale(${scale * 1.4})`,
+              transition: 'transform 4s cubic-bezier(0.45, 0, 0.55, 1)',
+            }}
+          />
+          {/* The breathing orb */}
+          <div
+            className="rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 shadow-[0_0_60px_rgba(251,191,36,0.4)]"
+            style={{
+              width: '60%',
+              height: '60%',
+              transform: `scale(${scale})`,
+              transition: 'transform 4s cubic-bezier(0.45, 0, 0.55, 1)',
+            }}
+          />
+        </div>
+
+        <p
+          key={`${cycleIdx}-${phase}`}
+          data-testid="breathing-prayer-text"
+          className="mt-8 text-white text-lg sm:text-xl text-center font-light tracking-wide animate-in fade-in duration-700 max-w-xl px-4"
+        >
+          {phaseText}
+        </p>
+        <p className="text-amber-400 text-sm mt-2">&mdash; {cycle.ref}</p>
       </div>
-
-      <p
-        key={phase}
-        data-testid="breathing-prayer-text"
-        className="mt-10 text-white text-xl sm:text-2xl text-center font-light tracking-wide animate-in fade-in duration-700 min-h-[3rem]"
-      >
-        {phaseText}
-      </p>
-      <p className="text-amber-400 text-sm mt-3">&mdash; Psalm 46:10</p>
     </div>
   );
 };
