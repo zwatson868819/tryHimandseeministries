@@ -62,6 +62,11 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
   - **Warm Light theme** — toggleable via sun/moon button in the header. Adds `.warm-mode` class to `<html>`, CSS swaps slate backgrounds to cream/amber palette. Persists in localStorage. Default is dark.
   - **Worship music toggle** — floating speaker button (bottom-left), reads `/audio/worship.mp3`, plays on loop at 25% volume. Shows "Tap for soft worship music" tooltip on first visit. Gracefully tells user "coming soon" if audio file not uploaded yet. README at `/app/frontend/public/audio/README.md` explains where to drop the file.
 
+## 2026-02-XX — Sacred Pause polish
+- Removed Web Audio chime + bell toggle from `BreathingPrayer.jsx` (user did not like the chime).
+- Restructured overlay so the "A Sacred Pause" title sits clearly at the top of the screen (was getting clipped under the previous centered layout). Phrase block now reserves min-height to prevent layout shift between phases.
+- Verified end-to-end via testing agent (iteration_1.json — 100% frontend pass).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
