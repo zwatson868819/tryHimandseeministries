@@ -67,6 +67,9 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Restructured overlay so the "A Sacred Pause" title sits clearly at the top of the screen (was getting clipped under the previous centered layout). Phrase block now reserves min-height to prevent layout shift between phases.
 - Verified end-to-end via testing agent (iteration_1.json — 100% frontend pass).
 
+## 2026-02-XX — Sacred Pause removed
+- Per user request, the Sacred Pause feature was fully removed. Deleted `/app/frontend/src/components/BreathingPrayer.jsx` and removed the `BreathingPrayerTrigger` import + usage from `Header.jsx`. Verified header has no Sacred Pause button.
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
