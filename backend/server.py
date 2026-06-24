@@ -139,6 +139,37 @@ async def view_candles_migration_sql():
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
+# ---------------------------------------------------------------------------
+# Compatibility stubs for endpoints that only exist on the Cloudflare Worker
+# (production backend). They return the same shape as the Worker so the React
+# frontend doesn't log 404s in the dev preview environment. The legacy FastAPI
+# backend is read-only for these endpoints — real data lives in Cloudflare D1.
+# ---------------------------------------------------------------------------
+from datetime import datetime, timezone
+
+@api_router.get("/testimonies")
+async def stub_testimonies(limit: int = 20):
+    return []
+
+@api_router.get("/donations/progress")
+async def stub_donation_progress():
+    now = datetime.now(timezone.utc)
+    return {
+        "goal": 500,
+        "raised": 0,
+        "percent": 0,
+        "month": now.strftime("%B %Y"),
+    }
+
+@api_router.get("/stats/impact")
+async def stub_impact_stats():
+    return {
+        "lives_touched": 0,
+        "kits_given": 0,
+        "miracle_runs": 0,
+        "total_donations": 0,
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
