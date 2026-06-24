@@ -70,6 +70,10 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 ## 2026-02-XX — Sacred Pause removed
 - Per user request, the Sacred Pause feature was fully removed. Deleted `/app/frontend/src/components/BreathingPrayer.jsx` and removed the `BreathingPrayerTrigger` import + usage from `Header.jsx`. Verified header has no Sacred Pause button.
 
+## 2026-02-XX — Preview 404s fixed
+- Added 3 compatibility stub endpoints to legacy FastAPI `server.py` so the dev preview environment no longer 404s for `/api/testimonies`, `/api/donations/progress`, `/api/stats/impact`. They return the same JSON shape as the Cloudflare Worker (empty array / zeros). Production Cloudflare Worker already had real implementations of these.
+- Verified via testing_agent (iteration_2.json — 100% backend pytest + 100% frontend).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
