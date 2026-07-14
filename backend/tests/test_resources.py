@@ -19,8 +19,9 @@ EXPECTED_COUNTS = {
     "clothing": 9,
     "social-services": 9,
     "mental-health": 8,
+    "domestic-violence": 10,
 }
-EXPECTED_TOTAL = sum(EXPECTED_COUNTS.values())  # 48
+EXPECTED_TOTAL = sum(EXPECTED_COUNTS.values())  # 58
 
 
 @pytest.fixture(scope="module")

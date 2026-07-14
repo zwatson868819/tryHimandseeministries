@@ -1,0 +1,41 @@
+{
+  "summary": "Verified two new features on top of the AdminDashboard refactor: (1) URL-based tab routing via useSearchParams and (2) new 'Abuse / Domestic Violence' 6th Resource Directory category with 10 real Richmond/Henrico orgs. Backend: 20/20 pytest tests pass — GET /api/resources returns exactly 58 items, ?category=domestic-violence returns exactly 10, GET /api/download/resources-dv-delta-sql returns 200 with 14 lines, header comment on line 1, exactly 10 INSERT statements all mentioning 'domestic-violence', and last INSERT contains 'Richmond SPCA'. Also updated existing full migration test to expect 58 (was 48). Frontend: header Resource Directory dropdown now has 6 items with 'Abuse / Domestic Violence' → /resources/domestic-violence; /resources/domestic-violence page renders data-testid='resource-directory-page' with H1 'Abuse / Domestic Violence', exactly 10 resource-card testids, quick-switch pills bar shows all 6 categories with resource-tab-domestic-violence carrying the amber active class; all 4 required phone numbers ((804) 612-6126, (804) 500-2755, 1 (800) 838-8238, 1 (800) 799-7233) appear as tel: links and 'Call 911 if in immediate danger.' text is present. Admin URL routing: logged in as zwatson — landing URL is clean /admin/dashboard with no ?tab= and donations tab active; clicking Resources / Prayers updates URL to ?tab=resources / ?tab=prayers without full reload; direct refresh at /admin/dashboard?tab=notary loads with notary tab active (amber-500) and admin-notary-panel visible; ?tab=bogus silently falls back to donations; browser back/forward correctly switches tab state (back after clicking Resources returns activeTab='donations', forward restores 'resources'); Resources tab filter dropdown lists 'All categories (58)' plus all 6 per-category options including 'Abuse / Domestic Violence (10)'. Both features fully wired end-to-end.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_resources.py",
+    "/app/backend/tests/test_download_sql.py",
+    "/app/test_reports/pytest/pytest_iter7.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "AdminDashboard.jsx uses setSearchParams({tab}, {replace:true}) for every tab click. This intentionally keeps browser history clean (no 6-entry spam for 6 tab clicks). The 'back after clicking a tab returns to the previous URL' still works because the initial /admin/dashboard entry (or any prior goto) remains in the stack — verified by Playwright back/forward in test 6.",
+    "AdminDashboard.jsx line 91-95: useEffect deps only include [searchParams] and internally reads activeTab — ESLint's exhaustive-deps rule would flag missing activeTab and VALID_TABS. Not a bug (activeTab read is only compared, and VALID_TABS is a stable const), but consider useMemo or ref to appease the linter.",
+    "AdminDashboard.jsx line 60: reads searchParams.get('tab') twice in the same expression. Minor DRY nit — cache in a variable. Non-blocking.",
+    "resources-dv-delta.sql uses INSERT OR REPLACE with fixed UUIDs — perfect for idempotent D1 runs, matches the file header claim.",
+    "ResourceDirectory.jsx RESOURCE_CATEGORIES now has 6 entries with ShieldAlert icon and from-fuchsia-500 to-rose-500 gradient — visually distinct from the other 5 amber/emerald/blue/etc gradients, good for the sensitive DV category. H1 with icon avatar renders cleanly (see screenshot).",
+    "Preview backend endpoint /api/download/resources-dv-delta-sql is a plain FileResponse of a static SQL file — simple and correct. Same pattern as the existing resources-migration-sql and notary-migration-sql endpoints.",
+    "Pre-existing console noise (from iteration_6): GET /api/admin/today-summary 404, React hydration warnings <span> child of <tr>/<tbody>/<select>/<option>. Neither is caused by this change and both are already documented as preview-only / browser-extension issues."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_resources.py (bumped EXPECTED_COUNTS to include domestic-violence:10, total 58)",
+    "/app/backend/tests/test_download_sql.py (updated insert_count expectation 48→58, added TestResourcesDvDeltaDownload class with 2 tests)"
+  ],
+  "success_rate": {
+    "backend": "100% (20/20 pytest passed)",
+    "frontend": "100% (all 7 admin URL routing scenarios + all 6 public DV page scenarios + header dropdown verified)"
+  },
+  "test_credentials": "Admin: zwatson / Anandotowel@1988* (from /app/memory/test_credentials.md) — LOGIN SUCCESSFUL",
+  "seed_data_creation": "None. Backend seed remains at 58 resources (48 originals + 10 new DV orgs).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Both features are green. URL routing is implemented with replace:true, which is a deliberate choice to avoid history spam — 'browser back' after tab clicks returns to whatever URL preceded /admin/dashboard, and 'forward' restores the last clicked tab. This is the semantics the current implementation gives; the review-request 'back returns to donations' works out because the pre-existing /admin/dashboard state has donations as default. The only remaining console noise (today-summary 404 + <span>→<tr>/<option>/<select> hydration warnings) is pre-existing and unrelated to this task (documented in iterations 4 and 6). Production Cloudflare Worker will not show DV orgs until the user runs /app/cf-dashboard-deploy/resources-dv-delta.sql against D1 — this is expected and out of scope for the preview test.",
+  "rca of the issue": "N/A — no bug found. Feature verification passed 100%."
+}

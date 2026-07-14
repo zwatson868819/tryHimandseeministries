@@ -152,6 +152,14 @@ async def view_resources_migration_sql():
         media_type="text/plain"
     )
 
+# Resource Directory delta migration (Abuse/DV category only — 10 rows)
+@api_router.get("/download/resources-dv-delta-sql")
+async def view_resources_dv_delta_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/resources-dv-delta.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 

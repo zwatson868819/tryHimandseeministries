@@ -32,7 +32,8 @@ const Header = () => {
         { name: 'Food', path: '/resources/food' },
         { name: 'Clothing', path: '/resources/clothing' },
         { name: 'Social Services', path: '/resources/social-services' },
-        { name: 'Mental / Behavioral Health', path: '/resources/mental-health' }
+        { name: 'Mental / Behavioral Health', path: '/resources/mental-health' },
+        { name: 'Abuse / Domestic Violence', path: '/resources/domestic-violence' }
       ]
     },
     { name: 'Get Involved', path: '/get-involved' },

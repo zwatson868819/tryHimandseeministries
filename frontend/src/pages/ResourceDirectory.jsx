@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Phone, Globe, Clock, StickyNote, Home, Utensils, Shirt, Building2, HeartPulse, ArrowLeft } from 'lucide-react';
+import { MapPin, Phone, Globe, Clock, StickyNote, Home, Utensils, Shirt, Building2, HeartPulse, ShieldAlert, ArrowLeft } from 'lucide-react';
 import PageMeta from '../components/PageMeta';
 import { getResources } from '../services/api';
 
 export const RESOURCE_CATEGORIES = [
-  { key: 'housing',         label: 'Housing / Rental',                icon: Home,        color: 'from-sky-500 to-cyan-500' },
-  { key: 'food',            label: 'Food',                             icon: Utensils,    color: 'from-amber-500 to-orange-500' },
-  { key: 'clothing',        label: 'Clothing',                         icon: Shirt,       color: 'from-emerald-500 to-teal-500' },
-  { key: 'social-services', label: 'Social Services',                  icon: Building2,   color: 'from-indigo-500 to-purple-500' },
-  { key: 'mental-health',   label: 'Mental / Behavioral Health',       icon: HeartPulse,  color: 'from-rose-500 to-pink-500' },
+  { key: 'housing',           label: 'Housing / Rental',                icon: Home,        color: 'from-sky-500 to-cyan-500' },
+  { key: 'food',              label: 'Food',                             icon: Utensils,    color: 'from-amber-500 to-orange-500' },
+  { key: 'clothing',          label: 'Clothing',                         icon: Shirt,       color: 'from-emerald-500 to-teal-500' },
+  { key: 'social-services',   label: 'Social Services',                  icon: Building2,   color: 'from-indigo-500 to-purple-500' },
+  { key: 'mental-health',     label: 'Mental / Behavioral Health',       icon: HeartPulse,  color: 'from-rose-500 to-pink-500' },
+  { key: 'domestic-violence', label: 'Abuse / Domestic Violence',        icon: ShieldAlert, color: 'from-fuchsia-500 to-rose-500' },
 ];
 
 const getCategory = (key) => RESOURCE_CATEGORIES.find((c) => c.key === key);

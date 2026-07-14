@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   getDashboardStats,
@@ -53,6 +53,11 @@ const emptyResource = (defaultCategory) => ({
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Valid tab keys — kept in sync with TabBar.jsx
+  const VALID_TABS = ['donations', 'volunteers', 'contacts', 'prayers', 'notary', 'resources'];
+  const initialTab = VALID_TABS.includes(searchParams.get('tab')) ? searchParams.get('tab') : 'donations';
 
   // Auth + top-level data
   const [token, setToken] = useState(null);
@@ -69,7 +74,25 @@ const AdminDashboard = () => {
   const [impact, setImpact] = useState(null);
 
   // UI state
-  const [activeTab, setActiveTab] = useState('donations');
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Keep the URL in sync when the tab changes, and respond to browser back/forward.
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === 'donations') {
+      // default tab — omit query param for a cleaner URL
+      searchParams.delete('tab');
+      setSearchParams(searchParams, { replace: true });
+    } else {
+      setSearchParams({ tab }, { replace: true });
+    }
+  };
+
+  useEffect(() => {
+    const urlTab = searchParams.get('tab');
+    const next = VALID_TABS.includes(urlTab) ? urlTab : 'donations';
+    if (next !== activeTab) setActiveTab(next);
+  }, [searchParams]);
 
   // Editors
   const [editingGoal, setEditingGoal] = useState(false);
@@ -383,7 +406,7 @@ const AdminDashboard = () => {
         <StatsCards stats={stats} />
 
         <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <TabBar activeTab={activeTab} onChange={setActiveTab} />
+          <TabBar activeTab={activeTab} onChange={handleTabChange} />
 
           <div className="p-6">
             {activeTab === 'donations' && (
