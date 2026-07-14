@@ -53,7 +53,7 @@ const ResourceCard = ({ resource, highlighted, categoryKey }) => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      toast.success('Link copied — paste to share this listing');
+      toast.success('Link copied - paste to share this listing');
       setTimeout(() => setCopied(false), 1800);
     } catch {
       toast.error('Could not copy link');
@@ -195,8 +195,8 @@ const ResourceDirectory = () => {
   return (
     <div className="min-h-screen bg-slate-950 pt-24" data-testid="resource-directory-page">
       <PageMeta
-        title={`${category.label} Resources — Richmond & Henrico`}
-        description={`Real, verified ${category.label.toLowerCase()} resources in Richmond and Henrico, Virginia — curated by tryHimandsee Ministries.`}
+        title={`${category.label} Resources - Richmond & Henrico`}
+        description={`Real, verified ${category.label.toLowerCase()} resources in Richmond and Henrico, Virginia - curated by tryHimandsee Ministries.`}
         path={`/resources/${category.key}`}
       />
 
@@ -220,7 +220,7 @@ const ResourceDirectory = () => {
             </div>
           </div>
           <p className="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed">
-            Curated organizations serving <strong className="text-amber-300">Richmond &amp; Henrico, Virginia</strong>. Please call ahead to confirm hours and eligibility — some listings require appointments or referrals.
+            Curated organizations serving <strong className="text-amber-300">Richmond &amp; Henrico, Virginia</strong>. Please call ahead to confirm hours and eligibility - some listings require appointments or referrals.
           </p>
         </div>
       </section>

@@ -1,23 +1,23 @@
-# tryHimandsee Ministries — Cloudflare Dashboard-Only Deployment Guide
+# tryHimandsee Ministries - Cloudflare Dashboard-Only Deployment Guide
 
 Everything below is done in the Cloudflare web dashboard. **No terminal commands.**
 
 You have two files in this folder:
-- `worker.js` — your entire backend, bundled into one file
-- `schema.sql` — the database tables to create
+- `worker.js` - your entire backend, bundled into one file
+- `schema.sql` - the database tables to create
 
 Read each step in order. Click slowly. If you get stuck on a step, stop and ask for help before continuing.
 
 ---
 
-## Part 1 — Create the D1 Database (~3 minutes)
+## Part 1 - Create the D1 Database (~3 minutes)
 
 1. Go to https://dash.cloudflare.com and log in.
 2. In the left sidebar click **Workers & Pages** → then click **D1** in the submenu.
-   - If you don't see D1, scroll the sidebar — sometimes it's under "Storage & Databases".
+   - If you don't see D1, scroll the sidebar - sometimes it's under "Storage & Databases".
 3. Click the blue **Create database** button.
 4. Database name: type `tryhimandsee-db`
-5. Location: pick "Automatic" (or whatever is closest to your users — Eastern US is fine)
+5. Location: pick "Automatic" (or whatever is closest to your users - Eastern US is fine)
 6. Click **Create**.
 
 You should now see your new database. **Stay on this page.**
@@ -34,15 +34,15 @@ You should see results like "Query executed successfully" with green checkmarks.
 
 ### Save the database ID:
 1. Click the **Settings** tab on the D1 page.
-2. You'll see a "Database ID" — it looks like `abc12345-6789-...`
-3. Copy it somewhere — you'll paste it in Part 3.
+2. You'll see a "Database ID" - it looks like `abc12345-6789-...`
+3. Copy it somewhere - you'll paste it in Part 3.
 
 ---
 
-## Part 2 — Create the R2 Bucket (~1 minute)
+## Part 2 - Create the R2 Bucket (~1 minute)
 
 1. In the left sidebar click **R2 Object Storage** (or just "R2").
-2. If this is your first time using R2, Cloudflare will ask you to "Enable R2" — it's free, click Enable.
+2. If this is your first time using R2, Cloudflare will ask you to "Enable R2" - it's free, click Enable.
 3. Click **Create bucket**.
 4. Bucket name: `tryhimandsee-media`
 5. Location: pick "Automatic"
@@ -52,11 +52,11 @@ You should see results like "Query executed successfully" with green checkmarks.
 1. Click your new `tryhimandsee-media` bucket.
 2. Click the **Settings** tab.
 3. Find **Public access** → click **Allow Access**.
-4. Cloudflare gives you a URL like `https://pub-xxxxxxxxxx.r2.dev` — copy this URL somewhere.
+4. Cloudflare gives you a URL like `https://pub-xxxxxxxxxx.r2.dev` - copy this URL somewhere.
 
 ---
 
-## Part 3 — Create the Worker (~5 minutes)
+## Part 3 - Create the Worker (~5 minutes)
 
 1. In the left sidebar click **Workers & Pages**.
 2. Click **Create application**.
@@ -74,11 +74,11 @@ You should see results like "Query executed successfully" with green checkmarks.
 7. Paste it into the Cloudflare code editor.
 8. Click **Deploy** (top right of the editor).
 
-You should see "Deployed successfully." The Worker URL appears — something like `https://tryhimandsee-backend.YOUR-SUBDOMAIN.workers.dev`. **Copy that URL and save it.**
+You should see "Deployed successfully." The Worker URL appears - something like `https://tryhimandsee-backend.YOUR-SUBDOMAIN.workers.dev`. **Copy that URL and save it.**
 
 ---
 
-## Part 4 — Connect D1 + R2 to the Worker (~3 minutes)
+## Part 4 - Connect D1 + R2 to the Worker (~3 minutes)
 
 The Worker code runs but doesn't have access to the database or bucket yet. We bind them now.
 
@@ -96,7 +96,7 @@ The Worker code runs but doesn't have access to the database or bucket yet. We b
 
 ---
 
-## Part 5 — Set the Worker Secrets (~3 minutes)
+## Part 5 - Set the Worker Secrets (~3 minutes)
 
 Still on the Worker's **Settings → Bindings** page (or **Variables and Secrets** depending on Cloudflare's current layout):
 
@@ -108,15 +108,15 @@ You need to add 5 secrets. For each one click **Add variable** (or **Add secret*
 | `STRIPE_API_KEY` | Your Stripe LIVE secret key (`sk_live_...`) |
 | `ADMIN_SETUP_KEY` | Any random string you make up (used ONCE in Part 7) |
 | `R2_PUBLIC_BASE_URL` | The `https://pub-xxxxxxxxxx.r2.dev` URL you copied in Part 2 |
-| `CORS_ORIGINS` | `*` (just an asterisk) — we'll tighten this in Part 9 |
+| `CORS_ORIGINS` | `*` (just an asterisk) - we'll tighten this in Part 9 |
 
-**Important**: For `CORS_ORIGINS`, choose **Type: Variable (plaintext)** — not Secret. The rest should be **Type: Secret**.
+**Important**: For `CORS_ORIGINS`, choose **Type: Variable (plaintext)** - not Secret. The rest should be **Type: Secret**.
 
 After adding all 5, click **Deploy** to apply.
 
 ---
 
-## Part 6 — Test the Worker (~1 minute)
+## Part 6 - Test the Worker (~1 minute)
 
 In your browser, visit your Worker URL + `/api/`:
 `https://tryhimandsee-backend.YOUR-SUBDOMAIN.workers.dev/api/`
@@ -130,9 +130,9 @@ If yes, your backend is alive!
 
 ---
 
-## Part 7 — Seed Your Admin Account (~1 minute)
+## Part 7 - Seed Your Admin Account (~1 minute)
 
-Cloudflare has a built-in tool to make HTTP requests called a "REST API explorer" — but the easiest way for non-developers is to use https://reqbin.com (a free online tool).
+Cloudflare has a built-in tool to make HTTP requests called a "REST API explorer" - but the easiest way for non-developers is to use https://reqbin.com (a free online tool).
 
 1. Go to https://reqbin.com
 2. URL: paste `https://tryhimandsee-backend.YOUR-SUBDOMAIN.workers.dev/api/admin/setup`
@@ -149,11 +149,11 @@ Cloudflare has a built-in tool to make HTTP requests called a "REST API explorer
 
 Expected response (right side): `{"id":"...","username":"zwatson"}` with status 200.
 
-**Done!** Your admin account is created. The setup endpoint now refuses to run again — it's safely locked.
+**Done!** Your admin account is created. The setup endpoint now refuses to run again - it's safely locked.
 
 ---
 
-## Part 8 — Rebuild Your Frontend with the New Backend URL
+## Part 8 - Rebuild Your Frontend with the New Backend URL
 
 Paste your Worker URL back to your developer (me). I will:
 - Rebuild the React frontend with your Worker URL baked in as the backend
@@ -162,7 +162,7 @@ Paste your Worker URL back to your developer (me). I will:
 
 ---
 
-## Part 9 — Tighten CORS (~1 minute, do this AFTER Part 8)
+## Part 9 - Tighten CORS (~1 minute, do this AFTER Part 8)
 
 Once your Cloudflare Pages site is live at its real URL (whether `tryhimandsee.pages.dev` or your custom domain):
 
@@ -175,7 +175,7 @@ Once your Cloudflare Pages site is live at its real URL (whether `tryhimandsee.p
 
 ---
 
-## Part 10 — Connect Custom Domain (Optional, do AFTER everything else works)
+## Part 10 - Connect Custom Domain (Optional, do AFTER everything else works)
 
 To make `tryhimandseeministries.org` serve your Cloudflare site:
 

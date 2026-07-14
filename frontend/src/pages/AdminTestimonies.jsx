@@ -42,7 +42,7 @@ const AdminTestimonies = () => {
   const handleApprove = async (id) => {
     try {
       await updateTestimony(id, { status: 'approved' }, token);
-      toast.success('Testimony approved — now live on site');
+      toast.success('Testimony approved - now live on site');
       fetchItems();
     } catch {
       toast.error('Failed to approve');

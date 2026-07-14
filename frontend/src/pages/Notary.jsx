@@ -46,7 +46,7 @@ const Notary = () => {
       });
       setSubmitted(true);
       setForm(initialForm);
-      toast.success("Request received — we'll reach out shortly to confirm.");
+      toast.success("Request received - we'll reach out shortly to confirm.");
     } catch (err) {
       const detail = err?.response?.data?.detail || 'Unable to submit your request right now. Please try again.';
       toast.error(detail);
@@ -70,7 +70,7 @@ const Notary = () => {
             <FileSignature className="text-amber-400" size={32} />
           </div>
           <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-3">
-            A Ministry Service — At No Cost
+            A Ministry Service - At No Cost
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
             Free <span className="text-amber-400">Notary Services</span>
@@ -94,12 +94,12 @@ const Notary = () => {
           <div className="bg-slate-900/60 border border-amber-500/20 rounded-xl p-6 text-center">
             <HandHeart className="text-amber-400 mx-auto mb-3" size={28} />
             <h3 className="text-white font-semibold mb-1">Always Free</h3>
-            <p className="text-slate-400 text-sm">No fees, ever. This is a gift to the community — freely received, freely given.</p>
+            <p className="text-slate-400 text-sm">No fees, ever. This is a gift to the community - freely received, freely given.</p>
           </div>
           <div className="bg-slate-900/60 border border-amber-500/20 rounded-xl p-6 text-center">
             <Clock className="text-amber-400 mx-auto mb-3" size={28} />
             <h3 className="text-white font-semibold mb-1">Flexible Scheduling</h3>
-            <p className="text-slate-400 text-sm">Share a time that works for you — we&apos;ll do our best to accommodate.</p>
+            <p className="text-slate-400 text-sm">Share a time that works for you - we&apos;ll do our best to accommodate.</p>
           </div>
         </div>
       </section>

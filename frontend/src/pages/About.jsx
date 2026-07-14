@@ -32,7 +32,7 @@ const About = () => {
     <div className="min-h-screen pt-20">
       <PageMeta
         title="About Our Mission"
-        description="Learn about tryHimandsee ministries — our calling to encourage encounters with Christ while serving the poor and underserved of Richmond and Henrico through food, clothing, and Monthly Miracle Runs."
+        description="Learn about tryHimandsee ministries - our calling to encourage encounters with Christ while serving the poor and underserved of Richmond and Henrico through food, clothing, and Monthly Miracle Runs."
         path="/about"
       />
       {/* Hero Section */}

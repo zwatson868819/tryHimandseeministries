@@ -117,7 +117,7 @@ class TestAdminResourcesCRUD:
         assert updated["name"] == "TEST_Playwright_Org_Renamed"
         assert updated["description"] == "updated"
 
-        # TOGGLE INACTIVE — should disappear from public list
+        # TOGGLE INACTIVE - should disappear from public list
         r3 = session.put(f"{API}/admin/resources/{rid}", json={"is_active": False}, timeout=15)
         assert r3.status_code == 200
         pub_r2 = session.get(f"{API}/resources", params={"category": "food"}, timeout=15)

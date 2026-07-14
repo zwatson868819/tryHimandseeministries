@@ -527,7 +527,7 @@ export const updateMonthlyGoal = async (goal, token) => {
   }
 };
 
-// Loving You Back To Life — CRM
+// Loving You Back To Life - CRM
 const authH = (token) => ({ headers: { Authorization: `Bearer ${token}` } });
 
 export const getLybtlContacts = async (token, q = '') => {

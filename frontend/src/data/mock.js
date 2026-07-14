@@ -15,7 +15,7 @@ export const services = [
   {
     id: 1,
     title: "The PEW Pantry",
-    description: "Food given with dignity. Provide. Encourage. Witness — no questions asked.",
+    description: "Food given with dignity. Provide. Encourage. Witness - no questions asked.",
     icon: "UtensilsCrossed"
   },
   {

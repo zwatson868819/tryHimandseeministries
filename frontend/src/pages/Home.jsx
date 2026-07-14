@@ -36,7 +36,7 @@ const Home = () => {
     try {
       await subscribeToBlog({ email });
       setSubscribed(true);
-      toast.success("You're subscribed — welcome to the Secret Place");
+      toast.success("You're subscribed - welcome to the Secret Place");
       setEmail('');
     } catch (err) {
       const msg = err?.response?.data?.detail || 'Subscription failed';
@@ -131,7 +131,7 @@ const Home = () => {
             <div className="w-1 h-3 bg-amber-400 rounded-full mt-2"></div>
           </div>
         </div>
-        {/* Hidden dove #1 — bottom-right of hero */}
+        {/* Hidden dove #1 - bottom-right of hero */}
         <div className="absolute bottom-4 right-4 z-20">
           <HiddenDove id={1} />
         </div>
@@ -438,7 +438,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/* Notes from the Secret Place — Subscribe Call-out */}
+      {/* Notes from the Secret Place - Subscribe Call-out */}
       <section className="py-20 bg-slate-950" data-testid="home-notes-cta">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative bg-gradient-to-br from-slate-900 via-amber-900/15 to-slate-900 border border-amber-500/30 rounded-2xl p-8 md:p-12 overflow-hidden">
@@ -451,7 +451,7 @@ const Home = () => {
                   <span className="text-amber-400">Secret Place</span>
                 </h2>
                 <p className="text-slate-300 mb-2 italic text-sm">
-                  "But thou, when thou prayest, enter into thy closet..." — Matthew 6:6
+                  "But thou, when thou prayest, enter into thy closet..." - Matthew 6:6
                 </p>
                 <p className="text-slate-400 mb-6">
                   Personal reflections, devotionals, and everyday writings. Subscribe to receive new notes in your inbox.

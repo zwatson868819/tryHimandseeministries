@@ -313,7 +313,7 @@ const Donate = () => {
                   )}
                 </div>
 
-                {/* Live Impact Preview — shows what their amount buys */}
+                {/* Live Impact Preview - shows what their amount buys */}
                 {(() => {
                   const currentAmount = amount === 'custom' ? customAmount : amount;
                   const impact = computeImpact(currentAmount);

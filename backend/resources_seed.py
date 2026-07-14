@@ -131,7 +131,7 @@ RESOURCES = [
     {
         "category": "food",
         "name": "Henrico Community Food Bank",
-        "description": "Home food delivery available to all Henrico residents — call to schedule.",
+        "description": "Home food delivery available to all Henrico residents - call to schedule.",
         "address": "PO Box 6300, Glen Allen, VA 23058",
         "phone": "(804) 549-6609",
         "website": "https://henricofoodbank.org/",
@@ -151,7 +151,7 @@ RESOURCES = [
     {
         "category": "food",
         "name": "St. Mark's Episcopal Church Food Pantry",
-        "description": "Free groceries — no ID required.",
+        "description": "Free groceries - no ID required.",
         "address": "520 N Arthur Ashe Blvd, Richmond, VA 23230",
         "phone": "(804) 358-4771",
         "website": "https://stmarksrva.org/",
@@ -252,8 +252,8 @@ RESOURCES = [
     },
     {
         "category": "clothing",
-        "name": "Belmont Community Resource Services — The Closet",
-        "description": "Free clothing and food distribution — South Richmond.",
+        "name": "Belmont Community Resource Services - The Closet",
+        "description": "Free clothing and food distribution - South Richmond.",
         "address": "3510 Broad Rock Blvd, Richmond, VA 23234",
         "phone": "(804) 275-6336",
         "website": "https://bcrsrva.org/the-closet/",
@@ -273,7 +273,7 @@ RESOURCES = [
     {
         "category": "clothing",
         "name": "Shady Grove UMC Caring Clothes Closet",
-        "description": "Free clothing — appointment only.",
+        "description": "Free clothing - appointment only.",
         "address": "4825 Pouncey Tract Rd, Glen Allen, VA 23059",
         "phone": "(804) 360-7779",
         "website": "https://www.shadygroveumc.net/",
@@ -282,7 +282,7 @@ RESOURCES = [
     },
     {
         "category": "clothing",
-        "name": "Our Lady of Lourdes — Laura's Closet",
+        "name": "Our Lady of Lourdes - Laura's Closet",
         "description": "Free clothing distribution weekly.",
         "address": "8200 Woodman Rd, Henrico, VA 23228",
         "phone": "(804) 262-7315",
@@ -334,7 +334,7 @@ RESOURCES = [
     # -------------------- SOCIAL SERVICES --------------------
     {
         "category": "social-services",
-        "name": "City of Richmond DSS — Downtown Main Office",
+        "name": "City of Richmond DSS - Downtown Main Office",
         "description": "SNAP, TANF, Medicaid, General Relief and child services for Richmond residents.",
         "address": "300 E. Franklin St, Richmond, VA 23219",
         "phone": "(804) 646-7212",
@@ -344,7 +344,7 @@ RESOURCES = [
     },
     {
         "category": "social-services",
-        "name": "City of Richmond DSS — South Richmond",
+        "name": "City of Richmond DSS - South Richmond",
         "description": "Child services and economic support (SNAP/TANF) for South Richmond.",
         "address": "4100 Hull Street Rd, Richmond, VA 23224",
         "phone": "(804) 646-8800",
@@ -354,7 +354,7 @@ RESOURCES = [
     },
     {
         "category": "social-services",
-        "name": "City of Richmond DSS — East Richmond",
+        "name": "City of Richmond DSS - East Richmond",
         "description": "Child services and economic support for East Richmond.",
         "address": "701 N 25th St, Richmond, VA 23223",
         "phone": "(804) 646-7320",
@@ -364,7 +364,7 @@ RESOURCES = [
     },
     {
         "category": "social-services",
-        "name": "Henrico County DSS — West End (Main)",
+        "name": "Henrico County DSS - West End (Main)",
         "description": "SNAP, TANF, Medicaid and full social services for Henrico residents.",
         "address": "8600 Dixon Powers Dr, Henrico, VA 23228",
         "phone": "(804) 501-4001",
@@ -374,7 +374,7 @@ RESOURCES = [
     },
     {
         "category": "social-services",
-        "name": "Henrico County DSS — East End",
+        "name": "Henrico County DSS - East End",
         "description": "Benefit programs only (SNAP, TANF).",
         "address": "3820 Nine Mile Rd, Henrico, VA 23223",
         "phone": "(804) 652-3123",
@@ -384,7 +384,7 @@ RESOURCES = [
     },
     {
         "category": "social-services",
-        "name": "CommonHelp — Statewide Benefits Portal",
+        "name": "CommonHelp - Statewide Benefits Portal",
         "description": "Online application for SNAP, TANF, Medicaid and energy assistance across Virginia.",
         "address": "Online / Statewide",
         "phone": "(855) 635-4370",
@@ -395,7 +395,7 @@ RESOURCES = [
     {
         "category": "social-services",
         "name": "211 Virginia",
-        "description": "Statewide referral line — dial 2-1-1 for help with food, housing, utilities, healthcare and more.",
+        "description": "Statewide referral line - dial 2-1-1 for help with food, housing, utilities, healthcare and more.",
         "address": "Statewide",
         "phone": "2-1-1",
         "website": "https://www.211virginia.org/",
@@ -415,7 +415,7 @@ RESOURCES = [
     {
         "category": "social-services",
         "name": "Society of St. Vincent de Paul (Richmond Council)",
-        "description": "Emergency financial aid — rent, utilities, security deposits — in select zip codes.",
+        "description": "Emergency financial aid - rent, utilities, security deposits - in select zip codes.",
         "address": "4491 Springfield Rd, Glen Allen, VA 23060",
         "phone": "(804) 997-4489",
         "website": "https://svdp-rvacouncil.org/",
@@ -436,7 +436,7 @@ RESOURCES = [
     },
     {
         "category": "mental-health",
-        "name": "Richmond Behavioral Health Authority (RBHA) — 24/7 Crisis",
+        "name": "Richmond Behavioral Health Authority (RBHA) - 24/7 Crisis",
         "description": "24-hour behavioral health crisis line for Richmond City residents. Walk-in assessments available on weekdays.",
         "address": "107 S. 5th Street, Richmond, VA 23219",
         "phone": "(804) 819-4100",
@@ -446,7 +446,7 @@ RESOURCES = [
     },
     {
         "category": "mental-health",
-        "name": "Henrico Area Mental Health & Developmental Services (HAMHDS) — 24/7 Crisis",
+        "name": "Henrico Area Mental Health & Developmental Services (HAMHDS) - 24/7 Crisis",
         "description": "24-hour crisis line for Henrico, Charles City and New Kent residents. Crisis stabilization, outpatient and pre-screening.",
         "address": "10299 Woodman Rd, Glen Allen, VA 23060",
         "phone": "(804) 727-8484",
@@ -456,7 +456,7 @@ RESOURCES = [
     },
     {
         "category": "mental-health",
-        "name": "HAMHDS — East Center",
+        "name": "HAMHDS - East Center",
         "description": "Outpatient behavioral health services for East Henrico.",
         "address": "3908 Nine Mile Rd, Henrico, VA 23223",
         "phone": "(804) 727-8484",
@@ -476,7 +476,7 @@ RESOURCES = [
     },
     {
         "category": "mental-health",
-        "name": "Crisis Receiving Center — St. Joseph's Villa",
+        "name": "Crisis Receiving Center - St. Joseph's Villa",
         "description": "Emergency behavioral health center for youth across Central Virginia.",
         "address": "8000 Brook Road, Richmond, VA 23227",
         "phone": "(804) 553-3201",
@@ -486,7 +486,7 @@ RESOURCES = [
     },
     {
         "category": "mental-health",
-        "name": "Sheltering Arms Institute — Behavioral Health",
+        "name": "Sheltering Arms Institute - Behavioral Health",
         "description": "Outpatient mental health services and referrals.",
         "address": "2000 Westmoreland St, Richmond, VA 23230",
         "phone": "(804) 764-1000",
@@ -509,7 +509,7 @@ RESOURCES = [
     {
         "category": "domestic-violence",
         "name": "Greater Richmond Regional Hotline (YWCA)",
-        "description": "24/7 confidential crisis line for domestic and sexual violence — serving Richmond, Henrico, and Chesterfield. Managed by YWCA, routes callers to Safe Harbor and other partners for emergency shelter, safety planning, and counseling.",
+        "description": "24/7 confidential crisis line for domestic and sexual violence - serving Richmond, Henrico, and Chesterfield. Managed by YWCA, routes callers to Safe Harbor and other partners for emergency shelter, safety planning, and counseling.",
         "address": "Serving Richmond & Henrico",
         "phone": "(804) 612-6126",
         "website": "https://ywcarichmond.org/get-help/",
@@ -518,7 +518,7 @@ RESOURCES = [
     },
     {
         "category": "domestic-violence",
-        "name": "YWCA of Richmond — Domestic Violence Services",
+        "name": "YWCA of Richmond - Domestic Violence Services",
         "description": "Emergency shelter, crisis counseling, court advocacy, and support groups for survivors of domestic and sexual violence.",
         "address": "6 N. Fifth St, Richmond, VA 23219",
         "phone": "(804) 643-6761",
@@ -528,17 +528,17 @@ RESOURCES = [
     },
     {
         "category": "domestic-violence",
-        "name": "Safe Harbor — 24/7 Helpline",
+        "name": "Safe Harbor - 24/7 Helpline",
         "description": "24-hour crisis hotline for domestic and sexual violence survivors in Henrico County and Richmond. Access to emergency shelter, safety planning, and advocacy.",
         "address": "Serving Henrico & Richmond",
         "phone": "(804) 500-2755",
         "website": "https://safeharborshelter.com/",
         "hours": "24 hours, 7 days a week",
-        "notes": "Confidential — shelter location is not disclosed publicly for safety.",
+        "notes": "Confidential - shelter location is not disclosed publicly for safety.",
     },
     {
         "category": "domestic-violence",
-        "name": "Safe Harbor — Administrative & Counseling Office",
+        "name": "Safe Harbor - Administrative & Counseling Office",
         "description": "Non-crisis appointments, counseling, court advocacy, and prevention education.",
         "address": "1934 N. Parham Rd, Suite 300, Henrico, VA 23229",
         "phone": "(804) 249-9470",
@@ -548,7 +548,7 @@ RESOURCES = [
     },
     {
         "category": "domestic-violence",
-        "name": "Henrico Police — Domestic Violence Victim Services",
+        "name": "Henrico Police - Domestic Violence Victim Services",
         "description": "Confidential support, safety planning, and criminal-justice advocacy for Henrico County domestic violence victims. Assistance with protective orders.",
         "address": "7721 E. Parham Rd, Henrico, VA 23294",
         "phone": "(804) 501-4830",
@@ -558,18 +558,18 @@ RESOURCES = [
     },
     {
         "category": "domestic-violence",
-        "name": "Richmond Police — Family & Sexual Violence Unit",
+        "name": "Richmond Police - Family & Sexual Violence Unit",
         "description": "Specialized investigators for domestic and sexual violence within Richmond City. Coordinates with victim advocates and shelters.",
         "address": "200 W Grace St, Richmond, VA 23220",
         "phone": "(804) 646-3011",
         "website": "https://www.rva.gov/police",
-        "hours": "24/7 dispatch — call 911 for emergencies",
+        "hours": "24/7 dispatch - call 911 for emergencies",
         "notes": "Non-emergency: dial 3-1-1 within Richmond.",
     },
     {
         "category": "domestic-violence",
         "name": "Virginia Statewide Hotline (Action Alliance)",
-        "description": "Statewide bilingual hotline (English/Spanish) for domestic and sexual violence — free, confidential, 24/7. Text and chat options available.",
+        "description": "Statewide bilingual hotline (English/Spanish) for domestic and sexual violence - free, confidential, 24/7. Text and chat options available.",
         "address": "Statewide",
         "phone": "1 (800) 838-8238",
         "website": "https://vadata.org/",
@@ -588,23 +588,23 @@ RESOURCES = [
     },
     {
         "category": "domestic-violence",
-        "name": "Central Virginia Legal Aid Society — Protective Orders",
-        "description": "Free civil legal help for survivors of domestic violence — protective orders, custody, divorce, and eviction defense.",
+        "name": "Central Virginia Legal Aid Society - Protective Orders",
+        "description": "Free civil legal help for survivors of domestic violence - protective orders, custody, divorce, and eviction defense.",
         "address": "101 W Broad St, Richmond, VA 23220",
         "phone": "(804) 648-1012",
         "website": "https://cvlas.org/",
         "hours": "Mon–Fri 9am–5pm",
-        "notes": "Intake by phone — ask for the domestic violence advocate.",
+        "notes": "Intake by phone - ask for the domestic violence advocate.",
     },
     {
         "category": "domestic-violence",
-        "name": "Richmond SPCA — Safer Together (SAAF) Program",
-        "description": "Free foster care for pets of domestic violence survivors entering shelter — so no one has to choose between safety and their beloved companion.",
+        "name": "Richmond SPCA - Safer Together (SAAF) Program",
+        "description": "Free foster care for pets of domestic violence survivors entering shelter - so no one has to choose between safety and their beloved companion.",
         "address": "2519 Hermitage Rd, Richmond, VA 23220",
         "phone": "(804) 521-1330",
         "website": "https://richmondspca.org/saaf-providing-a-safe-harbor-for-family-pets-at-a-time-of-critical-need/",
         "hours": "Mon–Sun, by referral through YWCA/Safe Harbor",
-        "notes": "Confidential — coordinated via 804-612-6126.",
+        "notes": "Confidential - coordinated via 804-612-6126.",
     },
 ]
 

@@ -54,7 +54,7 @@ const BlogDetail = () => {
     <div className="min-h-screen pt-20 bg-slate-950" data-testid="blog-detail-page">
       <PageMeta
         title={post.title}
-        description={(post.content || '').replace(/<[^>]+>/g, '').slice(0, 160) || `Read &ldquo;${post.title}&rdquo; — a devotional from tryHimandsee ministries.`}
+        description={(post.content || '').replace(/<[^>]+>/g, '').slice(0, 160) || `Read &ldquo;${post.title}&rdquo; - a devotional from tryHimandsee ministries.`}
         image={post.image_urls?.[0]}
         path={`/blog/${post.id}`}
         type="article"

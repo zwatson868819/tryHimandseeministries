@@ -69,7 +69,7 @@ const buildQuoteCard = (verse) => {
   // Reference
   ctx.fillStyle = '#fbbf24';
   ctx.font = 'bold 42px Georgia, serif';
-  ctx.fillText(`— ${verse.ref}`, size / 2, y + 80);
+  ctx.fillText(`- ${verse.ref}`, size / 2, y + 80);
 
   // Footer / branding
   ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
@@ -86,7 +86,7 @@ const canvasToBlob = (canvas) =>
   new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 
 export const shareVerse = async (verse) => {
-  const text = `"${verse.text}" — ${verse.ref}\n\nVerse of the Day from tryHimandsee ministries`;
+  const text = `"${verse.text}" - ${verse.ref}\n\nVerse of the Day from tryHimandsee ministries`;
   const url = APP_URL;
   const canvas = buildQuoteCard(verse);
   const blob = await canvasToBlob(canvas);
@@ -113,7 +113,7 @@ export const shareVerse = async (verse) => {
       await navigator.clipboard.writeText(`${text}\n${url}`);
     }
   } catch {
-    // ignore — clipboard may be blocked in some contexts
+    // ignore - clipboard may be blocked in some contexts
   }
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);

@@ -1,4 +1,4 @@
-// 31 hand-picked verses — one per day of the month — that match the tone of
+// 31 hand-picked verses - one per day of the month - that match the tone of
 // tryHimandsee ministries (encouragement, generosity, encounter with Christ).
 const VERSES = [
   { text: 'Freely ye have received, freely give.', ref: 'Matthew 10:8' },

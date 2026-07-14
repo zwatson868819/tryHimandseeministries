@@ -33,7 +33,7 @@ const setCanonical = (url) => {
 // Twitter Card tags on mount, then restores defaults on unmount.
 const PageMeta = ({ title, description, image, path, type = 'website' }) => {
   useEffect(() => {
-    const fullTitle = title ? `${title} — ${SITE_NAME}` : SITE_NAME;
+    const fullTitle = title ? `${title} - ${SITE_NAME}` : SITE_NAME;
     const url = path ? `${SITE_URL}${path}` : SITE_URL;
     const ogImage = image
       ? (image.startsWith('http') ? image : `${SITE_URL}${image}`)

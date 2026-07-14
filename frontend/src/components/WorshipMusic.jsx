@@ -15,7 +15,7 @@ const WorshipMusic = () => {
 
   useEffect(() => {
     // Cloudflare Pages serves index.html (HTTP 200) for any missing path.
-    // So a plain `r.ok` check isn't enough — we must verify the response is
+    // So a plain `r.ok` check isn't enough - we must verify the response is
     // actually an audio file via Content-Type.
     fetch(AUDIO_SRC, { method: 'HEAD' })
       .then((r) => {
@@ -36,7 +36,7 @@ const WorshipMusic = () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (!hasAudio) {
-      toast.info('Worship music is coming soon — your custom track will go here.');
+      toast.info('Worship music is coming soon - your custom track will go here.');
       return;
     }
     try {

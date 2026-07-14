@@ -113,7 +113,7 @@ const AdminLybtl = () => {
               <h1 className="text-4xl font-bold text-white mb-1">
                 Loving You <span className="text-amber-400">Back To Life</span>
               </h1>
-              <p className="text-slate-400">Your private outreach contact book — names, journal notes, follow-ups</p>
+              <p className="text-slate-400">Your private outreach contact book - names, journal notes, follow-ups</p>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ const AdminLybtl = () => {
           <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-5" data-testid="lybtl-followups-card">
             <h3 className="text-white font-bold flex items-center mb-3">
               <Calendar className="text-amber-400 mr-2" size={20} />
-              Follow-ups (next 14 days) — {upcoming.follow_ups.length}
+              Follow-ups (next 14 days) - {upcoming.follow_ups.length}
             </h3>
             {upcoming.follow_ups.length === 0 ? (
               <p className="text-slate-500 text-sm">Nothing scheduled.</p>
@@ -152,7 +152,7 @@ const AdminLybtl = () => {
           <div className="bg-slate-900 border border-pink-500/30 rounded-xl p-5" data-testid="lybtl-birthdays-card">
             <h3 className="text-white font-bold flex items-center mb-3">
               <Gift className="text-pink-400 mr-2" size={20} />
-              Birthdays (next 14 days) — {upcoming.birthdays.length}
+              Birthdays (next 14 days) - {upcoming.birthdays.length}
             </h3>
             {upcoming.birthdays.length === 0 ? (
               <p className="text-slate-500 text-sm">No birthdays coming up.</p>

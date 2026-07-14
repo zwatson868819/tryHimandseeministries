@@ -122,7 +122,7 @@ const AdminSubscribers = () => {
                 {subs.map((s) => (
                   <tr key={s.id} className="hover:bg-slate-950 transition-colors">
                     <td className="px-6 py-4 text-white">{s.email}</td>
-                    <td className="px-6 py-4 text-slate-300">{s.name || '—'}</td>
+                    <td className="px-6 py-4 text-slate-300">{s.name || '-'}</td>
                     <td className="px-6 py-4 text-slate-400 text-sm">{fmt(s.created_at)}</td>
                     <td className="px-6 py-4 text-right">
                       <button

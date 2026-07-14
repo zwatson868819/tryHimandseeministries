@@ -152,7 +152,7 @@ async def view_resources_migration_sql():
         media_type="text/plain"
     )
 
-# Resource Directory delta migration (Abuse/DV category only — 10 rows)
+# Resource Directory delta migration (Abuse/DV category only - 10 rows)
 @api_router.get("/download/resources-dv-delta-sql")
 async def view_resources_dv_delta_sql():
     return FileResponse(
@@ -167,7 +167,7 @@ api_router.include_router(ministry_router, tags=["ministry"])
 # Compatibility stubs for endpoints that only exist on the Cloudflare Worker
 # (production backend). They return the same shape as the Worker so the React
 # frontend doesn't log 404s in the dev preview environment. The legacy FastAPI
-# backend is read-only for these endpoints — real data lives in Cloudflare D1.
+# backend is read-only for these endpoints - real data lives in Cloudflare D1.
 # ---------------------------------------------------------------------------
 from datetime import datetime, timezone
 

@@ -36,7 +36,7 @@ class TestResourcesMigrationDownload:
         r = api.get(f"{BASE_URL}/api/download/resources-migration-sql", timeout=30)
         body = r.text
 
-        # Count INSERT statements (58 seed rows expected — 48 originals + 10 DV)
+        # Count INSERT statements (58 seed rows expected - 48 originals + 10 DV)
         insert_count = len(re.findall(r"^INSERT\b", body, flags=re.MULTILINE))
         assert insert_count == 58, f"Expected 58 INSERT rows, found {insert_count}"
 
@@ -46,17 +46,17 @@ class TestResourcesMigrationDownload:
         assert re.search(r"CREATE INDEX", body, re.IGNORECASE), "Missing CREATE INDEX"
 
         # Not truncated - last seed row must be present
-        assert "NAMI Central Virginia" in body, "File appears truncated — 'NAMI Central Virginia' missing"
+        assert "NAMI Central Virginia" in body, "File appears truncated - 'NAMI Central Virginia' missing"
 
-        # Total line count sanity — expect ~81 lines (schema + 58 inserts)
+        # Total line count sanity - expect ~81 lines (schema + 58 inserts)
         lines = body.splitlines()
         assert len(lines) >= 70, f"Expected ~81 lines, got {len(lines)}"
 
     def test_last_insert_terminated(self, api):
-        """The last INSERT must end with ');' — proves no mid-statement truncation."""
+        """The last INSERT must end with ');' - proves no mid-statement truncation."""
         r = api.get(f"{BASE_URL}/api/download/resources-migration-sql", timeout=30)
         body = r.text.rstrip()
-        assert body.endswith(");"), f"Body does not end with ');' — possibly truncated. Tail: {body[-120:]!r}"
+        assert body.endswith(");"), f"Body does not end with ');' - possibly truncated. Tail: {body[-120:]!r}"
 
 
 class TestNotaryMigrationDownload:
@@ -73,7 +73,7 @@ class TestNotaryMigrationDownload:
 
 
 class TestResourcesDvDeltaDownload:
-    """GET /api/download/resources-dv-delta-sql — 10 DV INSERTs, ~13 lines."""
+    """GET /api/download/resources-dv-delta-sql - 10 DV INSERTs, ~13 lines."""
 
     def test_status_and_content_type(self, api):
         r = api.get(f"{BASE_URL}/api/download/resources-dv-delta-sql", timeout=30)

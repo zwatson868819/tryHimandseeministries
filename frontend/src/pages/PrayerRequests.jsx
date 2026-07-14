@@ -62,7 +62,7 @@ const PrayerRequests = () => {
       : (prayerForm.name || '').trim() || 'Anonymous';
     // Transform form state → backend schema (name, email, request, is_public).
     // "Submit anonymously" means: post to the public wall with name hidden,
-    // not "keep private" — visitors can still pray over it.
+    // not "keep private" - visitors can still pray over it.
     const payload = {
       name: displayName,
       email: (prayerForm.email || '').trim() || null,
@@ -94,7 +94,7 @@ const PrayerRequests = () => {
 
   const handlePrayClick = async (requestId) => {
     if (prayedSet.has(requestId)) return;
-    // Optimistic update — increment locally before round trip
+    // Optimistic update - increment locally before round trip
     setPrayerRequests((prev) =>
       prev.map((r) =>
         r.id === requestId ? { ...r, pray_count: (r.pray_count || 0) + 1 } : r

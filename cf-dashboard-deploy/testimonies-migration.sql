@@ -1,4 +1,4 @@
--- TESTIMONIES MIGRATION — Run this ONCE in your Cloudflare D1 Console
+-- TESTIMONIES MIGRATION - Run this ONCE in your Cloudflare D1 Console
 -- Adds the testimonies table for visitor-submitted stories.
 
 CREATE TABLE IF NOT EXISTS testimonies (

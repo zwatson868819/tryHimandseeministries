@@ -175,7 +175,7 @@ app.get("/api/prayer-requests", async (c) => {
   );
 });
 
-// Increment "praying" counter on a public prayer request. No auth — public action.
+// Increment "praying" counter on a public prayer request. No auth - public action.
 app.post("/api/prayer-requests/:id/pray", async (c) => {
   const id = c.req.param("id");
   const existing = await c.env.DB.prepare(
@@ -199,7 +199,7 @@ app.post("/api/prayer-requests/:id/pray", async (c) => {
 });
 
 // ---------- notary requests ----------
-// Public endpoint — anyone can request a free notary appointment.
+// Public endpoint - anyone can request a free notary appointment.
 app.post("/api/notary-requests", async (c) => {
   const b = await c.req.json<any>();
   if (!b.name || !b.phone) return c.json({ detail: "Name and phone are required" }, 400);
@@ -240,7 +240,7 @@ app.post("/api/notary-requests", async (c) => {
           ${b.message ? `<p style="margin:16px 0 0;padding-top:16px;border-top:1px solid #334155;"><strong style="color:#f59e0b;">Message:</strong><br/>${escapeHtml(b.message)}</p>` : ""}
         </td></tr>
         <tr><td style="padding:16px 32px 24px;border-top:1px solid #334155;">
-          <p style="color:#64748b;font-size:12px;margin:0;">Submitted ${escapeHtml(createdAt)} — view all in the admin dashboard.</p>
+          <p style="color:#64748b;font-size:12px;margin:0;">Submitted ${escapeHtml(createdAt)} - view all in the admin dashboard.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -785,7 +785,7 @@ app.post("/api/subscribers", async (c) => {
     .bind(email)
     .first();
   if (existing) {
-    return c.json({ detail: "You're already subscribed — thank you!" }, 409);
+    return c.json({ detail: "You're already subscribed - thank you!" }, 409);
   }
   const id = uuid();
   await c.env.DB.prepare(
@@ -823,7 +823,7 @@ app.post("/api/testimonies", async (c) => {
     return c.json({ detail: "Please share your name and testimony" }, 400);
   }
   if (testimony.length < 20) {
-    return c.json({ detail: "Please share a bit more — at least a few sentences" }, 400);
+    return c.json({ detail: "Please share a bit more - at least a few sentences" }, 400);
   }
   const id = uuid();
   await c.env.DB.prepare(
@@ -838,10 +838,10 @@ app.post("/api/testimonies", async (c) => {
       now()
     )
     .run();
-  return c.json({ id, message: "Thank you for sharing — your testimony has been received." }, 201);
+  return c.json({ id, message: "Thank you for sharing - your testimony has been received." }, 201);
 });
 
-// Public — only approved
+// Public - only approved
 app.get("/api/testimonies", async (c) => {
   const limit = Math.min(parseInt(c.req.query("limit") || "20", 10), 100);
   const rows = await c.env.DB.prepare(
@@ -852,7 +852,7 @@ app.get("/api/testimonies", async (c) => {
   return c.json(rows.results || []);
 });
 
-// Admin — all
+// Admin - all
 app.get("/api/admin/testimonies", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json({ detail: "Unauthorized" }, 401);
@@ -866,7 +866,7 @@ app.get("/api/admin/testimonies", async (c) => {
   return c.json(rows.results || []);
 });
 
-// Admin — approve / reject / edit
+// Admin - approve / reject / edit
 app.put("/api/admin/testimonies/:id", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json({ detail: "Unauthorized" }, 401);
@@ -951,7 +951,7 @@ app.put("/api/admin/settings/monthly-goal", async (c) => {
   return c.json({ goal, message: "Goal updated" });
 });
 
-// ---------- Loving You Back To Life — Contacts CRM ----------
+// ---------- Loving You Back To Life - Contacts CRM ----------
 
 function mapContactRow(r: any) {
   if (!r) return r;
@@ -1125,7 +1125,7 @@ app.get("/api/admin/lybtl/upcoming", async (c) => {
     .bind(todayISO, future)
     .all();
 
-  // Birthdays — match MM-DD slice across the 14-day window
+  // Birthdays - match MM-DD slice across the 14-day window
   const allContacts = await c.env.DB.prepare(
     "SELECT id, name, birthday, phone FROM loving_you_back_contacts WHERE birthday IS NOT NULL AND birthday != ''"
   ).all();
@@ -1335,7 +1335,7 @@ app.get("/api/admin/dashboard/stats", async (c) => {
   });
 });
 
-// "Today" summary card — events in the last 24 hours + pending follow-ups for today.
+// "Today" summary card - events in the last 24 hours + pending follow-ups for today.
 app.get("/api/admin/today-summary", async (c) => {
   const admin = await requireAdmin(c);
   if (!admin) return c.json({ detail: "Unauthorized" }, 401);
@@ -1434,7 +1434,7 @@ app.get("/api/stats/prayer-count", async (c) => {
   return c.json({ total: row?.total ?? 0 });
 });
 
-// Public Candle Wall — anonymous "Light a candle" page.
+// Public Candle Wall - anonymous "Light a candle" page.
 app.post("/api/candles", async (c) => {
   const b = await c.req.json<{ name?: string; intention?: string }>();
   const name = (b.name || "Anonymous").slice(0, 40).trim() || "Anonymous";

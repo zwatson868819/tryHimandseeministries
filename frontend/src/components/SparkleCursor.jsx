@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
 // Tiny golden sparkles trail the cursor on desktop / fine-pointer devices only.
-// Pure CSS — no canvas. Safe to mount once at the App root.
+// Pure CSS - no canvas. Safe to mount once at the App root.
 const SparkleCursor = () => {
   const containerRef = useRef(null);
   const throttleRef = useRef(0);
 
   useEffect(() => {
-    // Skip on touch / coarse pointer devices entirely — saves battery on phones.
+    // Skip on touch / coarse pointer devices entirely - saves battery on phones.
     if (!window.matchMedia?.('(pointer: fine)').matches) return;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
 

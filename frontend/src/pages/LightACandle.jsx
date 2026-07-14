@@ -96,7 +96,7 @@ const LightACandle = () => {
           >
             <div>
               <label className="block text-slate-300 text-sm font-semibold mb-2" htmlFor="candle-name">
-                First name <span className="text-slate-500 font-normal">(optional — leave blank to be anonymous)</span>
+                First name <span className="text-slate-500 font-normal">(optional - leave blank to be anonymous)</span>
               </label>
               <input
                 id="candle-name"

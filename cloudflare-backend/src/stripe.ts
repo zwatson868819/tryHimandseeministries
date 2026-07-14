@@ -1,4 +1,4 @@
-// Stripe REST helpers — direct API calls (no SDK, no node deps)
+// Stripe REST helpers - direct API calls (no SDK, no node deps)
 // Compatible with Cloudflare Workers.
 
 const STRIPE_API = "https://api.stripe.com/v1";
@@ -53,7 +53,7 @@ export async function createOneTimeCheckoutSession(
     mode: "payment",
     "payment_method_types[0]": "card",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][product_data][name]": "tryHimandsee Ministries — Donation",
+    "line_items[0][price_data][product_data][name]": "tryHimandsee Ministries - Donation",
     "line_items[0][price_data][unit_amount]": Math.round(args.amount * 100),
     "line_items[0][quantity]": 1,
     customer_email: args.customerEmail,
@@ -81,7 +81,7 @@ export async function createMonthlyCheckoutSession(
     mode: "subscription",
     "payment_method_types[0]": "card",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][product_data][name]": "tryHimandsee Ministries — Monthly Partnership",
+    "line_items[0][price_data][product_data][name]": "tryHimandsee Ministries - Monthly Partnership",
     "line_items[0][price_data][unit_amount]": Math.round(args.amount * 100),
     "line_items[0][price_data][recurring][interval]": "month",
     "line_items[0][quantity]": 1,

@@ -117,7 +117,13 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Clicking the button copies `${origin}/resources/${category}#${slug}` to the clipboard, shows a toast, and briefly flips the icon to a green check.
 - Direct visits to a hash link auto-scroll the target card into view and apply a highlighted amber ring for ~3.5s.
 - Invalid or absent hashes render normally with no errors.
-- Verified via testing_agent (iteration_8.json — 100% frontend 6/6 scenarios).
+- Verified via testing_agent (iteration_8.json - 100% frontend 6/6 scenarios).
+
+## 2026-02-XX - Em-dash Purge
+- User requested all em-dashes (U+2014, "-") be replaced with regular hyphens (-) site-wide.
+- Bulk sed replacement across ~170 occurrences in 50 files (frontend, backend, SQL migrations, docs). Zero em-dashes remain in source.
+- SQL migration files regenerated from cleaned `resources_seed.py` - user needs to re-run resources migration (or apply an UPDATE) to purge em-dashes already in D1.
+- Verified via preview screenshot - Abuse/DV page and all cards render with regular hyphens.
 
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths

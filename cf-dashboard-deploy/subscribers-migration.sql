@@ -1,4 +1,4 @@
--- SUBSCRIBERS MIGRATION — Run this ONCE in your Cloudflare D1 Console
+-- SUBSCRIBERS MIGRATION - Run this ONCE in your Cloudflare D1 Console
 -- Adds the subscribers table for Notes from the Secret Place email signups.
 
 CREATE TABLE IF NOT EXISTS subscribers (

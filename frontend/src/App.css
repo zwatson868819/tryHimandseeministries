@@ -9,7 +9,7 @@
 }
 
 /* ============================================
-   WARM LIGHT MODE — toggled via .warm-mode on <html>
+   WARM LIGHT MODE - toggled via .warm-mode on <html>
    Parchment + amber palette like sunlight through stained glass.
    ============================================ */
 html.warm-mode {
@@ -41,7 +41,7 @@ html.warm-mode .border-slate-800 { border-color: #c4a875 !important; }
 html.warm-mode .border-slate-700 { border-color: #a0822c !important; }
 html.warm-mode .border-amber-500\/20 { border-color: rgba(180, 83, 9, 0.5) !important; }
 html.warm-mode .border-amber-500\/30 { border-color: rgba(180, 83, 9, 0.6) !important; }
-/* Heroes with dark gradients — soften to parchment */
+/* Heroes with dark gradients - soften to parchment */
 html.warm-mode .from-slate-900,
 html.warm-mode .via-slate-900,
 html.warm-mode .to-slate-900 { --tw-gradient-from: #dfca94; --tw-gradient-via: #dfca94; --tw-gradient-to: #dfca94; }
@@ -53,7 +53,7 @@ html.warm-mode .text-amber-400,
 html.warm-mode .text-amber-300 { color: #92400e !important; }
 html.warm-mode .text-amber-100 { color: #5b2807 !important; }
 html.warm-mode .text-amber-200\/80 { color: #78350f !important; }
-/* Hero overlay gradient — fade to parchment not navy */
+/* Hero overlay gradient - fade to parchment not navy */
 html.warm-mode .from-slate-900\/70 { --tw-gradient-from: rgba(236, 220, 173, 0.5); }
 html.warm-mode .via-slate-900\/60 { --tw-gradient-via: rgba(236, 220, 173, 0.35); }
 

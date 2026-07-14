@@ -681,7 +681,7 @@ async def create_donation_checkout(
         success_url = f"{origin_url}/donate?session_id={{CHECKOUT_SESSION_ID}}&success=true"
         cancel_url = f"{origin_url}/donate?canceled=true"
 
-        # MONTHLY (subscription) flow — use official Stripe SDK with mode='subscription'
+        # MONTHLY (subscription) flow - use official Stripe SDK with mode='subscription'
         if payment_request.donation_type == "monthly":
             stripe_sdk.api_key = stripe_api_key
             metadata = {
@@ -697,7 +697,7 @@ async def create_donation_checkout(
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "tryHimandsee Ministries — Monthly Partnership"
+                            "name": "tryHimandsee Ministries - Monthly Partnership"
                         },
                         "unit_amount": int(round(final_amount * 100)),
                         "recurring": {"interval": "month"}

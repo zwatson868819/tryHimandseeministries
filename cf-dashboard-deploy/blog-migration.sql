@@ -1,4 +1,4 @@
--- BLOG MIGRATION — Run this ONCE in your Cloudflare D1 Console
+-- BLOG MIGRATION - Run this ONCE in your Cloudflare D1 Console
 -- (only adds the new blog_posts table; existing data is untouched)
 
 CREATE TABLE IF NOT EXISTS blog_posts (

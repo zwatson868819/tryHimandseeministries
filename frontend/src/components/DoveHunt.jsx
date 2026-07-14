@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
 
-// 5 dove hiding spots — visible-but-easy-to-miss. Each spot is identified by
+// 5 dove hiding spots - visible-but-easy-to-miss. Each spot is identified by
 // a stable key. The first time a user clicks any spot, they "find" that dove
 // and the count goes up. State persists in localStorage so finding them all
 // across multiple visits still counts.
@@ -37,10 +37,10 @@ export const HiddenDove = ({ id, className = '', size = 28 }) => {
     setFound(true);
 
     if (set.size >= TOTAL_DOVES) {
-      // Found all 5 — celebrate
+      // Found all 5 - celebrate
       if (!announcedFinishRef.current) {
         announcedFinishRef.current = true;
-        toast.success('You found all 5 doves! 🕊️ "I will give you the desires of your heart." — Psalm 37:4', {
+        toast.success('You found all 5 doves! 🕊️ "I will give you the desires of your heart." - Psalm 37:4', {
           duration: 7000,
         });
         const end = Date.now() + 2500;
@@ -80,7 +80,7 @@ export const HiddenDove = ({ id, className = '', size = 28 }) => {
   );
 };
 
-// Optional progress badge — shows in the footer how many doves remain.
+// Optional progress badge - shows in the footer how many doves remain.
 export const DoveProgress = () => {
   const [count, setCount] = useState(() => readFound().size);
 
@@ -93,7 +93,7 @@ export const DoveProgress = () => {
   if (count >= TOTAL_DOVES) {
     return (
       <p className="text-amber-400 text-xs text-center mt-3" data-testid="dove-progress-complete">
-        🕊️ All 5 doves found — you have an eye for grace.
+        🕊️ All 5 doves found - you have an eye for grace.
       </p>
     );
   }

@@ -57,7 +57,7 @@ const Ministries = () => {
               <div className="order-1 md:order-2">
                 <img 
                   src="/images/pew-pantry.jpg" 
-                  alt="The PEW Pantry — Food with Dignity" 
+                  alt="The PEW Pantry - Food with Dignity" 
                   className="rounded-2xl shadow-2xl w-full"
                 />
               </div>
@@ -68,7 +68,7 @@ const Ministries = () => {
               <div>
                 <img 
                   src="/images/garments-of-grace.jpg" 
-                  alt="Garments of Grace — Clothed in Dignity" 
+                  alt="Garments of Grace - Clothed in Dignity" 
                   className="rounded-2xl shadow-2xl w-full"
                 />
               </div>
@@ -145,7 +145,7 @@ const Ministries = () => {
               <div>
                 <img 
                   src="/images/monthly-miracle-run.png" 
-                  alt="Monthly Miracle Run — Random blessings, eternal impact" 
+                  alt="Monthly Miracle Run - Random blessings, eternal impact" 
                   className="rounded-2xl shadow-2xl w-full"
                 />
               </div>

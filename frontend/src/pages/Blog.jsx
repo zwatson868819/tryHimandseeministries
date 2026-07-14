@@ -41,7 +41,7 @@ const Blog = () => {
     try {
       await subscribeToBlog({ email, name: name || null });
       setSubscribed(true);
-      toast.success("You're subscribed — welcome to the Secret Place");
+      toast.success("You're subscribed - welcome to the Secret Place");
       setEmail('');
       setName('');
     } catch (err) {
@@ -73,7 +73,7 @@ const Blog = () => {
             Notes from the <span className="text-amber-400">Secret Place</span>
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto italic">
-            "But thou, when thou prayest, enter into thy closet, and when thou hast shut thy door, pray to thy Father which is in secret..." — Matthew 6:6
+            "But thou, when thou prayest, enter into thy closet, and when thou hast shut thy door, pray to thy Father which is in secret..." - Matthew 6:6
           </p>
         </div>
       </section>
@@ -140,7 +140,7 @@ const Blog = () => {
             <div className="text-center py-12" data-testid="blog-empty-state">
               <Feather className="text-amber-400 mx-auto mb-6" size={64} />
               <h2 className="text-3xl font-bold text-white mb-4">No notes yet</h2>
-              <p className="text-slate-400 text-lg">Check back soon — the first one is coming.</p>
+              <p className="text-slate-400 text-lg">Check back soon - the first one is coming.</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" data-testid="blog-grid">

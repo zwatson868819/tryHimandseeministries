@@ -1,4 +1,4 @@
-// Auth helpers — JWT + PBKDF2 password hashing using Web Crypto API
+// Auth helpers - JWT + PBKDF2 password hashing using Web Crypto API
 // All Workers-compatible (no node-only deps).
 
 import { sign, verify } from "hono/jwt";

@@ -89,7 +89,7 @@ const AdminBlog = () => {
         toast.success('Note updated');
       } else {
         await createBlogPost(formData, token);
-        toast.success('Note created — subscribers will be emailed');
+        toast.success('Note created - subscribers will be emailed');
       }
       setShowForm(false);
       setEditing(null);
@@ -211,7 +211,7 @@ const AdminBlog = () => {
                   placeholder="e.g. Z. Watson"
                 />
                 <p className="text-slate-500 text-sm mt-1">
-                  Optional — leave blank to hide the byline on this post.
+                  Optional - leave blank to hide the byline on this post.
                 </p>
               </div>
 

@@ -278,7 +278,7 @@ const Contact = () => {
               Share Your <span className="text-amber-400">Testimony</span>
             </h2>
             <p className="text-slate-300 max-w-2xl mx-auto">
-              Has the ministry, an Encounter, or a moment with God touched your life? Share your story with us — it may encourage someone else.
+              Has the ministry, an Encounter, or a moment with God touched your life? Share your story with us - it may encourage someone else.
             </p>
           </div>
 

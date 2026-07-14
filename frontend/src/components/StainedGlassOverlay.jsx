@@ -34,7 +34,7 @@ const StainedGlassOverlay = ({ className = '', style = {} }) => (
       </pattern>
     </defs>
 
-    {/* The "window" shape — gothic arch */}
+    {/* The "window" shape - gothic arch */}
     <path
       d="M 50,580 L 50,180 Q 50,30 200,30 Q 350,30 350,180 L 350,580 Z"
       fill="url(#sg-amber)"

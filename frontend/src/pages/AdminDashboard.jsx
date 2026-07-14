@@ -55,7 +55,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Valid tab keys — kept in sync with TabBar.jsx
+  // Valid tab keys - kept in sync with TabBar.jsx
   const VALID_TABS = ['donations', 'volunteers', 'contacts', 'prayers', 'notary', 'resources'];
   const initialTab = VALID_TABS.includes(searchParams.get('tab')) ? searchParams.get('tab') : 'donations';
 
@@ -80,7 +80,7 @@ const AdminDashboard = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     if (tab === 'donations') {
-      // default tab — omit query param for a cleaner URL
+      // default tab - omit query param for a cleaner URL
       searchParams.delete('tab');
       setSearchParams(searchParams, { replace: true });
     } else {

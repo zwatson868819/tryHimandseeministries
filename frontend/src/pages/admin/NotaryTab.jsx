@@ -33,9 +33,9 @@ const NotaryTab = ({ notaryRequests, onDelete }) => (
               <td className="py-3 text-slate-400 text-sm">
                 {n.email ? <a href={`mailto:${n.email}`} className="hover:text-amber-400">{n.email}</a> : 'N/A'}
               </td>
-              <td className="py-3 text-slate-300 text-sm max-w-[180px] truncate">{n.document_type || '—'}</td>
-              <td className="py-3 text-slate-300 text-sm max-w-[180px] truncate">{n.preferred_time || '—'}</td>
-              <td className="py-3 text-slate-400 text-sm max-w-xs truncate">{n.message || '—'}</td>
+              <td className="py-3 text-slate-300 text-sm max-w-[180px] truncate">{n.document_type || '-'}</td>
+              <td className="py-3 text-slate-300 text-sm max-w-[180px] truncate">{n.preferred_time || '-'}</td>
+              <td className="py-3 text-slate-400 text-sm max-w-xs truncate">{n.message || '-'}</td>
               <td className="py-3 text-right">
                 <button
                   onClick={() => onDelete(n.id)}

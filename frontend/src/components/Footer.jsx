@@ -14,7 +14,7 @@ const Footer = () => {
     try {
       const { method } = await shareVerse(verse);
       if (method === 'downloaded') {
-        toast.success('Verse copied and quote card downloaded — share it anywhere!');
+        toast.success('Verse copied and quote card downloaded - share it anywhere!');
       } else if (method === 'shared') {
         toast.success('Thanks for sharing the Word!');
       }

@@ -366,7 +366,7 @@ const AdminLybtlContact = () => {
                       {e.follow_up_date && (
                         <div className={`inline-flex items-center text-xs px-2.5 py-1 rounded ${e.status === 'done' ? 'bg-slate-800 text-slate-500 line-through' : 'bg-amber-500/15 text-amber-400'}`}>
                           <Calendar size={12} className="mr-1.5" />
-                          <span>Follow up {fmt(e.follow_up_date)}{e.follow_up_reason ? ` — ${e.follow_up_reason}` : ''}</span>
+                          <span>Follow up {fmt(e.follow_up_date)}{e.follow_up_reason ? ` - ${e.follow_up_reason}` : ''}</span>
                         </div>
                       )}
                     </div>

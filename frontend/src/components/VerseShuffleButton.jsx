@@ -13,7 +13,7 @@ const VerseShuffleButton = () => {
   const nearBottom = useNearBottom(180);
 
   const pickRandom = useCallback(() => {
-    // The verses module exports a getter only — pick another based on a random offset.
+    // The verses module exports a getter only - pick another based on a random offset.
     // Cheap trick: fetch by random day-of-month index by mutating Date prototype briefly.
     const original = Date.prototype.getUTCDate;
     const rand = 1 + Math.floor(Math.random() * 31);

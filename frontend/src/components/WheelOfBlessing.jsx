@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Gift, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-// 12 blessings — each a short, joyful encouragement prompt to bless someone today.
+// 12 blessings - each a short, joyful encouragement prompt to bless someone today.
 const BLESSINGS = [
   { label: 'Pray for a stranger today', emoji: '🙏' },
   { label: 'Smile at someone you don\u2019t know', emoji: '😊' },
