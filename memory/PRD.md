@@ -74,6 +74,15 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Added 3 compatibility stub endpoints to legacy FastAPI `server.py` so the dev preview environment no longer 404s for `/api/testimonies`, `/api/donations/progress`, `/api/stats/impact`. They return the same JSON shape as the Cloudflare Worker (empty array / zeros). Production Cloudflare Worker already had real implementations of these.
 - Verified via testing_agent (iteration_2.json — 100% backend pytest + 100% frontend).
 
+## 2026-02-XX — Free Notary Services
+- New public page at `/notary` — hero + info tiles + request form (Name*, Phone*, Email, Type of paperwork, Preferred date/time, Message).
+- New nav link "Free Notary Services" in the header (desktop + mobile).
+- Cloudflare Worker: `POST /api/notary-requests` persists to a new D1 table `notary_requests` and emails the admin via Resend. `GET /api/admin/notary-requests` + `DELETE /api/admin/notary-requests/:id` are admin-only.
+- Legacy FastAPI has echo/empty stubs so preview form flow works.
+- Admin Dashboard: new "Notary" tab lists all requests with click-to-call phone links, click-to-email addresses, and per-row delete.
+- D1 migration file: `/app/cf-dashboard-deploy/notary-migration.sql` — **user must run this once in the Cloudflare D1 console** after the next GitHub push.
+- Verified via testing_agent (iteration_3.json — 100% backend 6/6 pytest, 100% frontend).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
