@@ -1,13 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart, TrendingUp, Gift, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal, getAdminTodaySummary, getImpactStats, updateImpactStats, deletePrayerRequest, getAdminNotaryRequests, deleteNotaryRequest, getAdminResources, createResource, updateResource, deleteResource } from '../services/api';
+import {
+  getDashboardStats,
+  getAdminDonations,
+  exportDonationsCSV,
+  getAdminVolunteers,
+  getAdminContacts,
+  getAdminPrayerRequests,
+  getDonationProgress,
+  updateMonthlyGoal,
+  getAdminTodaySummary,
+  getImpactStats,
+  updateImpactStats,
+  deletePrayerRequest,
+  getAdminNotaryRequests,
+  deleteNotaryRequest,
+  getAdminResources,
+  createResource,
+  updateResource,
+  deleteResource,
+} from '../services/api';
 import { RESOURCE_CATEGORIES } from './ResourceDirectory';
+
+import AdminHeader from './admin/AdminHeader';
+import TodayCard from './admin/TodayCard';
+import ImpactEditor from './admin/ImpactEditor';
+import GoalEditor from './admin/GoalEditor';
+import StatsCards from './admin/StatsCards';
+import TabBar from './admin/TabBar';
+import DonationsTab from './admin/DonationsTab';
+import VolunteersTab from './admin/VolunteersTab';
+import ContactsTab from './admin/ContactsTab';
+import PrayersTab from './admin/PrayersTab';
+import NotaryTab from './admin/NotaryTab';
+import ResourcesTab from './admin/ResourcesTab';
+import ResourceModal from './admin/ResourceModal';
+
+const emptyResource = (defaultCategory) => ({
+  id: null,
+  category: defaultCategory,
+  name: '',
+  description: '',
+  address: '',
+  phone: '',
+  website: '',
+  hours: '',
+  notes: '',
+  sort_order: 999,
+  is_active: true,
+});
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+
+  // Auth + top-level data
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [donations, setDonations] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
@@ -15,26 +64,34 @@ const AdminDashboard = () => {
   const [prayers, setPrayers] = useState([]);
   const [notaryRequests, setNotaryRequests] = useState([]);
   const [resources, setResources] = useState([]);
+  const [progress, setProgress] = useState(null);
+  const [todaySummary, setTodaySummary] = useState(null);
+  const [impact, setImpact] = useState(null);
+
+  // UI state
+  const [activeTab, setActiveTab] = useState('donations');
+
+  // Editors
+  const [editingGoal, setEditingGoal] = useState(false);
+  const [goalInput, setGoalInput] = useState('');
+  const [editingImpact, setEditingImpact] = useState(false);
+  const [impactInputs, setImpactInputs] = useState({ lives_touched: '', kits_given: '', miracle_runs: '' });
+
+  // Resource CRUD state
   const [resourceFilter, setResourceFilter] = useState('all');
   const [editingResource, setEditingResource] = useState(null);
   const [showResourceModal, setShowResourceModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('donations');
-  const [progress, setProgress] = useState(null);
-  const [editingGoal, setEditingGoal] = useState(false);
-  const [goalInput, setGoalInput] = useState('');
-  const [todaySummary, setTodaySummary] = useState(null);
-  const [impact, setImpact] = useState(null);
-  const [editingImpact, setEditingImpact] = useState(false);
-  const [impactInputs, setImpactInputs] = useState({ lives_touched: '', kits_given: '', miracle_runs: '' });
+
+  // Donation filters
   const [filters, setFilters] = useState({
     donation_type: '',
     start_date: '',
     end_date: '',
     min_amount: '',
-    max_amount: ''
+    max_amount: '',
   });
 
+  // ---- Auth guard + initial load ----
   useEffect(() => {
     const adminToken = localStorage.getItem('admin_token');
     if (!adminToken) {
@@ -45,10 +102,18 @@ const AdminDashboard = () => {
     fetchAllData(adminToken);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    navigate('/admin/login');
+  };
+
   const fetchAllData = async (adminToken) => {
     try {
       setLoading(true);
-      const [statsData, donationsData, volunteersData, contactsData, prayersData, progressData, today, impactData, notaryData, resourcesData] = await Promise.all([
+      const [
+        statsData, donationsData, volunteersData, contactsData, prayersData,
+        progressData, today, impactData, notaryData, resourcesData,
+      ] = await Promise.all([
         getDashboardStats(adminToken),
         getAdminDonations(adminToken),
         getAdminVolunteers(adminToken),
@@ -60,7 +125,6 @@ const AdminDashboard = () => {
         getAdminNotaryRequests(adminToken).catch(() => []),
         getAdminResources(adminToken).catch(() => []),
       ]);
-      
       setStats(statsData);
       setDonations(donationsData);
       setVolunteers(volunteersData);
@@ -92,11 +156,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_token');
-    navigate('/admin/login');
-  };
-
+  // ---- Goal ----
   const handleSaveGoal = async () => {
     const goal = parseFloat(goalInput);
     if (!Number.isFinite(goal) || goal <= 0) {
@@ -109,11 +169,12 @@ const AdminDashboard = () => {
       setProgress(updated);
       setEditingGoal(false);
       toast.success('Monthly goal updated');
-    } catch (e) {
+    } catch {
       toast.error('Failed to update goal');
     }
   };
 
+  // ---- Impact ----
   const handleSaveImpact = async () => {
     const payload = {
       lives_touched: parseInt(impactInputs.lives_touched, 10) || 0,
@@ -131,6 +192,16 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleCancelImpactEdit = () => {
+    setEditingImpact(false);
+    setImpactInputs({
+      lives_touched: String(impact?.lives_touched ?? 0),
+      kits_given: String(impact?.kits_given ?? 0),
+      miracle_runs: String(impact?.miracle_runs ?? 0),
+    });
+  };
+
+  // ---- Prayers ----
   const handleDeletePrayer = async (prayerId) => {
     if (!window.confirm('Delete this prayer request? This cannot be undone.')) return;
     try {
@@ -142,6 +213,7 @@ const AdminDashboard = () => {
     }
   };
 
+  // ---- Notary ----
   const handleDeleteNotary = async (notaryId) => {
     if (!window.confirm('Delete this notary request? This cannot be undone.')) return;
     try {
@@ -153,21 +225,10 @@ const AdminDashboard = () => {
     }
   };
 
-  // -------- Resource Directory CRUD --------
+  // ---- Resources ----
   const openNewResource = () => {
-    setEditingResource({
-      id: null,
-      category: resourceFilter !== 'all' ? resourceFilter : RESOURCE_CATEGORIES[0].key,
-      name: '',
-      description: '',
-      address: '',
-      phone: '',
-      website: '',
-      hours: '',
-      notes: '',
-      sort_order: 999,
-      is_active: true,
-    });
+    const defaultCategory = resourceFilter !== 'all' ? resourceFilter : RESOURCE_CATEGORIES[0].key;
+    setEditingResource(emptyResource(defaultCategory));
     setShowResourceModal(true);
   };
 
@@ -206,7 +267,9 @@ const AdminDashboard = () => {
     try {
       if (editingResource.id) {
         const updated = await updateResource(editingResource.id, payload, token);
-        setResources((prev) => prev.map((r) => (r.id === editingResource.id ? { ...r, ...payload, updated_at: updated?.updated_at || r.updated_at } : r)));
+        setResources((prev) =>
+          prev.map((r) => (r.id === editingResource.id ? { ...r, ...payload, updated_at: updated?.updated_at || r.updated_at } : r))
+        );
         toast.success('Resource updated');
       } else {
         const created = await createResource(payload, token);
@@ -234,17 +297,17 @@ const AdminDashboard = () => {
     const nextActive = !(resource.is_active !== 0 && resource.is_active !== false);
     try {
       await updateResource(resource.id, { ...resource, is_active: nextActive }, token);
-      setResources((prev) => prev.map((r) => (r.id === resource.id ? { ...r, is_active: nextActive ? 1 : 0 } : r)));
+      setResources((prev) =>
+        prev.map((r) => (r.id === resource.id ? { ...r, is_active: nextActive ? 1 : 0 } : r))
+      );
     } catch {
       toast.error('Failed to update visibility');
     }
   };
 
+  // ---- Donations filters ----
   const handleFilterChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value
-    });
+    setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   const applyFilters = async () => {
@@ -253,7 +316,7 @@ const AdminDashboard = () => {
       const filtered = await getAdminDonations(token, filters);
       setDonations(filtered);
       toast.success('Filters applied');
-    } catch (error) {
+    } catch {
       toast.error('Failed to apply filters');
     }
   };
@@ -271,24 +334,9 @@ const AdminDashboard = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       toast.success('Donations exported successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to export donations');
     }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
   };
 
   if (loading) {
@@ -305,917 +353,74 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen pt-20 bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Admin <span className="text-amber-400">Dashboard</span>
-            </h1>
-            <p className="text-slate-400">Manage your ministry data and settings</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => navigate('/admin/encounters')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-            >
-              <Newspaper className="mr-2" size={18} />
-              Manage Encounters
-            </button>
-            <button
-              onClick={() => navigate('/admin/news')}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center"
-            >
-              <Newspaper className="mr-2" size={18} />
-              Manage News
-            </button>
-            <button
-              onClick={() => navigate('/admin/blog')}
-              data-testid="admin-manage-blog-btn"
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center"
-            >
-              <BookOpen className="mr-2" size={18} />
-              Manage Notes
-            </button>
-            <button
-              onClick={() => navigate('/admin/subscribers')}
-              data-testid="admin-manage-subscribers-btn"
-              className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors flex items-center"
-            >
-              <AtSign className="mr-2" size={18} />
-              Subscribers
-            </button>
-            <button
-              onClick={() => navigate('/admin/testimonies')}
-              data-testid="admin-manage-testimonies-btn"
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center"
-            >
-              <Sparkles className="mr-2" size={18} />
-              Testimonies
-            </button>
-            <button
-              onClick={() => navigate('/admin/lybtl')}
-              data-testid="admin-manage-lybtl-btn"
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all flex items-center"
-            >
-              <HandHeart className="mr-2" size={18} />
-              Loving You Back To Life
-            </button>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors flex items-center"
-            >
-              <LogOut className="mr-2" size={18} />
-              Logout
-            </button>
-          </div>
-        </div>
+        <AdminHeader onLogout={handleLogout} />
 
-        {/* Today at a Glance */}
-        {todaySummary && (
-          <div
-            data-testid="admin-today-card"
-            className="bg-gradient-to-r from-slate-900 via-amber-900/10 to-slate-900 border border-amber-500/30 rounded-xl p-6 mb-6"
-          >
-            <div className="flex items-center mb-4">
-              <TrendingUp className="text-amber-400 mr-3" size={26} />
-              <div>
-                <h3 className="text-white font-bold text-lg">Today at a Glance</h3>
-                <p className="text-slate-400 text-sm">Activity in the last 24 hours</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-amber-400">{todaySummary.new_donations}</p>
-                <p className="text-xs text-slate-400 mt-1">New donations</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-400">${Math.round(todaySummary.new_donation_amount || 0).toLocaleString()}</p>
-                <p className="text-xs text-slate-400 mt-1">Raised today</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-pink-400">{todaySummary.new_prayer_requests}</p>
-                <p className="text-xs text-slate-400 mt-1">Prayer requests</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-blue-400">{todaySummary.new_contacts}</p>
-                <p className="text-xs text-slate-400 mt-1">New CRM contacts</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-purple-400">{todaySummary.new_subscribers}</p>
-                <p className="text-xs text-slate-400 mt-1">New subscribers</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-orange-400">{todaySummary.followups_due_today}</p>
-                <p className="text-xs text-slate-400 mt-1">Follow-ups due</p>
-              </div>
-            </div>
-            {todaySummary.new_testimonies_pending > 0 && (
-              <div className="mt-4 pt-4 border-t border-amber-500/20 flex items-center justify-between flex-wrap gap-2">
-                <p className="text-amber-300 text-sm">
-                  <Sparkles className="inline mr-1" size={14} />
-                  {todaySummary.new_testimonies_pending} new testimon{todaySummary.new_testimonies_pending === 1 ? 'y' : 'ies'} awaiting moderation
-                </p>
-                <button
-                  onClick={() => navigate('/admin/testimonies')}
-                  className="text-amber-400 text-sm font-semibold hover:text-amber-300"
-                >
-                  Review &rarr;
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+        <TodayCard summary={todaySummary} />
 
-        {/* Impact Counters (Homepage Miracle Counter) */}
-        {impact && (
-          <div
-            data-testid="admin-impact-card"
-            className="bg-slate-900 border border-amber-500/30 rounded-xl p-6 mb-6"
-          >
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-              <div className="flex items-center">
-                <Gift className="text-amber-400 mr-3" size={26} />
-                <div>
-                  <h3 className="text-white font-bold text-lg">Homepage Impact Counter</h3>
-                  <p className="text-slate-400 text-sm">Numbers shown in the &ldquo;Miracles in Motion&rdquo; section on the homepage</p>
-                </div>
-              </div>
-              {editingImpact ? (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleSaveImpact}
-                    data-testid="admin-impact-save"
-                    className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
-                  >
-                    <Check size={16} className="mr-1" /> Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingImpact(false);
-                      setImpactInputs({
-                        lives_touched: String(impact.lives_touched ?? 0),
-                        kits_given: String(impact.kits_given ?? 0),
-                        miracle_runs: String(impact.miracle_runs ?? 0),
-                      });
-                    }}
-                    className="px-3 py-2 bg-slate-700 text-white rounded hover:bg-slate-600"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setEditingImpact(true)}
-                  data-testid="admin-impact-edit"
-                  className="px-3 py-2 bg-slate-800 text-amber-400 rounded hover:bg-slate-700 flex items-center"
-                >
-                  <Edit size={16} className="mr-1" /> Edit
-                </button>
-              )}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[
-                { key: 'lives_touched', label: 'Lives Touched' },
-                { key: 'kits_given', label: 'Hygiene Kits Given' },
-                { key: 'miracle_runs', label: 'Miracle Runs Completed' },
-              ].map(({ key, label }) => (
-                <div key={key} className="bg-slate-950 border border-slate-800 rounded-lg p-4">
-                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">{label}</p>
-                  {editingImpact ? (
-                    <input
-                      type="number"
-                      min="0"
-                      value={impactInputs[key]}
-                      onChange={(e) => setImpactInputs({ ...impactInputs, [key]: e.target.value })}
-                      data-testid={`admin-impact-${key}`}
-                      className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-3xl font-bold text-amber-400"
-                    />
-                  ) : (
-                    <p className="text-3xl font-bold text-amber-400">{impact[key]?.toLocaleString?.() ?? 0}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-slate-500 mt-3">
-              Tip: Set any to <strong>0</strong> to hide the section on the homepage. The &ldquo;Donations Received&rdquo; tile pulls live from completed Stripe payments.
-            </p>
-          </div>
-        )}
+        <ImpactEditor
+          impact={impact}
+          editing={editingImpact}
+          inputs={impactInputs}
+          onEditStart={() => setEditingImpact(true)}
+          onCancelEdit={handleCancelImpactEdit}
+          onInputChange={(key, value) => setImpactInputs((prev) => ({ ...prev, [key]: value }))}
+          onSave={handleSaveImpact}
+        />
 
-        {/* Monthly Goal Card */}
-        {progress && (
-          <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-6 mb-8" data-testid="admin-goal-card">
-            <div className="flex justify-between items-start mb-4 flex-wrap gap-3">
-              <div className="flex items-center">
-                <Target className="text-amber-400 mr-3" size={28} />
-                <div>
-                  <h3 className="text-white font-bold text-lg">{progress.month} Outreach Goal</h3>
-                  <p className="text-slate-400 text-sm">
-                    ${Math.round(progress.raised).toLocaleString()} raised of ${Math.round(progress.goal).toLocaleString()} ({progress.percent}%)
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {editingGoal ? (
-                  <>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                      <input
-                        type="number"
-                        min="1"
-                        step="50"
-                        value={goalInput}
-                        onChange={(e) => setGoalInput(e.target.value)}
-                        data-testid="admin-goal-input"
-                        className="pl-7 pr-3 py-2 w-32 bg-slate-950 border border-slate-700 rounded text-white"
-                      />
-                    </div>
-                    <button
-                      onClick={handleSaveGoal}
-                      data-testid="admin-goal-save"
-                      className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center"
-                    >
-                      <Check size={16} />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingGoal(false);
-                        setGoalInput(String(progress.goal));
-                      }}
-                      className="px-3 py-2 bg-slate-700 text-white rounded hover:bg-slate-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setEditingGoal(true)}
-                    data-testid="admin-goal-edit"
-                    className="px-4 py-2 bg-amber-500 text-slate-900 rounded font-semibold hover:bg-amber-400 transition-colors flex items-center"
-                  >
-                    <Edit className="mr-2" size={16} />
-                    Edit Goal
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-700 ease-out"
-                style={{ width: `${Math.max(progress.percent, progress.percent > 0 ? 2 : 0)}%` }}
-              />
-            </div>
-          </div>
-        )}
+        <GoalEditor
+          progress={progress}
+          editing={editingGoal}
+          goalInput={goalInput}
+          onEditStart={() => setEditingGoal(true)}
+          onCancelEdit={() => {
+            setEditingGoal(false);
+            setGoalInput(String(progress?.goal ?? ''));
+          }}
+          onGoalInputChange={setGoalInput}
+          onSave={handleSaveGoal}
+        />
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-900 border border-amber-500/30 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center">
-                <DollarSign className="text-amber-400" size={24} />
-              </div>
-            </div>
-            <h3 className="text-slate-400 text-sm mb-1">Total Donations</h3>
-            <p className="text-3xl font-bold text-white">{formatCurrency(stats?.total_donation_amount || 0)}</p>
-            <p className="text-xs text-slate-500 mt-2">{stats?.total_donations || 0} transactions</p>
-          </div>
+        <StatsCards stats={stats} />
 
-          <div className="bg-slate-900 border border-purple-500/30 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                <Users className="text-purple-400" size={24} />
-              </div>
-            </div>
-            <h3 className="text-slate-400 text-sm mb-1">Volunteers</h3>
-            <p className="text-3xl font-bold text-white">{stats?.total_volunteers || 0}</p>
-            <p className="text-xs text-slate-500 mt-2">Total applications</p>
-          </div>
-
-          <div className="bg-slate-900 border border-blue-500/30 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                <Mail className="text-blue-400" size={24} />
-              </div>
-            </div>
-            <h3 className="text-slate-400 text-sm mb-1">Contacts</h3>
-            <p className="text-3xl font-bold text-white">{stats?.total_contacts || 0}</p>
-            <p className="text-xs text-slate-500 mt-2">Messages received</p>
-          </div>
-
-          <div className="bg-slate-900 border border-pink-500/30 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-pink-500/10 rounded-lg flex items-center justify-center">
-                <Heart className="text-pink-400" size={24} />
-              </div>
-            </div>
-            <h3 className="text-slate-400 text-sm mb-1">Prayer Requests</h3>
-            <p className="text-3xl font-bold text-white">{stats?.total_prayer_requests || 0}</p>
-            <p className="text-xs text-slate-500 mt-2">Active requests</p>
-          </div>
-        </div>
-
-        {/* Tabs */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <div className="flex border-b border-slate-800">
-            {['donations', 'volunteers', 'contacts', 'prayers', 'notary', 'resources'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                data-testid={`admin-tab-${tab}`}
-                className={`px-6 py-4 font-semibold capitalize transition-colors ${
-                  activeTab === tab
-                    ? 'bg-amber-500 text-slate-900'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-              >
-                {tab === 'notary' ? 'Notary' : tab}
-              </button>
-            ))}
-          </div>
+          <TabBar activeTab={activeTab} onChange={setActiveTab} />
 
           <div className="p-6">
-            {/* Donations Tab */}
             {activeTab === 'donations' && (
-              <div>
-                {/* Filters */}
-                <div className="mb-6 p-4 bg-slate-950 border border-slate-800 rounded-lg">
-                  <div className="flex items-center mb-4">
-                    <Filter className="text-amber-400 mr-2" size={20} />
-                    <h3 className="text-white font-semibold">Filter Donations</h3>
-                  </div>
-                  <div className="grid md:grid-cols-5 gap-4">
-                    <div>
-                      <label className="block text-slate-400 text-sm mb-2">Type</label>
-                      <select
-                        name="donation_type"
-                        value={filters.donation_type}
-                        onChange={handleFilterChange}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white text-sm"
-                      >
-                        <option value="">All</option>
-                        <option value="one-time">One-time</option>
-                        <option value="monthly">Monthly</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-slate-400 text-sm mb-2">Start Date</label>
-                      <input
-                        type="date"
-                        name="start_date"
-                        value={filters.start_date}
-                        onChange={handleFilterChange}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-400 text-sm mb-2">End Date</label>
-                      <input
-                        type="date"
-                        name="end_date"
-                        value={filters.end_date}
-                        onChange={handleFilterChange}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-400 text-sm mb-2">Min Amount</label>
-                      <input
-                        type="number"
-                        name="min_amount"
-                        value={filters.min_amount}
-                        onChange={handleFilterChange}
-                        placeholder="$0"
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-slate-400 text-sm mb-2">Max Amount</label>
-                      <input
-                        type="number"
-                        name="max_amount"
-                        value={filters.max_amount}
-                        onChange={handleFilterChange}
-                        placeholder="$1000"
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex space-x-4 mt-4">
-                    <button
-                      onClick={applyFilters}
-                      className="px-4 py-2 bg-amber-500 text-slate-900 rounded font-semibold hover:bg-amber-400 transition-colors"
-                    >
-                      Apply Filters
-                    </button>
-                    <button
-                      onClick={handleExportCSV}
-                      className="px-4 py-2 bg-green-600 text-white rounded font-semibold hover:bg-green-700 transition-colors flex items-center"
-                    >
-                      <Download className="mr-2" size={18} />
-                      Export CSV
-                    </button>
-                  </div>
-                </div>
-
-                {/* Donations Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="border-b border-slate-800">
-                        <th className="pb-3 text-slate-400 font-semibold">Date</th>
-                        <th className="pb-3 text-slate-400 font-semibold">Name</th>
-                        <th className="pb-3 text-slate-400 font-semibold">Email</th>
-                        <th className="pb-3 text-slate-400 font-semibold">Amount</th>
-                        <th className="pb-3 text-slate-400 font-semibold">Type</th>
-                        <th className="pb-3 text-slate-400 font-semibold">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {donations.length === 0 ? (
-                        <tr>
-                          <td colSpan="6" className="py-8 text-center text-slate-500">
-                            No donations found
-                          </td>
-                        </tr>
-                      ) : (
-                        donations.map((donation) => (
-                          <tr key={donation.id} className="border-b border-slate-800">
-                            <td className="py-3 text-white">{formatDate(donation.created_at)}</td>
-                            <td className="py-3 text-white">{donation.name}</td>
-                            <td className="py-3 text-slate-400 text-sm">{donation.email}</td>
-                            <td className="py-3 text-amber-400 font-semibold">{formatCurrency(donation.amount)}</td>
-                            <td className="py-3">
-                              <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                donation.donation_type === 'monthly' 
-                                  ? 'bg-purple-500/20 text-purple-400' 
-                                  : 'bg-blue-500/20 text-blue-400'
-                              }`}>
-                                {donation.donation_type}
-                              </span>
-                            </td>
-                            <td className="py-3">
-                              <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                donation.status === 'completed' 
-                                  ? 'bg-green-500/20 text-green-400' 
-                                  : 'bg-yellow-500/20 text-yellow-400'
-                              }`}>
-                                {donation.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <DonationsTab
+                donations={donations}
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onApplyFilters={applyFilters}
+                onExportCSV={handleExportCSV}
+              />
             )}
-
-            {/* Volunteers Tab */}
-            {activeTab === 'volunteers' && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-slate-400 font-semibold">Date</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Name</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Email</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Phone</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Opportunity</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {volunteers.length === 0 ? (
-                      <tr>
-                        <td colSpan="5" className="py-8 text-center text-slate-500">
-                          No volunteer applications
-                        </td>
-                      </tr>
-                    ) : (
-                      volunteers.map((volunteer) => (
-                        <tr key={volunteer.id} className="border-b border-slate-800">
-                          <td className="py-3 text-white">{formatDate(volunteer.created_at)}</td>
-                          <td className="py-3 text-white">{volunteer.name}</td>
-                          <td className="py-3 text-slate-400 text-sm">{volunteer.email}</td>
-                          <td className="py-3 text-slate-400 text-sm">{volunteer.phone || 'N/A'}</td>
-                          <td className="py-3 text-white">{volunteer.opportunity}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Contacts Tab */}
-            {activeTab === 'contacts' && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-slate-400 font-semibold">Date</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Name</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Email</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Subject</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Message</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {contacts.length === 0 ? (
-                      <tr>
-                        <td colSpan="5" className="py-8 text-center text-slate-500">
-                          No contact messages
-                        </td>
-                      </tr>
-                    ) : (
-                      contacts.map((contact) => (
-                        <tr key={contact.id} className="border-b border-slate-800">
-                          <td className="py-3 text-white">{formatDate(contact.created_at)}</td>
-                          <td className="py-3 text-white">{contact.name}</td>
-                          <td className="py-3 text-slate-400 text-sm">{contact.email}</td>
-                          <td className="py-3 text-white">{contact.subject}</td>
-                          <td className="py-3 text-slate-400 text-sm max-w-xs truncate">{contact.message}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Prayers Tab */}
-            {activeTab === 'prayers' && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-slate-400 font-semibold">Date</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Name</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Email</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Request</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Status</th>
-                      <th className="pb-3 text-slate-400 font-semibold text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {prayers.length === 0 ? (
-                      <tr>
-                        <td colSpan="6" className="py-8 text-center text-slate-500">
-                          No prayer requests
-                        </td>
-                      </tr>
-                    ) : (
-                      prayers.map((prayer) => (
-                        <tr key={prayer.id} className="border-b border-slate-800">
-                          <td className="py-3 text-white">{formatDate(prayer.created_at)}</td>
-                          <td className="py-3 text-white">{prayer.display_name || prayer.name || 'Anonymous'}</td>
-                          <td className="py-3 text-slate-400 text-sm">{prayer.email || 'N/A'}</td>
-                          <td className="py-3 text-slate-400 text-sm max-w-md truncate">{prayer.request}</td>
-                          <td className="py-3">
-                            <span className="px-2 py-1 rounded text-xs font-semibold bg-green-500/20 text-green-400">
-                              {prayer.status}
-                            </span>
-                          </td>
-                          <td className="py-3 text-right">
-                            <button
-                              onClick={() => handleDeletePrayer(prayer.id)}
-                              data-testid={`delete-prayer-${prayer.id}`}
-                              title="Delete prayer request"
-                              className="inline-flex items-center px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded text-sm transition-colors"
-                            >
-                              <Trash2 size={14} className="mr-1" />
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Notary Tab */}
-            {activeTab === 'notary' && (
-              <div className="overflow-x-auto" data-testid="admin-notary-panel">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-slate-800">
-                      <th className="pb-3 text-slate-400 font-semibold">Date</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Name</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Phone</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Email</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Paperwork</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Preferred Time</th>
-                      <th className="pb-3 text-slate-400 font-semibold">Message</th>
-                      <th className="pb-3 text-slate-400 font-semibold text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {notaryRequests.length === 0 ? (
-                      <tr>
-                        <td colSpan="8" className="py-8 text-center text-slate-500">
-                          No notary requests yet
-                        </td>
-                      </tr>
-                    ) : (
-                      notaryRequests.map((n) => (
-                        <tr key={n.id} className="border-b border-slate-800" data-testid={`notary-row-${n.id}`}>
-                          <td className="py-3 text-white whitespace-nowrap">{formatDate(n.created_at)}</td>
-                          <td className="py-3 text-white">{n.name}</td>
-                          <td className="py-3 text-slate-300 text-sm whitespace-nowrap">
-                            <a href={`tel:${n.phone}`} className="hover:text-amber-400">{n.phone}</a>
-                          </td>
-                          <td className="py-3 text-slate-400 text-sm">
-                            {n.email ? <a href={`mailto:${n.email}`} className="hover:text-amber-400">{n.email}</a> : 'N/A'}
-                          </td>
-                          <td className="py-3 text-slate-300 text-sm max-w-[180px] truncate">{n.document_type || '—'}</td>
-                          <td className="py-3 text-slate-300 text-sm max-w-[180px] truncate">{n.preferred_time || '—'}</td>
-                          <td className="py-3 text-slate-400 text-sm max-w-xs truncate">{n.message || '—'}</td>
-                          <td className="py-3 text-right">
-                            <button
-                              onClick={() => handleDeleteNotary(n.id)}
-                              data-testid={`delete-notary-${n.id}`}
-                              title="Delete notary request"
-                              className="inline-flex items-center px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded text-sm transition-colors"
-                            >
-                              <Trash2 size={14} className="mr-1" />
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Resources Tab */}
+            {activeTab === 'volunteers' && <VolunteersTab volunteers={volunteers} />}
+            {activeTab === 'contacts' && <ContactsTab contacts={contacts} />}
+            {activeTab === 'prayers' && <PrayersTab prayers={prayers} onDelete={handleDeletePrayer} />}
+            {activeTab === 'notary' && <NotaryTab notaryRequests={notaryRequests} onDelete={handleDeleteNotary} />}
             {activeTab === 'resources' && (
-              <div data-testid="admin-resources-panel">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <label className="text-slate-400 text-sm mr-2">Filter:</label>
-                    <select
-                      value={resourceFilter}
-                      onChange={(e) => setResourceFilter(e.target.value)}
-                      data-testid="resource-filter"
-                      className="bg-slate-900 border border-slate-700 rounded-lg text-white text-sm px-3 py-1.5 focus:outline-none focus:border-amber-500"
-                    >
-                      <option value="all">All categories ({resources.length})</option>
-                      {RESOURCE_CATEGORIES.map((c) => (
-                        <option key={c.key} value={c.key}>
-                          {c.label} ({resources.filter((r) => r.category === c.key).length})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={openNewResource}
-                    data-testid="add-resource-btn"
-                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg text-sm font-semibold hover:from-amber-400 hover:to-amber-500 transition-all"
-                  >
-                    + Add Resource
-                  </button>
-                </div>
-
-                <div className="grid gap-3">
-                  {(resourceFilter === 'all' ? resources : resources.filter((r) => r.category === resourceFilter)).length === 0 ? (
-                    <p className="text-slate-500 text-center py-8">No resources in this category yet.</p>
-                  ) : (
-                    (resourceFilter === 'all' ? resources : resources.filter((r) => r.category === resourceFilter)).map((r) => {
-                      const category = RESOURCE_CATEGORIES.find((c) => c.key === r.category);
-                      const active = r.is_active !== 0 && r.is_active !== false;
-                      return (
-                        <div
-                          key={r.id}
-                          data-testid={`admin-resource-${r.id}`}
-                          className={`flex flex-col md:flex-row md:items-start md:justify-between gap-3 p-4 border rounded-lg ${
-                            active ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-900/30 border-slate-800 opacity-60'
-                          }`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-2 mb-1">
-                              <span className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs rounded-full">
-                                {category?.label || r.category}
-                              </span>
-                              {!active && (
-                                <span className="px-2 py-0.5 bg-slate-700 text-slate-300 text-xs rounded-full">Hidden</span>
-                              )}
-                            </div>
-                            <h4 className="text-white font-semibold">{r.name}</h4>
-                            {r.address && <p className="text-slate-400 text-xs mt-1">{r.address}</p>}
-                            {r.phone && <p className="text-slate-400 text-xs">{r.phone}</p>}
-                          </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleToggleResourceActive(r)}
-                              data-testid={`resource-toggle-${r.id}`}
-                              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                                active
-                                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20'
-                                  : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
-                              }`}
-                            >
-                              {active ? 'Visible' : 'Hidden'}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => openEditResource(r)}
-                              data-testid={`resource-edit-${r.id}`}
-                              className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 rounded text-xs transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteResource(r.id)}
-                              data-testid={`resource-delete-${r.id}`}
-                              className="inline-flex items-center px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded text-xs transition-colors"
-                            >
-                              <Trash2 size={12} className="mr-1" />
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+              <ResourcesTab
+                resources={resources}
+                resourceFilter={resourceFilter}
+                onFilterChange={setResourceFilter}
+                onOpenNew={openNewResource}
+                onEdit={openEditResource}
+                onDelete={handleDeleteResource}
+                onToggleActive={handleToggleResourceActive}
+              />
             )}
           </div>
         </div>
       </div>
 
-      {/* Resource edit/create modal */}
-      {showResourceModal && editingResource && (
-        <div
-          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-start justify-center overflow-y-auto p-4"
-          data-testid="resource-modal"
-          onClick={closeResourceModal}
-        >
-          <div
-            className="bg-slate-900 border border-amber-500/30 rounded-2xl max-w-2xl w-full my-8 p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white text-xl font-bold">
-                {editingResource.id ? 'Edit Resource' : 'Add Resource'}
-              </h3>
-              <button
-                type="button"
-                onClick={closeResourceModal}
-                data-testid="resource-modal-close"
-                className="p-2 text-slate-400 hover:text-white"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 text-sm mb-1">Category *</label>
-                  <select
-                    value={editingResource.category}
-                    onChange={(e) => handleResourceFieldChange('category', e.target.value)}
-                    data-testid="resource-field-category"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                  >
-                    {RESOURCE_CATEGORIES.map((c) => (
-                      <option key={c.key} value={c.key}>{c.label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-slate-300 text-sm mb-1">Sort order</label>
-                  <input
-                    type="number"
-                    value={editingResource.sort_order ?? 999}
-                    onChange={(e) => handleResourceFieldChange('sort_order', e.target.value)}
-                    data-testid="resource-field-sort-order"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                    placeholder="999"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 text-sm mb-1">Name *</label>
-                <input
-                  type="text"
-                  value={editingResource.name}
-                  onChange={(e) => handleResourceFieldChange('name', e.target.value)}
-                  data-testid="resource-field-name"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                  placeholder="Organization name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 text-sm mb-1">Description</label>
-                <textarea
-                  value={editingResource.description || ''}
-                  onChange={(e) => handleResourceFieldChange('description', e.target.value)}
-                  data-testid="resource-field-description"
-                  rows={2}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 text-sm mb-1">Address</label>
-                <input
-                  type="text"
-                  value={editingResource.address || ''}
-                  onChange={(e) => handleResourceFieldChange('address', e.target.value)}
-                  data-testid="resource-field-address"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                />
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 text-sm mb-1">Phone</label>
-                  <input
-                    type="text"
-                    value={editingResource.phone || ''}
-                    onChange={(e) => handleResourceFieldChange('phone', e.target.value)}
-                    data-testid="resource-field-phone"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 text-sm mb-1">Website</label>
-                  <input
-                    type="text"
-                    value={editingResource.website || ''}
-                    onChange={(e) => handleResourceFieldChange('website', e.target.value)}
-                    data-testid="resource-field-website"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 text-sm mb-1">Hours</label>
-                <input
-                  type="text"
-                  value={editingResource.hours || ''}
-                  onChange={(e) => handleResourceFieldChange('hours', e.target.value)}
-                  data-testid="resource-field-hours"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
-                  placeholder="Mon-Fri 9am-5pm"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-300 text-sm mb-1">Notes / eligibility</label>
-                <textarea
-                  value={editingResource.notes || ''}
-                  onChange={(e) => handleResourceFieldChange('notes', e.target.value)}
-                  data-testid="resource-field-notes"
-                  rows={2}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500 resize-none"
-                />
-              </div>
-
-              <label className="inline-flex items-center gap-2 text-slate-300 text-sm cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={!!editingResource.is_active}
-                  onChange={(e) => handleResourceFieldChange('is_active', e.target.checked)}
-                  data-testid="resource-field-active"
-                  className="rounded"
-                />
-                Visible on public directory
-              </label>
-            </div>
-
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-800">
-              <button
-                type="button"
-                onClick={closeResourceModal}
-                className="px-4 py-2 text-slate-400 hover:text-white text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveResource}
-                data-testid="resource-modal-save"
-                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg text-sm font-semibold hover:from-amber-400 hover:to-amber-500 transition-all"
-              >
-                {editingResource.id ? 'Save changes' : 'Add resource'}
-              </button>
-            </div>
-          </div>
-        </div>
+      {showResourceModal && (
+        <ResourceModal
+          resource={editingResource}
+          onFieldChange={handleResourceFieldChange}
+          onSave={handleSaveResource}
+          onClose={closeResourceModal}
+        />
       )}
     </div>
   );
