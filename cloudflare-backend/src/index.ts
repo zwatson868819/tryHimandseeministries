@@ -286,6 +286,95 @@ app.delete("/api/admin/notary-requests/:id", async (c) => {
   return c.json({ ok: true });
 });
 
+// ---------- resource directory ----------
+// Public: list active resources, optionally filtered by category.
+app.get("/api/resources", async (c) => {
+  const category = c.req.query("category");
+  const stmt = category
+    ? c.env.DB.prepare(
+        "SELECT * FROM resources WHERE is_active = 1 AND category = ? ORDER BY sort_order ASC, name ASC"
+      ).bind(category)
+    : c.env.DB.prepare(
+        "SELECT * FROM resources WHERE is_active = 1 ORDER BY category, sort_order ASC, name ASC"
+      );
+  const rows = await stmt.all();
+  return c.json(rows.results || []);
+});
+
+// Admin: list ALL resources (including inactive)
+app.get("/api/admin/resources", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const rows = await c.env.DB.prepare(
+    "SELECT * FROM resources ORDER BY category, sort_order ASC, name ASC"
+  ).all();
+  return c.json(rows.results || []);
+});
+
+app.post("/api/admin/resources", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json<any>();
+  if (!b.category || !b.name) return c.json({ detail: "Category and name are required" }, 400);
+  const id = uuid();
+  const ts = now();
+  await c.env.DB.prepare(
+    "INSERT INTO resources (id, category, name, description, address, phone, website, hours, notes, sort_order, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  )
+    .bind(
+      id,
+      b.category,
+      b.name,
+      b.description ?? "",
+      b.address ?? "",
+      b.phone ?? "",
+      b.website ?? "",
+      b.hours ?? "",
+      b.notes ?? "",
+      typeof b.sort_order === "number" ? b.sort_order : 999,
+      b.is_active === false ? 0 : 1,
+      ts,
+      ts
+    )
+    .run();
+  return c.json({ id, ...b, created_at: ts, updated_at: ts }, 201);
+});
+
+app.put("/api/admin/resources/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  const b = await c.req.json<any>();
+  const ts = now();
+  await c.env.DB.prepare(
+    "UPDATE resources SET category = ?, name = ?, description = ?, address = ?, phone = ?, website = ?, hours = ?, notes = ?, sort_order = ?, is_active = ?, updated_at = ? WHERE id = ?"
+  )
+    .bind(
+      b.category,
+      b.name,
+      b.description ?? "",
+      b.address ?? "",
+      b.phone ?? "",
+      b.website ?? "",
+      b.hours ?? "",
+      b.notes ?? "",
+      typeof b.sort_order === "number" ? b.sort_order : 999,
+      b.is_active === false ? 0 : 1,
+      ts,
+      id
+    )
+    .run();
+  return c.json({ ok: true, updated_at: ts });
+});
+
+app.delete("/api/admin/resources/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  await c.env.DB.prepare("DELETE FROM resources WHERE id = ?").bind(id).run();
+  return c.json({ ok: true });
+});
+
 // Public impact stats: combines admin-editable settings + live counts.
 app.get("/api/stats/impact", async (c) => {
   const settingRows = await c.env.DB.prepare(

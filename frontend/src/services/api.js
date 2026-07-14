@@ -792,3 +792,64 @@ export const deleteNotaryRequest = async (id, token) => {
   }
 };
 
+// --- Resource Directory ---
+
+export const getResources = async (category) => {
+  try {
+    const params = category ? { category } : {};
+    const response = await axios.get(`${API}/resources`, { params });
+    return response.data;
+  } catch (error) {
+    logError('Error fetching resources:', error);
+    throw error;
+  }
+};
+
+export const getAdminResources = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/resources`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error fetching admin resources:', error);
+    throw error;
+  }
+};
+
+export const createResource = async (data, token) => {
+  try {
+    const response = await axios.post(`${API}/admin/resources`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error creating resource:', error);
+    throw error;
+  }
+};
+
+export const updateResource = async (id, data, token) => {
+  try {
+    const response = await axios.put(`${API}/admin/resources/${id}`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error updating resource:', error);
+    throw error;
+  }
+};
+
+export const deleteResource = async (id, token) => {
+  try {
+    const response = await axios.delete(`${API}/admin/resources/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error deleting resource:', error);
+    throw error;
+  }
+};
+

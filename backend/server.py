@@ -189,6 +189,76 @@ async def stub_notary_create(payload: dict):
 async def stub_notary_list():
     return []
 
+# ---------- Resource Directory (preview stub) ----------
+# In production, the Cloudflare Worker persists to D1. Here we hold state in
+# memory so the admin CRUD flow is exercisable in preview.
+from resources_seed import get_seed_resources
+_RESOURCES_CACHE = {r["id"]: dict(r) for r in get_seed_resources()}
+
+@api_router.get("/resources")
+async def stub_resources_public(category: str | None = None):
+    items = [r for r in _RESOURCES_CACHE.values() if r.get("is_active", 1)]
+    if category:
+        items = [r for r in items if r.get("category") == category]
+    items.sort(key=lambda r: (r.get("sort_order", 0), r.get("name", "")))
+    return items
+
+@api_router.get("/admin/resources")
+async def stub_resources_admin():
+    items = list(_RESOURCES_CACHE.values())
+    items.sort(key=lambda r: (r.get("category", ""), r.get("sort_order", 0), r.get("name", "")))
+    return items
+
+@api_router.post("/admin/resources")
+async def stub_resources_create(payload: dict):
+    from fastapi import HTTPException
+    from uuid import uuid4
+    if not payload.get("category") or not payload.get("name"):
+        raise HTTPException(status_code=400, detail="Category and name are required")
+    now_iso = datetime.now(timezone.utc).isoformat()
+    new_id = str(uuid4())
+    record = {
+        "id": new_id,
+        "category": payload["category"],
+        "name": payload["name"],
+        "description": payload.get("description", ""),
+        "address": payload.get("address", ""),
+        "phone": payload.get("phone", ""),
+        "website": payload.get("website", ""),
+        "hours": payload.get("hours", ""),
+        "notes": payload.get("notes", ""),
+        "sort_order": int(payload.get("sort_order", 999)) if str(payload.get("sort_order", 999)).lstrip("-").isdigit() else 999,
+        "is_active": 0 if payload.get("is_active") is False else 1,
+        "created_at": now_iso,
+        "updated_at": now_iso,
+    }
+    _RESOURCES_CACHE[new_id] = record
+    return record
+
+@api_router.put("/admin/resources/{rid}")
+async def stub_resources_update(rid: str, payload: dict):
+    from fastapi import HTTPException
+    if rid not in _RESOURCES_CACHE:
+        raise HTTPException(status_code=404, detail="Resource not found")
+    record = _RESOURCES_CACHE[rid]
+    for key in ["category", "name", "description", "address", "phone", "website", "hours", "notes"]:
+        if key in payload:
+            record[key] = payload[key] or ""
+    if "sort_order" in payload:
+        try:
+            record["sort_order"] = int(payload["sort_order"])
+        except (TypeError, ValueError):
+            pass
+    if "is_active" in payload:
+        record["is_active"] = 0 if payload["is_active"] is False else 1
+    record["updated_at"] = datetime.now(timezone.utc).isoformat()
+    return record
+
+@api_router.delete("/admin/resources/{rid}")
+async def stub_resources_delete(rid: str):
+    _RESOURCES_CACHE.pop(rid, None)
+    return {"ok": True}
+
 # Include the router in the main app
 app.include_router(api_router)
 

@@ -5,14 +5,14 @@ import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const location = useLocation();
   let dropdownTimer = null;
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { 
-      name: 'About', 
+    {
+      name: 'About',
       path: '/about',
       dropdown: [
         { name: 'About Us', path: '/about' },
@@ -23,12 +23,33 @@ const Header = () => {
     { name: 'Encounters', path: '/encounters' },
     { name: 'Blog', path: '/blog' },
     { name: 'Light a Candle', path: '/light-a-candle' },
-    { name: 'Free Notary Services', path: '/notary' },
+    { name: 'Free Notary', path: '/notary' },
+    {
+      name: 'Resource Directory',
+      path: '/resources',
+      dropdown: [
+        { name: 'Housing / Rental', path: '/resources/housing' },
+        { name: 'Food', path: '/resources/food' },
+        { name: 'Clothing', path: '/resources/clothing' },
+        { name: 'Social Services', path: '/resources/social-services' },
+        { name: 'Mental / Behavioral Health', path: '/resources/mental-health' }
+      ]
+    },
     { name: 'Get Involved', path: '/get-involved' },
     { name: 'Contact', path: '/contact' }
   ];
 
   const isActive = (path) => location.pathname === path;
+  const isDropdownActive = (link) =>
+    link.dropdown && link.dropdown.some((d) => location.pathname === d.path || location.pathname.startsWith(d.path));
+
+  const openDropdown = (name) => {
+    if (dropdownTimer) clearTimeout(dropdownTimer);
+    setActiveDropdown(name);
+  };
+  const closeDropdown = () => {
+    dropdownTimer = setTimeout(() => setActiveDropdown(null), 180);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-amber-500/20">
@@ -36,9 +57,9 @@ const Header = () => {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <img 
-              src="/images/header-logo.png" 
-              alt="tryHimandsee Ministries" 
+            <img
+              src="/images/header-logo.png"
+              alt="tryHimandsee Ministries"
               className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110"
             />
             <div className="hidden md:block">
@@ -48,37 +69,36 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-0.5">
             {navLinks.map((link) => (
               link.dropdown ? (
-                <div 
-                  key={link.path}
+                <div
+                  key={link.name}
                   className="relative"
-                  onMouseEnter={() => {
-                    if (dropdownTimer) clearTimeout(dropdownTimer);
-                    setShowAboutDropdown(true);
-                  }}
-                  onMouseLeave={() => {
-                    dropdownTimer = setTimeout(() => setShowAboutDropdown(false), 200);
-                  }}
+                  onMouseEnter={() => openDropdown(link.name)}
+                  onMouseLeave={closeDropdown}
                 >
                   <button
-                    className={`px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center ${
-                      isActive(link.path) || location.pathname === '/news'
+                    data-testid={`nav-dropdown-${link.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                    className={`px-2 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center whitespace-nowrap ${
+                      isActive(link.path) || isDropdownActive(link)
                         ? 'bg-amber-500 text-slate-900'
                         : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
                     }`}
                   >
                     {link.name}
-                    <ChevronDown size={14} className="ml-0.5" />
+                    <ChevronDown size={12} className="ml-0.5" />
                   </button>
-                  {showAboutDropdown && (
-                    <div className="absolute top-full left-0 mt-2 w-48 bg-slate-900 border border-amber-500/20 rounded-lg shadow-xl overflow-hidden z-50">
+                  {activeDropdown === link.name && (
+                    <div
+                      data-testid={`nav-dropdown-menu-${link.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                      className="absolute top-full left-0 mt-2 w-60 bg-slate-900 border border-amber-500/20 rounded-lg shadow-xl overflow-hidden z-50"
+                    >
                       {link.dropdown.map((item) => (
                         <Link
                           key={item.path}
                           to={item.path}
-                          onClick={() => setShowAboutDropdown(false)}
+                          onClick={() => setActiveDropdown(null)}
                           className={`block px-4 py-3 text-sm transition-colors ${
                             isActive(item.path)
                               ? 'bg-amber-500 text-slate-900 font-semibold'
@@ -95,7 +115,7 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                  className={`px-2 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 whitespace-nowrap ${
                     isActive(link.path)
                       ? 'bg-amber-500 text-slate-900'
                       : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
@@ -107,7 +127,7 @@ const Header = () => {
             ))}
             <Link
               to="/donate"
-              className="ml-2 px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 whitespace-nowrap"
+              className="ml-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 whitespace-nowrap text-sm"
             >
               Donate
             </Link>
@@ -120,6 +140,7 @@ const Header = () => {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 text-amber-400 hover:bg-amber-500/10 rounded-lg transition-colors ml-2"
+              data-testid="mobile-menu-toggle"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -132,8 +153,8 @@ const Header = () => {
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 link.dropdown ? (
-                  <div key={link.path} className="space-y-1">
-                    <div className="text-amber-400 font-semibold text-sm px-4 py-2">
+                  <div key={link.name} className="space-y-1">
+                    <div className="text-amber-400 font-semibold text-sm px-4 py-2 uppercase tracking-wider">
                       {link.name}
                     </div>
                     {link.dropdown.map((item) => (

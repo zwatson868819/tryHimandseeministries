@@ -1,0 +1,58 @@
+{
+  "summary": "End-to-end tested the new Resource Directory feature. Backend: 11/11 pytest passing — GET /api/resources returns 48 seeded items with correct category counts (housing 10, food 12, clothing 9, social-services 9, mental-health 8); category filter works; unknown category returns []; POST/PUT/DELETE /api/admin/resources full CRUD verified (create → GET, update → GET, toggle inactive hides from public list, delete → gone); 400 error on missing name and missing category. Frontend: Header desktop Resource Directory dropdown works (trigger + hover menu + all 5 links, no header overflow at 1440px, About dropdown still functional alongside — multi-dropdown pattern OK); mobile menu shows 'RESOURCE DIRECTORY' section with 5 category links; public /resources/food renders resource-directory-page with h1='Food', all 5 quick-switch pills, active amber style on food tab, 12 cards each with tel: link + Google Maps link; other 4 categories render correct card counts (housing 10, clothing 9, social-services 9, mental-health 8); /resources/bogus renders resource-directory-invalid. Admin: zwatson login works; admin-tab-resources visible; admin-resources-panel with filter dropdown (showing counts per category) + '+ Add Resource' button; full CRUD flow — create modal opens with all 10 fields, save creates row, edit renames row (verified via API), toggle sets is_active=0 with 'Hidden' badge, delete removes row. Filter=food shows 12 rows, filter=housing shows 10 rows. Seed intact (48) after cleanup.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/admin/resources", "issue": "Preview stub endpoints do NOT require authentication (any client can POST/PUT/DELETE). Production Cloudflare Worker enforces JWT. Non-blocking for preview but flag for parity."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_resources.py",
+    "/app/test_reports/pytest/pytest_resources.xml"
+  ],
+  "action_items": [
+    "MINOR: Review request spec listed 8 mental-health resources but seed has 8 already — consistent. Spec listed 8 social-services but seed has 9. Not a bug — actual is >= 8; verify intended count with product owner.",
+    "MINOR: data-testid naming inconsistency vs review request. Spec called them 'resource-field-sort_order' and 'resource-field-is_active'; actual DOM uses 'resource-field-sort-order' and 'resource-field-active'. Fields work; naming is stylistic. Consider aligning to underscore or documenting the hyphen convention.",
+    "OPTIONAL: Preview /api/admin/resources CRUD endpoints have no auth (production D1 Worker does). Consider adding a token check for parity even in preview."
+  ],
+  "critical_code_review_comments": [
+    "resources_seed.py is clean — 48 real Richmond+Henrico orgs across 5 categories, uses stable uuid5 for deterministic ids.",
+    "ResourceDirectory.jsx: safe URL/phone/address handling (normalizeUrl, telHref, mapsHref) — good defensive coding; empty/loading/error states all have data-testid; PageMeta included for SEO.",
+    "Header.jsx: activeDropdown state with hover timer works correctly for multiple dropdowns; text-[13px] keeps nav slim; whitespace-nowrap prevents wrapping. Overall clean refactor.",
+    "server.py Resource Directory stubs (lines 192–260) accept `dict` payloads with no Pydantic model — consider a schema for parity + validation depth. Category is not validated against the 5 allowed values (any string accepted).",
+    "AdminDashboard.jsx: handleSaveResource + list mutation is done optimistically without refetch — minor risk of drift vs backend (e.g., server-side sort_order coercion). Not observed in testing but worth noting."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_resources.py (new — 11 pytest cases covering public + admin CRUD)"
+  ],
+  "success_rate": {
+    "backend": "100% (11/11 pytest)",
+    "frontend": "100% (desktop dropdown, mobile menu, 5 public category pages, invalid category, admin tab + full CRUD + filter — all verified)"
+  },
+  "test_credentials": "Admin: zwatson / Anandotowel@1988* (from /app/memory/test_credentials.md) — LOGIN SUCCESSFUL",
+  "seed_data_creation": "None persisted. Test created TEST_UI_Resource_UNIQUE_1234 in admin flow and deleted it in the same run. Backend was restarted mid-test to reset in-memory cache after an earlier over-broad selector accidentally deleted a seeded clothing item; final state = 48 seeded resources intact (verified: housing 10, food 12, clothing 9, social-services 9, mental-health 8).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Preview /api/(admin/)resources endpoints are in-memory (from resources_seed.py, ~L192-260 of server.py). Data resets on backend restart. Production uses Cloudflare D1 via /app/cloudflare-backend/src/index.ts + resources-migration.sql. Frontend key testids: nav-dropdown-resource-directory (header trigger), nav-dropdown-menu-resource-directory (hover menu), resource-directory-page / -invalid / resource-tab-<key> / resource-card-<id> / resource-back-home / resource-list / resource-loading / resource-error / resource-empty (public), admin-tab-resources / admin-resources-panel / resource-filter / add-resource-btn / resource-modal / resource-modal-save / resource-field-{category,sort-order,name,description,address,phone,website,hours,notes,active} / resource-edit-<id> / resource-toggle-<id> / resource-delete-<id> (admin). Field testids use hyphens (sort-order / active), not underscores per spec — coincidentally spec text differs from implementation.",
+  "verified_endpoints": [
+    {"endpoint": "GET /api/resources", "status": "200", "notes": "48 items"},
+    {"endpoint": "GET /api/resources?category=food", "status": "200", "notes": "12 items"},
+    {"endpoint": "GET /api/resources?category=housing", "status": "200", "notes": "10 items"},
+    {"endpoint": "GET /api/resources?category=clothing", "status": "200", "notes": "9 items"},
+    {"endpoint": "GET /api/resources?category=social-services", "status": "200", "notes": "9 items"},
+    {"endpoint": "GET /api/resources?category=mental-health", "status": "200", "notes": "8 items"},
+    {"endpoint": "GET /api/resources?category=bogus", "status": "200", "notes": "returns []"},
+    {"endpoint": "GET /api/admin/resources", "status": "200", "notes": "includes inactive"},
+    {"endpoint": "POST /api/admin/resources (missing name)", "status": "400", "notes": "detail='Category and name are required'"},
+    {"endpoint": "POST /api/admin/resources (missing category)", "status": "400", "notes": "same detail"},
+    {"endpoint": "POST /api/admin/resources (valid)", "status": "200", "notes": "returns record with id + created_at + updated_at"},
+    {"endpoint": "PUT /api/admin/resources/{id}", "status": "200", "notes": "partial update supported"},
+    {"endpoint": "DELETE /api/admin/resources/{id}", "status": "200", "notes": "returns {ok:true}"}
+  ],
+  "mocked_api_note": "MOCKED: Preview Resource Directory endpoints use an in-memory dict (server.py _RESOURCES_CACHE, seeded from resources_seed.py). Data resets on backend restart. Production persistence lives in Cloudflare D1 via the Worker + resources-migration.sql. Also mocked: notary, testimonies, impact stats, donation progress (unchanged from prior iterations)."
+}

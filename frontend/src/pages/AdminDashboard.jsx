@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart, TrendingUp, Gift, Trash2 } from 'lucide-react';
+import { DollarSign, Users, Mail, Heart, Download, Filter, Calendar, LogOut, Newspaper, BookOpen, AtSign, Sparkles, Target, Edit, Check, HandHeart, TrendingUp, Gift, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal, getAdminTodaySummary, getImpactStats, updateImpactStats, deletePrayerRequest, getAdminNotaryRequests, deleteNotaryRequest } from '../services/api';
+import { getDashboardStats, getAdminDonations, exportDonationsCSV, getAdminVolunteers, getAdminContacts, getAdminPrayerRequests, getDonationProgress, updateMonthlyGoal, getAdminTodaySummary, getImpactStats, updateImpactStats, deletePrayerRequest, getAdminNotaryRequests, deleteNotaryRequest, getAdminResources, createResource, updateResource, deleteResource } from '../services/api';
+import { RESOURCE_CATEGORIES } from './ResourceDirectory';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -13,6 +14,10 @@ const AdminDashboard = () => {
   const [contacts, setContacts] = useState([]);
   const [prayers, setPrayers] = useState([]);
   const [notaryRequests, setNotaryRequests] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [resourceFilter, setResourceFilter] = useState('all');
+  const [editingResource, setEditingResource] = useState(null);
+  const [showResourceModal, setShowResourceModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('donations');
   const [progress, setProgress] = useState(null);
@@ -43,7 +48,7 @@ const AdminDashboard = () => {
   const fetchAllData = async (adminToken) => {
     try {
       setLoading(true);
-      const [statsData, donationsData, volunteersData, contactsData, prayersData, progressData, today, impactData, notaryData] = await Promise.all([
+      const [statsData, donationsData, volunteersData, contactsData, prayersData, progressData, today, impactData, notaryData, resourcesData] = await Promise.all([
         getDashboardStats(adminToken),
         getAdminDonations(adminToken),
         getAdminVolunteers(adminToken),
@@ -53,6 +58,7 @@ const AdminDashboard = () => {
         getAdminTodaySummary().catch(() => null),
         getImpactStats().catch(() => null),
         getAdminNotaryRequests(adminToken).catch(() => []),
+        getAdminResources(adminToken).catch(() => []),
       ]);
       
       setStats(statsData);
@@ -65,6 +71,7 @@ const AdminDashboard = () => {
       setTodaySummary(today);
       setImpact(impactData);
       setNotaryRequests(notaryData || []);
+      setResources(resourcesData || []);
       if (impactData) {
         setImpactInputs({
           lives_touched: String(impactData.lives_touched ?? 0),
@@ -143,6 +150,93 @@ const AdminDashboard = () => {
       toast.success('Notary request deleted');
     } catch {
       toast.error('Failed to delete notary request');
+    }
+  };
+
+  // -------- Resource Directory CRUD --------
+  const openNewResource = () => {
+    setEditingResource({
+      id: null,
+      category: resourceFilter !== 'all' ? resourceFilter : RESOURCE_CATEGORIES[0].key,
+      name: '',
+      description: '',
+      address: '',
+      phone: '',
+      website: '',
+      hours: '',
+      notes: '',
+      sort_order: 999,
+      is_active: true,
+    });
+    setShowResourceModal(true);
+  };
+
+  const openEditResource = (r) => {
+    setEditingResource({ ...r, is_active: r.is_active !== 0 && r.is_active !== false });
+    setShowResourceModal(true);
+  };
+
+  const closeResourceModal = () => {
+    setShowResourceModal(false);
+    setEditingResource(null);
+  };
+
+  const handleResourceFieldChange = (field, value) => {
+    setEditingResource((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveResource = async () => {
+    if (!editingResource) return;
+    if (!editingResource.category || !editingResource.name) {
+      toast.error('Category and name are required.');
+      return;
+    }
+    const payload = {
+      category: editingResource.category,
+      name: editingResource.name.trim(),
+      description: editingResource.description || '',
+      address: editingResource.address || '',
+      phone: editingResource.phone || '',
+      website: editingResource.website || '',
+      hours: editingResource.hours || '',
+      notes: editingResource.notes || '',
+      sort_order: Number(editingResource.sort_order) || 999,
+      is_active: !!editingResource.is_active,
+    };
+    try {
+      if (editingResource.id) {
+        const updated = await updateResource(editingResource.id, payload, token);
+        setResources((prev) => prev.map((r) => (r.id === editingResource.id ? { ...r, ...payload, updated_at: updated?.updated_at || r.updated_at } : r)));
+        toast.success('Resource updated');
+      } else {
+        const created = await createResource(payload, token);
+        setResources((prev) => [...prev, created]);
+        toast.success('Resource added');
+      }
+      closeResourceModal();
+    } catch {
+      toast.error('Failed to save resource');
+    }
+  };
+
+  const handleDeleteResource = async (resourceId) => {
+    if (!window.confirm('Delete this resource? This cannot be undone.')) return;
+    try {
+      await deleteResource(resourceId, token);
+      setResources((prev) => prev.filter((r) => r.id !== resourceId));
+      toast.success('Resource deleted');
+    } catch {
+      toast.error('Failed to delete resource');
+    }
+  };
+
+  const handleToggleResourceActive = async (resource) => {
+    const nextActive = !(resource.is_active !== 0 && resource.is_active !== false);
+    try {
+      await updateResource(resource.id, { ...resource, is_active: nextActive }, token);
+      setResources((prev) => prev.map((r) => (r.id === resource.id ? { ...r, is_active: nextActive ? 1 : 0 } : r)));
+    } catch {
+      toast.error('Failed to update visibility');
     }
   };
 
@@ -524,7 +618,7 @@ const AdminDashboard = () => {
         {/* Tabs */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
           <div className="flex border-b border-slate-800">
-            {['donations', 'volunteers', 'contacts', 'prayers', 'notary'].map((tab) => (
+            {['donations', 'volunteers', 'contacts', 'prayers', 'notary', 'resources'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -857,9 +951,272 @@ const AdminDashboard = () => {
                 </table>
               </div>
             )}
+
+            {/* Resources Tab */}
+            {activeTab === 'resources' && (
+              <div data-testid="admin-resources-panel">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="text-slate-400 text-sm mr-2">Filter:</label>
+                    <select
+                      value={resourceFilter}
+                      onChange={(e) => setResourceFilter(e.target.value)}
+                      data-testid="resource-filter"
+                      className="bg-slate-900 border border-slate-700 rounded-lg text-white text-sm px-3 py-1.5 focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="all">All categories ({resources.length})</option>
+                      {RESOURCE_CATEGORIES.map((c) => (
+                        <option key={c.key} value={c.key}>
+                          {c.label} ({resources.filter((r) => r.category === c.key).length})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={openNewResource}
+                    data-testid="add-resource-btn"
+                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg text-sm font-semibold hover:from-amber-400 hover:to-amber-500 transition-all"
+                  >
+                    + Add Resource
+                  </button>
+                </div>
+
+                <div className="grid gap-3">
+                  {(resourceFilter === 'all' ? resources : resources.filter((r) => r.category === resourceFilter)).length === 0 ? (
+                    <p className="text-slate-500 text-center py-8">No resources in this category yet.</p>
+                  ) : (
+                    (resourceFilter === 'all' ? resources : resources.filter((r) => r.category === resourceFilter)).map((r) => {
+                      const category = RESOURCE_CATEGORIES.find((c) => c.key === r.category);
+                      const active = r.is_active !== 0 && r.is_active !== false;
+                      return (
+                        <div
+                          key={r.id}
+                          data-testid={`admin-resource-${r.id}`}
+                          className={`flex flex-col md:flex-row md:items-start md:justify-between gap-3 p-4 border rounded-lg ${
+                            active ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-900/30 border-slate-800 opacity-60'
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-1">
+                              <span className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs rounded-full">
+                                {category?.label || r.category}
+                              </span>
+                              {!active && (
+                                <span className="px-2 py-0.5 bg-slate-700 text-slate-300 text-xs rounded-full">Hidden</span>
+                              )}
+                            </div>
+                            <h4 className="text-white font-semibold">{r.name}</h4>
+                            {r.address && <p className="text-slate-400 text-xs mt-1">{r.address}</p>}
+                            {r.phone && <p className="text-slate-400 text-xs">{r.phone}</p>}
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleResourceActive(r)}
+                              data-testid={`resource-toggle-${r.id}`}
+                              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
+                                active
+                                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20'
+                                  : 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700'
+                              }`}
+                            >
+                              {active ? 'Visible' : 'Hidden'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => openEditResource(r)}
+                              data-testid={`resource-edit-${r.id}`}
+                              className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 rounded text-xs transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteResource(r.id)}
+                              data-testid={`resource-delete-${r.id}`}
+                              className="inline-flex items-center px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded text-xs transition-colors"
+                            >
+                              <Trash2 size={12} className="mr-1" />
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Resource edit/create modal */}
+      {showResourceModal && editingResource && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur flex items-start justify-center overflow-y-auto p-4"
+          data-testid="resource-modal"
+          onClick={closeResourceModal}
+        >
+          <div
+            className="bg-slate-900 border border-amber-500/30 rounded-2xl max-w-2xl w-full my-8 p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white text-xl font-bold">
+                {editingResource.id ? 'Edit Resource' : 'Add Resource'}
+              </h3>
+              <button
+                type="button"
+                onClick={closeResourceModal}
+                data-testid="resource-modal-close"
+                className="p-2 text-slate-400 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 text-sm mb-1">Category *</label>
+                  <select
+                    value={editingResource.category}
+                    onChange={(e) => handleResourceFieldChange('category', e.target.value)}
+                    data-testid="resource-field-category"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                  >
+                    {RESOURCE_CATEGORIES.map((c) => (
+                      <option key={c.key} value={c.key}>{c.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-300 text-sm mb-1">Sort order</label>
+                  <input
+                    type="number"
+                    value={editingResource.sort_order ?? 999}
+                    onChange={(e) => handleResourceFieldChange('sort_order', e.target.value)}
+                    data-testid="resource-field-sort-order"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                    placeholder="999"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm mb-1">Name *</label>
+                <input
+                  type="text"
+                  value={editingResource.name}
+                  onChange={(e) => handleResourceFieldChange('name', e.target.value)}
+                  data-testid="resource-field-name"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                  placeholder="Organization name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm mb-1">Description</label>
+                <textarea
+                  value={editingResource.description || ''}
+                  onChange={(e) => handleResourceFieldChange('description', e.target.value)}
+                  data-testid="resource-field-description"
+                  rows={2}
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm mb-1">Address</label>
+                <input
+                  type="text"
+                  value={editingResource.address || ''}
+                  onChange={(e) => handleResourceFieldChange('address', e.target.value)}
+                  data-testid="resource-field-address"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 text-sm mb-1">Phone</label>
+                  <input
+                    type="text"
+                    value={editingResource.phone || ''}
+                    onChange={(e) => handleResourceFieldChange('phone', e.target.value)}
+                    data-testid="resource-field-phone"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 text-sm mb-1">Website</label>
+                  <input
+                    type="text"
+                    value={editingResource.website || ''}
+                    onChange={(e) => handleResourceFieldChange('website', e.target.value)}
+                    data-testid="resource-field-website"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm mb-1">Hours</label>
+                <input
+                  type="text"
+                  value={editingResource.hours || ''}
+                  onChange={(e) => handleResourceFieldChange('hours', e.target.value)}
+                  data-testid="resource-field-hours"
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500"
+                  placeholder="Mon-Fri 9am-5pm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm mb-1">Notes / eligibility</label>
+                <textarea
+                  value={editingResource.notes || ''}
+                  onChange={(e) => handleResourceFieldChange('notes', e.target.value)}
+                  data-testid="resource-field-notes"
+                  rows={2}
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-amber-500 resize-none"
+                />
+              </div>
+
+              <label className="inline-flex items-center gap-2 text-slate-300 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!editingResource.is_active}
+                  onChange={(e) => handleResourceFieldChange('is_active', e.target.checked)}
+                  data-testid="resource-field-active"
+                  className="rounded"
+                />
+                Visible on public directory
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={closeResourceModal}
+                className="px-4 py-2 text-slate-400 hover:text-white text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveResource}
+                data-testid="resource-modal-save"
+                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg text-sm font-semibold hover:from-amber-400 hover:to-amber-500 transition-all"
+              >
+                {editingResource.id ? 'Save changes' : 'Add resource'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
