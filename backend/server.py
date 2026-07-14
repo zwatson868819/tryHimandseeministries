@@ -136,6 +136,22 @@ async def view_candles_migration_sql():
         media_type="text/plain"
     )
 
+# Notary Requests migration
+@api_router.get("/download/notary-migration-sql")
+async def view_notary_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/notary-migration.sql",
+        media_type="text/plain"
+    )
+
+# Resource Directory migration (schema + 48 seed rows)
+@api_router.get("/download/resources-migration-sql")
+async def view_resources_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/resources-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
