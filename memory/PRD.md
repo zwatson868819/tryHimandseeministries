@@ -83,6 +83,17 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - D1 migration file: `/app/cf-dashboard-deploy/notary-migration.sql` — **user must run this once in the Cloudflare D1 console** after the next GitHub push.
 - Verified via testing_agent (iteration_3.json — 100% backend 6/6 pytest, 100% frontend).
 
+## 2026-02-XX — Resource Directory
+- New header dropdown "Resource Directory" with 5 categories: Housing/Rental, Food, Clothing, Social Services, Mental/Behavioral Health.
+- Public pages at `/resources/:category` with quick-switch pills and rich cards (address→Google Maps, phone→tel:, website, hours, notes).
+- Curated seed of **48 real Richmond & Henrico orgs**: 10 housing, 12 food, 9 clothing, 9 social services, 8 mental health. Sources include Feed More, CARITAS, Homeward, RBHA, HAMHDS, Interfaith Henrico, CVLAS, 988, and more.
+- Header refactored to support multiple dropdowns (activeDropdown state). Nav item font size reduced to `text-[13px]` and "Free Notary Services" relabeled "Free Notary" — all tabs fit at 1440px without overflow.
+- Admin Dashboard: new "Resources" tab with per-category filter, "+ Add Resource" button, edit modal (10 fields), delete, and per-row Visible/Hidden toggle.
+- Cloudflare Worker endpoints: `GET /api/resources?category=X`, `GET/POST/PUT/DELETE /api/admin/resources`.
+- Preview FastAPI: in-memory CRUD backed by `resources_seed.py` — deterministic uuid5 IDs.
+- D1 migration: `/app/cf-dashboard-deploy/resources-migration.sql` (schema + full seed).
+- Verified via testing_agent (iteration_4.json — 100% backend 11/11 pytest, 100% frontend).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
