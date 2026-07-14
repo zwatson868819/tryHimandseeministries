@@ -94,6 +94,16 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - D1 migration: `/app/cf-dashboard-deploy/resources-migration.sql` (schema + full seed).
 - Verified via testing_agent (iteration_4.json — 100% backend 11/11 pytest, 100% frontend).
 
+## 2026-02-XX — SQL Migration Download Endpoints
+- Added `/api/download/notary-migration-sql` and `/api/download/resources-migration-sql` to legacy FastAPI so user can grab intact migration files from browser (avoids copy-paste truncation issues).
+- Verified via testing_agent (iteration_5.json — 100% backend).
+
+## 2026-02-XX — AdminDashboard Refactor
+- Split 1,225-line monolith into 1 shell + 12 focused sub-components under `/app/frontend/src/pages/admin/`.
+- New file structure: AdminHeader, TodayCard, ImpactEditor, GoalEditor, StatsCards, TabBar, DonationsTab, VolunteersTab, ContactsTab, PrayersTab, NotaryTab, ResourcesTab, ResourceModal + utils.js.
+- Zero behavior changes — every data-testid preserved. AdminDashboard.jsx shrank from 1225 → 429 lines. Average sub-component ~90 lines.
+- Verified via testing_agent (iteration_6.json — 100% refactor scope, all interactive flows work end-to-end).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
