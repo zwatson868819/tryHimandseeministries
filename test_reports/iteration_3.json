@@ -1,0 +1,43 @@
+{
+  "summary": "End-to-end tested the new Free Notary Services feature. Backend stub endpoints (POST /api/notary-requests validates name+phone; GET /api/admin/notary-requests returns []) all pass (6/6 pytest). Frontend public flow works — 'Free Notary Services' link visible in desktop AND mobile nav, /notary route renders notary-page + hero + 3 info tiles + full form; valid submission produces success card with 'Request Received' and 'Submit another request' resets the form; empty submits are blocked. Admin login (zwatson) succeeds; admin-tab-notary is present, clickable, and reveals admin-notary-panel with 'No notary requests yet' empty state.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_notary.py",
+    "/app/test_reports/pytest/pytest_notary.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "AdminDashboard.jsx generates React hydration warnings ('<tr> cannot be a child of <span>' / '<span> cannot be a child of <tbody>') visible in console. Cause is the visual-editor injecting extra <span> wrappers around table rows/bodies (x-ve-dynamic). Pre-existing across all admin tabs — not specific to the Notary tab — but worth flagging.",
+    "Pre-existing console error: GET .../admin/today-summary returns 404 ('Error fetching today summary: AxiosError'). Unrelated to Notary feature but should be addressed.",
+    "server.py stub_notary_create(payload: dict) accepts any keys; consider a Pydantic model in the FastAPI stub for parity with the Cloudflare Worker (low priority — stub only).",
+    "In Notary.jsx handleSubmit both HTML5 'required' AND JS validation are used, which is defensive and correct; however toast.error branches will only fire if HTML5 validation is bypassed. Not a bug."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_notary.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (6/6 pytest)",
+    "frontend": "100% (all Notary feature checks pass — desktop nav, mobile nav, page render, form submit, success card, reset, admin tab & empty panel)"
+  },
+  "test_credentials": "Admin: zwatson / Anandotowel@1988* (from /app/memory/test_credentials.md) — LOGIN SUCCESSFUL",
+  "seed_data_creation": "None (POST /api/notary-requests is a MOCKED preview stub — echoes only, does not persist). Backend/admin list is expected to remain empty in preview.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Notary Services stubs live in /app/backend/server.py (~L173-190). Production persistence lives in Cloudflare Worker /app/cloudflare-backend/src/index.ts (D1 + Resend email) — not exercised here. Admin table pre-existing React hydration warnings (span/tr nesting from visual-editor injections) are unrelated to this feature but pollute the console.",
+  "verified_endpoints": [
+    {"endpoint": "POST /api/notary-requests (valid)", "status": "200", "notes": "Echoes payload with id + status='new' + created_at"},
+    {"endpoint": "POST /api/notary-requests (missing phone)", "status": "400", "notes": "detail='Name and phone are required'"},
+    {"endpoint": "POST /api/notary-requests (missing name)", "status": "400", "notes": "detail='Name and phone are required'"},
+    {"endpoint": "POST /api/notary-requests ({})", "status": "400", "notes": "detail='Name and phone are required'"},
+    {"endpoint": "GET /api/admin/notary-requests", "status": "200", "notes": "Returns []"}
+  ],
+  "mocked_api_note": "MOCKED: POST /api/notary-requests (echo only, no persistence) and GET /api/admin/notary-requests (always []) in the preview FastAPI backend. Real persistence + Resend email happens only in the production Cloudflare Worker."
+}

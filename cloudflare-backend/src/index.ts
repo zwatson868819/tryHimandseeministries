@@ -198,6 +198,94 @@ app.post("/api/prayer-requests/:id/pray", async (c) => {
   return c.json({ id, pray_count: row?.pray_count ?? 0 });
 });
 
+// ---------- notary requests ----------
+// Public endpoint — anyone can request a free notary appointment.
+app.post("/api/notary-requests", async (c) => {
+  const b = await c.req.json<any>();
+  if (!b.name || !b.phone) return c.json({ detail: "Name and phone are required" }, 400);
+  const id = uuid();
+  const createdAt = now();
+  await c.env.DB.prepare(
+    "INSERT INTO notary_requests (id, name, phone, email, document_type, preferred_time, message, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?)"
+  )
+    .bind(
+      id,
+      b.name,
+      b.phone,
+      b.email ?? null,
+      b.document_type ?? null,
+      b.preferred_time ?? null,
+      b.message ?? null,
+      createdAt
+    )
+    .run();
+
+  // Fire-and-forget email to admin (via Resend). We don't fail the request if email fails.
+  if (c.env.RESEND_API_KEY && c.env.RESEND_FROM_EMAIL) {
+    const html = `<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#0f172a;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0f172a;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #f59e0b33;">
+        <tr><td style="padding:32px 32px 16px;">
+          <p style="color:#fbbf24;font-size:12px;letter-spacing:2px;margin:0 0 8px;text-transform:uppercase;">Free Notary Request</p>
+          <h1 style="color:#ffffff;font-size:24px;margin:0 0 8px;line-height:1.3;">New notary appointment request</h1>
+        </td></tr>
+        <tr><td style="padding:8px 32px 24px;color:#cbd5e1;font-size:15px;line-height:1.7;">
+          <p style="margin:0 0 8px;"><strong style="color:#f59e0b;">Name:</strong> ${escapeHtml(b.name)}</p>
+          <p style="margin:0 0 8px;"><strong style="color:#f59e0b;">Phone:</strong> ${escapeHtml(b.phone)}</p>
+          ${b.email ? `<p style="margin:0 0 8px;"><strong style="color:#f59e0b;">Email:</strong> ${escapeHtml(b.email)}</p>` : ""}
+          ${b.document_type ? `<p style="margin:0 0 8px;"><strong style="color:#f59e0b;">Paperwork:</strong> ${escapeHtml(b.document_type)}</p>` : ""}
+          ${b.preferred_time ? `<p style="margin:0 0 8px;"><strong style="color:#f59e0b;">Preferred time:</strong> ${escapeHtml(b.preferred_time)}</p>` : ""}
+          ${b.message ? `<p style="margin:16px 0 0;padding-top:16px;border-top:1px solid #334155;"><strong style="color:#f59e0b;">Message:</strong><br/>${escapeHtml(b.message)}</p>` : ""}
+        </td></tr>
+        <tr><td style="padding:16px 32px 24px;border-top:1px solid #334155;">
+          <p style="color:#64748b;font-size:12px;margin:0;">Submitted ${escapeHtml(createdAt)} — view all in the admin dashboard.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+    try {
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${c.env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: c.env.RESEND_FROM_EMAIL,
+          to: [c.env.RESEND_FROM_EMAIL],
+          subject: `Notary request from ${b.name}`,
+          html,
+          reply_to: b.email || undefined,
+        }),
+      });
+    } catch (e) {
+      console.error("Notary email send failed", e);
+    }
+  }
+
+  return c.json({ id, ...b, status: "new", created_at: createdAt }, 201);
+});
+
+app.get("/api/admin/notary-requests", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const rows = await c.env.DB.prepare(
+    "SELECT * FROM notary_requests ORDER BY created_at DESC LIMIT 500"
+  ).all();
+  return c.json(rows.results || []);
+});
+
+app.delete("/api/admin/notary-requests/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  await c.env.DB.prepare("DELETE FROM notary_requests WHERE id = ?").bind(id).run();
+  return c.json({ ok: true });
+});
+
 // Public impact stats: combines admin-editable settings + live counts.
 app.get("/api/stats/impact", async (c) => {
   const settingRows = await c.env.DB.prepare(

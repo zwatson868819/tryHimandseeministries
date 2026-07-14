@@ -23,6 +23,7 @@ const Header = () => {
     { name: 'Encounters', path: '/encounters' },
     { name: 'Blog', path: '/blog' },
     { name: 'Light a Candle', path: '/light-a-candle' },
+    { name: 'Free Notary Services', path: '/notary' },
     { name: 'Get Involved', path: '/get-involved' },
     { name: 'Contact', path: '/contact' }
   ];

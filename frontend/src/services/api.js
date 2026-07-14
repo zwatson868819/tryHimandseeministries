@@ -756,3 +756,39 @@ export const getPrayerCount = async () => {
   }
 };
 
+// --- Free Notary Services ---
+
+export const submitNotaryRequest = async (data) => {
+  try {
+    const response = await axios.post(`${API}/notary-requests`, data);
+    return response.data;
+  } catch (error) {
+    logError('Error submitting notary request:', error);
+    throw error;
+  }
+};
+
+export const getAdminNotaryRequests = async (token) => {
+  try {
+    const response = await axios.get(`${API}/admin/notary-requests`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error fetching notary requests:', error);
+    throw error;
+  }
+};
+
+export const deleteNotaryRequest = async (id, token) => {
+  try {
+    const response = await axios.delete(`${API}/admin/notary-requests/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    logError('Error deleting notary request:', error);
+    throw error;
+  }
+};
+

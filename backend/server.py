@@ -170,6 +170,25 @@ async def stub_impact_stats():
         "total_donations": 0,
     }
 
+@api_router.post("/notary-requests")
+async def stub_notary_create(payload: dict):
+    # In production the Cloudflare Worker persists to D1 and emails via Resend.
+    # This preview stub simply echoes the payload back so the form flow works.
+    from fastapi import HTTPException
+    if not payload.get("name") or not payload.get("phone"):
+        raise HTTPException(status_code=400, detail="Name and phone are required")
+    from uuid import uuid4
+    return {
+        "id": str(uuid4()),
+        **payload,
+        "status": "new",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+@api_router.get("/admin/notary-requests")
+async def stub_notary_list():
+    return []
+
 # Include the router in the main app
 app.include_router(api_router)
 

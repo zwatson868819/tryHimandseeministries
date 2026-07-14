@@ -27,6 +27,7 @@ import AdminLybtlContact from './pages/AdminLybtlContact';
 import LightACandle from './pages/LightACandle';
 import ShareKit from './pages/ShareKit';
 import Beatitudes from './pages/Beatitudes';
+import Notary from './pages/Notary';
 import SparkleCursor from './components/SparkleCursor';
 import KonamiCode from './components/KonamiCode';
 import VerseShuffleButton from './components/VerseShuffleButton';
@@ -50,6 +51,7 @@ function App() {
           <Route path="/light-a-candle" element={<LightACandle />} />
           <Route path="/share" element={<ShareKit />} />
           <Route path="/beatitudes" element={<Beatitudes />} />
+          <Route path="/notary" element={<Notary />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/blog" element={<Blog />} />
