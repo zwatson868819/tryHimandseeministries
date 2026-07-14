@@ -125,6 +125,16 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - SQL migration files regenerated from cleaned `resources_seed.py` - user needs to re-run resources migration (or apply an UPDATE) to purge em-dashes already in D1.
 - Verified via preview screenshot - Abuse/DV page and all cards render with regular hyphens.
 
+## 2026-02-XX - Voices from the Street + Miracle Mailbox
+- **Voices from the Street**: public /voices audio testimony wall, /voices/record page with 30-sec MediaRecorder + first name + category. Admin moderation queue with approve/reject/delete.
+- **Miracle Mailbox**: admin generates MM-XXXXX codes in bulk (up to 200 at a time). Public /mailbox/:code renders personalized welcome + scripture + optional featured voice + 6 resource category quick-links + visit tracking.
+- **QR generators in admin**: (1) bulk-print QR card sheet for selected mailbox codes; (2) single QR generator for /voices/record with per-campaign ref param.
+- **100% Cloudflare stack in production**: `env.AI` binding with `@cf/openai/whisper-large-v3-turbo` for transcription, MEDIA R2 binding for audio storage, D1 for structured data. Zero Emergent runtime dependency.
+- Preview backend has stubs (no Whisper, no R2) so admin flows work in dev; production Worker has the real path.
+- New D1 tables: `voices` + `mailbox_codes` (migration at `/app/cf-dashboard-deploy/voices-mailbox-migration.sql`, download route `/api/download/voices-mailbox-migration-sql`).
+- qrcode.react v4.2.0 added.
+- Verified via testing_agent (iteration_9.json - 100% backend 15/15 pytest, 100% frontend across 13 scenarios).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use

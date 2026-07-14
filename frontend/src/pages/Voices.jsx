@@ -118,7 +118,7 @@ const Voices = () => {
             </p>
           )}
           <div className="grid md:grid-cols-2 gap-5" data-testid="voices-list">
-            {items.map((v) => <VoiceCard key={v.id} voice={v} />)}
+            {items.length > 0 && items.map((v) => <VoiceCard key={v.id} voice={v} />)}
           </div>
         </div>
       </section>
