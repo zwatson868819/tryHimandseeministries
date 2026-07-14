@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { MapPin, Phone, Globe, Clock, StickyNote, Home, Utensils, Shirt, Building2, HeartPulse, ShieldAlert, ArrowLeft } from 'lucide-react';
+import { useParams, Link, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
+import { MapPin, Phone, Globe, Clock, StickyNote, Home, Utensils, Shirt, Building2, HeartPulse, ShieldAlert, ArrowLeft, Link2, Check } from 'lucide-react';
 import PageMeta from '../components/PageMeta';
 import { getResources } from '../services/api';
 
@@ -32,16 +33,56 @@ const telHref = (phone) => {
   return digits ? `tel:${digits}` : null;
 };
 
-const ResourceCard = ({ resource }) => {
+// Build a URL-safe slug from an org name so we can deep-link to specific cards.
+const slugify = (str = '') =>
+  str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 60);
+
+const ResourceCard = ({ resource, highlighted, categoryKey }) => {
   const map = mapsHref(resource.address);
   const tel = telHref(resource.phone);
   const web = normalizeUrl(resource.website);
+  const slug = slugify(resource.name);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/resources/${categoryKey}#${slug}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success('Link copied — paste to share this listing');
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      toast.error('Could not copy link');
+    }
+  };
+
   return (
     <article
+      id={slug}
       data-testid={`resource-card-${resource.id}`}
-      className="bg-slate-900/80 border border-amber-500/20 rounded-xl p-6 hover:border-amber-400/60 hover:shadow-lg hover:shadow-amber-500/10 transition-all"
+      className={`bg-slate-900/80 border rounded-xl p-6 hover:shadow-lg hover:shadow-amber-500/10 transition-all scroll-mt-40 ${
+        highlighted
+          ? 'border-amber-400 ring-2 ring-amber-400/60 shadow-lg shadow-amber-500/20'
+          : 'border-amber-500/20 hover:border-amber-400/60'
+      }`}
     >
-      <h3 className="text-white text-lg font-semibold mb-2 leading-snug">{resource.name}</h3>
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <h3 className="text-white text-lg font-semibold leading-snug flex-1">{resource.name}</h3>
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          data-testid={`resource-share-${resource.id}`}
+          aria-label={`Copy link to ${resource.name}`}
+          title="Copy shareable link"
+          className="p-1.5 rounded-md text-slate-400 hover:text-amber-400 hover:bg-amber-500/10 transition-colors flex-shrink-0"
+        >
+          {copied ? <Check size={16} className="text-emerald-400" /> : <Link2 size={16} />}
+        </button>
+      </div>
       {resource.description && (
         <p className="text-slate-400 text-sm leading-relaxed mb-4">{resource.description}</p>
       )}
@@ -95,10 +136,12 @@ const ResourceCard = ({ resource }) => {
 
 const ResourceDirectory = () => {
   const { category: categoryKey } = useParams();
+  const location = useLocation();
   const category = getCategory(categoryKey);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [highlightSlug, setHighlightSlug] = useState(null);
 
   useEffect(() => {
     if (!category) {
@@ -112,6 +155,28 @@ const ResourceDirectory = () => {
       .catch(() => setError('We could not load the resource list right now. Please try again later.'))
       .finally(() => setLoading(false));
   }, [category]);
+
+  // After items load, scroll to the anchor in the URL hash and highlight it briefly.
+  useEffect(() => {
+    if (loading || items.length === 0) return;
+    const hash = location.hash?.replace('#', '');
+    if (!hash) {
+      setHighlightSlug(null);
+      return;
+    }
+    setHighlightSlug(hash);
+    // Delay a tick so the DOM has laid out
+    const t = setTimeout(() => {
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+    // Clear highlight after a few seconds so it doesn't stay stuck
+    const clearT = setTimeout(() => setHighlightSlug(null), 3500);
+    return () => {
+      clearTimeout(t);
+      clearTimeout(clearT);
+    };
+  }, [loading, items, location.hash]);
 
   if (!category) {
     return (
@@ -203,7 +268,12 @@ const ResourceDirectory = () => {
           )}
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-5" data-testid="resource-list">
             {items.map((r) => (
-              <ResourceCard key={r.id} resource={r} />
+              <ResourceCard
+                key={r.id}
+                resource={r}
+                categoryKey={category.key}
+                highlighted={highlightSlug === slugify(r.name)}
+              />
             ))}
           </div>
 

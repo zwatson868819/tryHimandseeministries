@@ -1,0 +1,33 @@
+{
+  "summary": "Frontend-only verification of the new shareable per-org anchor links feature on Resource Directory pages. All 6 scenarios from the review request pass: share button copies URL + shows toast + green check, slug ids are correct kebab-case, hash navigation scrolls + highlights + fades, invalid hash is graceful, no-hash renders normally, and existing data-testids remain intact.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "ResourceDirectory.jsx is now ~290 lines with two components — still comfortably under the 700-line threshold, but ResourceCard could be split into its own file for future extensibility if more share/report actions land.",
+    "slugify() truncates to 60 chars — theoretically two very long org names sharing the same 60-char prefix could collide; unlikely with the current 58-item corpus but worth remembering when new orgs are added.",
+    "handleCopyLink() falls back to a toast.error on any clipboard exception, which is correct, but consider a document.execCommand('copy') fallback for older browsers or non-secure contexts where navigator.clipboard is undefined."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped)", "frontend": "100% (6/6 scenarios)"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Verified against preview URL from REACT_APP_BACKEND_URL. Feature covered on /resources/domestic-violence and /resources/food. Clipboard permission had to be granted via page.context.grant_permissions(['clipboard-read','clipboard-write']) for the readText() assertion — copied URL confirmed as https://<origin>/resources/<category>#<slug>. Highlight fade check must NOT use plain substring 'border-amber-400' because the non-highlighted class already contains 'hover:border-amber-400/60'; instead assert 'ring-2' absence or use exact class regex.",
+  "detailed_results": {
+    "share_button_toast_and_check": "PASS — Clicking resource-share-<id> triggered toast 'Link copied — paste to share this listing' and icon flipped to a green (emerald-400) check svg. Reverted to Link2 icon after ~1.8s. Clipboard content verified: https://himandsee-faith.preview.emergentagent.com/resources/domestic-violence#greater-richmond-regional-hotline-ywca",
+    "slug_ids": "PASS — All 10 cards on /resources/domestic-violence have id equal to a valid kebab-case slug. 'Safe Harbor — 24/7 Helpline' correctly slugified to id='safe-harbor-24-7-helpline'. Regex /^[a-z0-9]+(-[a-z0-9]+)*$/ matched every id.",
+    "direct_hash_navigation": "PASS — Loading /resources/domestic-violence#safe-harbor-24-7-helpline auto-scrolled the target card into the viewport (bounding box y=159.75 within window height 1080) and applied classes border-amber-400 + ring-2 + ring-amber-400/60. After ~3.5s the highlight ring cleared (class reverted to 'border-amber-500/20 hover:border-amber-400/60' with no ring-2), and the card remained visible.",
+    "invalid_hash": "PASS — /resources/food#nonexistent-slug rendered normally, 0 cards received ring-2 highlight, no console/page errors. All 12 cards and 12 share buttons present.",
+    "absent_hash": "PASS — /resources/food (no hash) rendered with scrollY=0, no cards highlighted, no scroll behavior triggered.",
+    "regression_data_testids": "PASS — resource-directory-page, resource-list, resource-tab-* (6 tabs), resource-card-* (12 cards on food, 10 on DV), resource-share-* all present. resource-loading correctly detaches after fetch. resource-empty not applicable (data present)."
+  }
+}
