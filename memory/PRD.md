@@ -112,6 +112,13 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - New download endpoint `/api/download/resources-dv-delta-sql`.
 - Verified via testing_agent (iteration_7.json — 100% backend 20/20 pytest, 100% frontend across 13 scenarios).
 
+## 2026-02-XX — Shareable Per-Org Anchor Links
+- Every resource card now has a stable slug id (kebab-case of the org name) and a copy-link icon button (top-right of the card).
+- Clicking the button copies `${origin}/resources/${category}#${slug}` to the clipboard, shows a toast, and briefly flips the icon to a green check.
+- Direct visits to a hash link auto-scroll the target card into view and apply a highlighted amber ring for ~3.5s.
+- Invalid or absent hashes render normally with no errors.
+- Verified via testing_agent (iteration_8.json — 100% frontend 6/6 scenarios).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
