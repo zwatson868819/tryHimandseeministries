@@ -20,6 +20,12 @@ import {
   createResource,
   updateResource,
   deleteResource,
+  getAdminVoices,
+  updateVoice,
+  deleteVoice,
+  getAdminMailbox,
+  generateMailboxCodes,
+  deleteMailboxCode,
 } from '../services/api';
 import { RESOURCE_CATEGORIES } from './ResourceDirectory';
 
@@ -36,6 +42,8 @@ import PrayersTab from './admin/PrayersTab';
 import NotaryTab from './admin/NotaryTab';
 import ResourcesTab from './admin/ResourcesTab';
 import ResourceModal from './admin/ResourceModal';
+import VoicesTab from './admin/VoicesTab';
+import MailboxTab from './admin/MailboxTab';
 
 const emptyResource = (defaultCategory) => ({
   id: null,
@@ -56,7 +64,7 @@ const AdminDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Valid tab keys - kept in sync with TabBar.jsx
-  const VALID_TABS = ['donations', 'volunteers', 'contacts', 'prayers', 'notary', 'resources'];
+  const VALID_TABS = ['donations', 'volunteers', 'contacts', 'prayers', 'notary', 'resources', 'voices', 'mailbox'];
   const initialTab = VALID_TABS.includes(searchParams.get('tab')) ? searchParams.get('tab') : 'donations';
 
   // Auth + top-level data
@@ -105,6 +113,10 @@ const AdminDashboard = () => {
   const [editingResource, setEditingResource] = useState(null);
   const [showResourceModal, setShowResourceModal] = useState(false);
 
+  // Voices + Mailbox state
+  const [voices, setVoices] = useState([]);
+  const [mailboxes, setMailboxes] = useState([]);
+
   // Donation filters
   const [filters, setFilters] = useState({
     donation_type: '',
@@ -136,6 +148,7 @@ const AdminDashboard = () => {
       const [
         statsData, donationsData, volunteersData, contactsData, prayersData,
         progressData, today, impactData, notaryData, resourcesData,
+        voicesData, mailboxData,
       ] = await Promise.all([
         getDashboardStats(adminToken),
         getAdminDonations(adminToken),
@@ -147,6 +160,8 @@ const AdminDashboard = () => {
         getImpactStats().catch(() => null),
         getAdminNotaryRequests(adminToken).catch(() => []),
         getAdminResources(adminToken).catch(() => []),
+        getAdminVoices(adminToken).catch(() => []),
+        getAdminMailbox(adminToken).catch(() => []),
       ]);
       setStats(statsData);
       setDonations(donationsData);
@@ -159,6 +174,8 @@ const AdminDashboard = () => {
       setImpact(impactData);
       setNotaryRequests(notaryData || []);
       setResources(resourcesData || []);
+      setVoices(voicesData || []);
+      setMailboxes(mailboxData || []);
       if (impactData) {
         setImpactInputs({
           lives_touched: String(impactData.lives_touched ?? 0),
@@ -328,6 +345,53 @@ const AdminDashboard = () => {
     }
   };
 
+  // ---- Voices ----
+  const handleUpdateVoice = async (voiceId, patch) => {
+    try {
+      await updateVoice(voiceId, patch, token);
+      setVoices((prev) => prev.map((v) => (v.id === voiceId ? { ...v, ...patch, approved_at: patch.status === 'approved' ? new Date().toISOString() : v.approved_at } : v)));
+      if (patch.status) toast.success(`Voice ${patch.status}`);
+    } catch {
+      toast.error('Failed to update voice');
+    }
+  };
+
+  const handleDeleteVoice = async (voiceId) => {
+    if (!window.confirm('Delete this voice testimony? This cannot be undone.')) return;
+    try {
+      await deleteVoice(voiceId, token);
+      setVoices((prev) => prev.filter((v) => v.id !== voiceId));
+      toast.success('Voice deleted');
+    } catch {
+      toast.error('Failed to delete voice');
+    }
+  };
+
+  // ---- Mailbox ----
+  const handleGenerateMailbox = async (payload) => {
+    try {
+      const result = await generateMailboxCodes(payload, token);
+      // Refresh full list to pull in the new codes
+      const fresh = await getAdminMailbox(token);
+      setMailboxes(fresh);
+      return result;
+    } catch {
+      toast.error('Failed to generate codes');
+      return { created: [], count: 0 };
+    }
+  };
+
+  const handleDeleteMailbox = async (code) => {
+    if (!window.confirm(`Delete code ${code}? This cannot be undone.`)) return;
+    try {
+      await deleteMailboxCode(code, token);
+      setMailboxes((prev) => prev.filter((m) => m.code !== code));
+      toast.success('Code deleted');
+    } catch {
+      toast.error('Failed to delete code');
+    }
+  };
+
   // ---- Donations filters ----
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -431,6 +495,21 @@ const AdminDashboard = () => {
                 onEdit={openEditResource}
                 onDelete={handleDeleteResource}
                 onToggleActive={handleToggleResourceActive}
+              />
+            )}
+            {activeTab === 'voices' && (
+              <VoicesTab
+                voices={voices}
+                onUpdate={handleUpdateVoice}
+                onDelete={handleDeleteVoice}
+              />
+            )}
+            {activeTab === 'mailbox' && (
+              <MailboxTab
+                mailboxes={mailboxes}
+                voices={voices}
+                onGenerate={handleGenerateMailbox}
+                onDelete={handleDeleteMailbox}
               />
             )}
           </div>

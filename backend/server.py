@@ -160,6 +160,14 @@ async def view_resources_dv_delta_sql():
         media_type="text/plain"
     )
 
+# Voices + Mailbox migration (2 new tables)
+@api_router.get("/download/voices-mailbox-migration-sql")
+async def view_voices_mailbox_migration_sql():
+    return FileResponse(
+        path="/app/cf-dashboard-deploy/voices-mailbox-migration.sql",
+        media_type="text/plain"
+    )
+
 # Include ministry routes
 api_router.include_router(ministry_router, tags=["ministry"])
 
@@ -281,6 +289,150 @@ async def stub_resources_update(rid: str, payload: dict):
 @api_router.delete("/admin/resources/{rid}")
 async def stub_resources_delete(rid: str):
     _RESOURCES_CACHE.pop(rid, None)
+    return {"ok": True}
+
+# ---------- Voices from the Street (preview stub) ----------
+# In production, Cloudflare Worker + Workers AI (Whisper) transcribes and stores
+# to D1/R2. Preview stub keeps everything in memory so admin flows are exercisable.
+from fastapi import UploadFile, File, Form, HTTPException as _HTTPExc
+from uuid import uuid4 as _uuid4
+
+_VOICES_CACHE: dict[str, dict] = {}
+_MAILBOX_CACHE: dict[str, dict] = {}
+
+@api_router.post("/voices")
+async def stub_voice_submit(
+    audio: UploadFile = File(...),
+    first_name: str = Form(...),
+    category: str = Form("testimony"),
+    ref_source: str = Form(""),
+    duration_sec: int = Form(0),
+):
+    if not first_name.strip():
+        raise _HTTPExc(status_code=400, detail="First name is required")
+    data = await audio.read()
+    if len(data) > 8 * 1024 * 1024:
+        raise _HTTPExc(status_code=413, detail="Audio too large (max 8MB)")
+    vid = str(_uuid4())
+    _VOICES_CACHE[vid] = {
+        "id": vid,
+        "first_name": first_name.strip(),
+        "audio_key": f"voices/{vid}.webm",
+        "audio_url": "",  # Preview has no R2; production sets this.
+        "mime_type": audio.content_type or "audio/webm",
+        "duration_sec": duration_sec,
+        "transcript": "",  # Preview has no Whisper; production sets this.
+        "category": category,
+        "ref_source": ref_source or None,
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "approved_at": None,
+    }
+    return {"id": vid, "transcript": "", "status": "pending"}
+
+@api_router.get("/voices")
+async def stub_voices_public():
+    items = [v for v in _VOICES_CACHE.values() if v.get("status") == "approved"]
+    items.sort(key=lambda v: v.get("approved_at") or v.get("created_at"), reverse=True)
+    return items
+
+@api_router.get("/admin/voices")
+async def stub_voices_admin():
+    order = {"pending": 0, "approved": 1, "rejected": 2}
+    items = sorted(
+        _VOICES_CACHE.values(),
+        key=lambda v: (order.get(v.get("status", "pending"), 3), v.get("created_at", "")),
+        reverse=False,
+    )
+    return items
+
+@api_router.put("/admin/voices/{vid}")
+async def stub_voice_update(vid: str, payload: dict):
+    if vid not in _VOICES_CACHE:
+        raise _HTTPExc(status_code=404, detail="Voice not found")
+    v = _VOICES_CACHE[vid]
+    for k in ["first_name", "transcript", "category", "status"]:
+        if k in payload and payload[k] is not None:
+            v[k] = payload[k]
+    if payload.get("status") == "approved":
+        v["approved_at"] = datetime.now(timezone.utc).isoformat()
+    return {"ok": True, "updated_at": datetime.now(timezone.utc).isoformat()}
+
+@api_router.delete("/admin/voices/{vid}")
+async def stub_voice_delete(vid: str):
+    _VOICES_CACHE.pop(vid, None)
+    return {"ok": True}
+
+# ---------- Miracle Mailbox (preview stub) ----------
+import random as _random
+_MM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+def _gen_mm_code():
+    return "MM-" + "".join(_random.choice(_MM_CHARS) for _ in range(5))
+
+@api_router.get("/mailbox/{code}")
+async def stub_mailbox_get(code: str):
+    code_upper = code.upper()
+    if code_upper not in _MAILBOX_CACHE:
+        raise _HTTPExc(status_code=404, detail="Mailbox code not found")
+    row = _MAILBOX_CACHE[code_upper]
+    row["visit_count"] = row.get("visit_count", 0) + 1
+    row["last_visited_at"] = datetime.now(timezone.utc).isoformat()
+    if not row.get("first_opened_at"):
+        row["first_opened_at"] = row["last_visited_at"]
+    featured_voice = None
+    if row.get("featured_voice_id") and row["featured_voice_id"] in _VOICES_CACHE:
+        v = _VOICES_CACHE[row["featured_voice_id"]]
+        if v.get("status") == "approved":
+            featured_voice = {k: v[k] for k in ("id", "first_name", "audio_url", "audio_key", "transcript") if k in v}
+    return {**row, "featured_voice": featured_voice}
+
+@api_router.post("/admin/mailbox/generate")
+async def stub_mailbox_generate(payload: dict):
+    count = max(1, min(200, int(payload.get("count", 10))))
+    now_iso = datetime.now(timezone.utc).isoformat()
+    created = []
+    for _ in range(count):
+        # Ensure unique
+        for _try in range(5):
+            code = _gen_mm_code()
+            if code not in _MAILBOX_CACHE:
+                break
+        _MAILBOX_CACHE[code] = {
+            "code": code,
+            "welcome_text": payload.get("welcome_text", ""),
+            "scripture_ref": payload.get("scripture_ref", ""),
+            "featured_voice_id": payload.get("featured_voice_id"),
+            "distributed_at": payload.get("distributed_at"),
+            "distributed_by": payload.get("distributed_by", ""),
+            "notes": payload.get("notes", ""),
+            "visit_count": 0,
+            "first_opened_at": None,
+            "last_visited_at": None,
+            "created_at": now_iso,
+        }
+        created.append({"code": code})
+    return {"created": created, "count": len(created)}
+
+@api_router.get("/admin/mailbox")
+async def stub_mailbox_list():
+    items = sorted(_MAILBOX_CACHE.values(), key=lambda x: x.get("created_at", ""), reverse=True)
+    return items
+
+@api_router.put("/admin/mailbox/{code}")
+async def stub_mailbox_update(code: str, payload: dict):
+    code_upper = code.upper()
+    if code_upper not in _MAILBOX_CACHE:
+        raise _HTTPExc(status_code=404, detail="Mailbox code not found")
+    row = _MAILBOX_CACHE[code_upper]
+    for k in ["welcome_text", "scripture_ref", "featured_voice_id", "distributed_by", "notes"]:
+        if k in payload and payload[k] is not None:
+            row[k] = payload[k]
+    return {"ok": True}
+
+@api_router.delete("/admin/mailbox/{code}")
+async def stub_mailbox_delete(code: str):
+    _MAILBOX_CACHE.pop(code.upper(), None)
     return {"ok": True}
 
 # Include the router in the main app

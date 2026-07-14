@@ -21,6 +21,11 @@ database_id = "70408856-b32d-498a-8c70-733cf458f7fd"
 binding = "MEDIA"
 bucket_name = "tryhimandsee-media"
 
+# Cloudflare Workers AI - used for Whisper transcription of voice testimonies.
+# No API key required; billed to your Cloudflare account under Workers AI.
+[ai]
+binding = "AI"
+
 # Secrets to set via `wrangler secret put <NAME>`:
 #   JWT_SECRET           — random 32+ char string for signing admin JWTs
 #   STRIPE_API_KEY       — your Stripe LIVE secret key (sk_live_...)

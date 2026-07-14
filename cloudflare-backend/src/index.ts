@@ -375,6 +375,229 @@ app.delete("/api/admin/resources/:id", async (c) => {
   return c.json({ ok: true });
 });
 
+// ---------- Voices from the Street ----------
+// Public: submit an audio testimony. Multipart: audio, first_name, category, ref_source.
+app.post("/api/voices", async (c) => {
+  const form = await c.req.formData();
+  const audio = form.get("audio");
+  const firstName = String(form.get("first_name") || "").trim();
+  const category = String(form.get("category") || "testimony");
+  const refSource = String(form.get("ref_source") || "");
+  const durationSec = Number(form.get("duration_sec") || 0) | 0;
+
+  if (!(audio instanceof Blob)) return c.json({ detail: "Missing audio" }, 400);
+  if (!firstName) return c.json({ detail: "First name is required" }, 400);
+  if (audio.size > 8 * 1024 * 1024) return c.json({ detail: "Audio too large (max 8MB)" }, 413);
+
+  const id = uuid();
+  const audioKey = `voices/${id}.webm`;
+
+  // Store the audio in R2
+  await c.env.MEDIA.put(audioKey, audio.stream(), {
+    httpMetadata: { contentType: audio.type || "audio/webm" },
+  });
+
+  // Transcribe with Cloudflare Workers AI Whisper (skip if binding missing e.g. local test)
+  let transcript = "";
+  try {
+    if (c.env.AI) {
+      const arrayBuf = await audio.arrayBuffer();
+      const audioBase64 = arrayBufferToBase64(arrayBuf);
+      const result = (await c.env.AI.run("@cf/openai/whisper-large-v3-turbo", {
+        audio: audioBase64,
+        language: "en",
+      })) as { text?: string };
+      transcript = (result?.text || "").trim();
+    }
+  } catch (e) {
+    console.error("Whisper transcription failed:", e);
+  }
+
+  const publicUrl = c.env.R2_PUBLIC_BASE_URL
+    ? `${c.env.R2_PUBLIC_BASE_URL}/${audioKey}`
+    : "";
+
+  await c.env.DB.prepare(
+    "INSERT INTO voices (id, first_name, audio_key, audio_url, mime_type, duration_sec, transcript, category, ref_source, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)"
+  )
+    .bind(
+      id, firstName, audioKey, publicUrl, audio.type || "audio/webm",
+      durationSec, transcript, category, refSource || null, now()
+    )
+    .run();
+
+  return c.json({ id, transcript, status: "pending" }, 201);
+});
+
+// Public: get the approved audio testimony wall.
+app.get("/api/voices", async (c) => {
+  const rows = await c.env.DB.prepare(
+    "SELECT id, first_name, audio_url, audio_key, transcript, category, duration_sec, created_at, approved_at FROM voices WHERE status = 'approved' ORDER BY approved_at DESC LIMIT 100"
+  ).all();
+  return c.json(rows.results || []);
+});
+
+// Public: stream a single audio blob (fallback if R2_PUBLIC_BASE_URL not configured).
+app.get("/api/voices/audio/:id", async (c) => {
+  const id = c.req.param("id");
+  const row = await c.env.DB.prepare(
+    "SELECT audio_key, mime_type, status FROM voices WHERE id = ?"
+  ).bind(id).first<any>();
+  if (!row || row.status !== "approved") return c.notFound();
+  const obj = await c.env.MEDIA.get(row.audio_key);
+  if (!obj) return c.notFound();
+  return new Response(obj.body, {
+    headers: {
+      "Content-Type": row.mime_type || "audio/webm",
+      "Cache-Control": "public, max-age=86400",
+    },
+  });
+});
+
+// Admin: list all voices with pending queue first.
+app.get("/api/admin/voices", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const rows = await c.env.DB.prepare(
+    "SELECT * FROM voices ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, created_at DESC LIMIT 500"
+  ).all();
+  return c.json(rows.results || []);
+});
+
+app.put("/api/admin/voices/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  const b = await c.req.json<any>();
+  const ts = now();
+  await c.env.DB.prepare(
+    "UPDATE voices SET first_name = COALESCE(?, first_name), transcript = COALESCE(?, transcript), category = COALESCE(?, category), status = COALESCE(?, status), approved_at = CASE WHEN ? = 'approved' THEN ? ELSE approved_at END WHERE id = ?"
+  )
+    .bind(
+      b.first_name ?? null,
+      b.transcript ?? null,
+      b.category ?? null,
+      b.status ?? null,
+      b.status ?? null,
+      ts,
+      id
+    )
+    .run();
+  return c.json({ ok: true, updated_at: ts });
+});
+
+app.delete("/api/admin/voices/:id", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  const row = await c.env.DB.prepare("SELECT audio_key FROM voices WHERE id = ?").bind(id).first<any>();
+  if (row?.audio_key) {
+    try { await c.env.MEDIA.delete(row.audio_key); } catch { /* ignore */ }
+  }
+  await c.env.DB.prepare("DELETE FROM voices WHERE id = ?").bind(id).run();
+  return c.json({ ok: true });
+});
+
+// ---------- Miracle Mailbox ----------
+// Public: retrieve mailbox content by code + track visit.
+app.get("/api/mailbox/:code", async (c) => {
+  const code = c.req.param("code").toUpperCase();
+  const row = await c.env.DB.prepare("SELECT * FROM mailbox_codes WHERE code = ?").bind(code).first<any>();
+  if (!row) return c.json({ detail: "Mailbox code not found" }, 404);
+
+  const ts = now();
+  await c.env.DB.prepare(
+    "UPDATE mailbox_codes SET visit_count = visit_count + 1, last_visited_at = ?, first_opened_at = COALESCE(first_opened_at, ?) WHERE code = ?"
+  ).bind(ts, ts, code).run();
+
+  // Optionally hydrate featured voice
+  let featured_voice = null;
+  if (row.featured_voice_id) {
+    featured_voice = await c.env.DB.prepare(
+      "SELECT id, first_name, audio_url, audio_key, transcript FROM voices WHERE id = ? AND status = 'approved'"
+    ).bind(row.featured_voice_id).first<any>();
+  }
+  return c.json({ ...row, featured_voice });
+});
+
+// Admin: bulk-generate mailbox codes.
+app.post("/api/admin/mailbox/generate", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const b = await c.req.json<any>();
+  const count = Math.max(1, Math.min(200, Number(b.count) || 10));
+  const distributedBy = b.distributed_by || "";
+  const distributedAt = b.distributed_at || null;
+  const welcomeText = b.welcome_text || "";
+  const scriptureRef = b.scripture_ref || "";
+  const featuredVoiceId = b.featured_voice_id || null;
+
+  const created: any[] = [];
+  const ts = now();
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no confusing 0/O/1/I
+  const genCode = () => {
+    let s = "MM-";
+    for (let i = 0; i < 5; i++) s += chars[Math.floor(Math.random() * chars.length)];
+    return s;
+  };
+
+  for (let i = 0; i < count; i++) {
+    let code = genCode();
+    // Retry once if collision (very unlikely with 32^5 space)
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        await c.env.DB.prepare(
+          "INSERT INTO mailbox_codes (code, welcome_text, scripture_ref, featured_voice_id, distributed_at, distributed_by, notes, visit_count, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)"
+        ).bind(code, welcomeText, scriptureRef, featuredVoiceId, distributedAt, distributedBy, b.notes || "", ts).run();
+        created.push({ code });
+        break;
+      } catch {
+        code = genCode();
+        attempts++;
+      }
+    }
+  }
+  return c.json({ created, count: created.length }, 201);
+});
+
+app.get("/api/admin/mailbox", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const rows = await c.env.DB.prepare(
+    "SELECT * FROM mailbox_codes ORDER BY created_at DESC LIMIT 500"
+  ).all();
+  return c.json(rows.results || []);
+});
+
+app.put("/api/admin/mailbox/:code", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const code = c.req.param("code").toUpperCase();
+  const b = await c.req.json<any>();
+  await c.env.DB.prepare(
+    "UPDATE mailbox_codes SET welcome_text = COALESCE(?, welcome_text), scripture_ref = COALESCE(?, scripture_ref), featured_voice_id = COALESCE(?, featured_voice_id), distributed_by = COALESCE(?, distributed_by), notes = COALESCE(?, notes) WHERE code = ?"
+  ).bind(b.welcome_text ?? null, b.scripture_ref ?? null, b.featured_voice_id ?? null, b.distributed_by ?? null, b.notes ?? null, code).run();
+  return c.json({ ok: true });
+});
+
+app.delete("/api/admin/mailbox/:code", async (c) => {
+  const admin = await requireAdmin(c);
+  if (!admin) return c.json({ detail: "Unauthorized" }, 401);
+  const code = c.req.param("code").toUpperCase();
+  await c.env.DB.prepare("DELETE FROM mailbox_codes WHERE code = ?").bind(code).run();
+  return c.json({ ok: true });
+});
+
+// Base64 helper for Whisper (nodejs_compat provides Buffer)
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  // btoa is available in Workers runtime
+  return btoa(binary);
+}
+
 // Public impact stats: combines admin-editable settings + live counts.
 app.get("/api/stats/impact", async (c) => {
   const settingRows = await c.env.DB.prepare(

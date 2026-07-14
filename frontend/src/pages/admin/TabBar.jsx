@@ -7,6 +7,8 @@ const TABS = [
   { key: 'prayers',    label: 'Prayers' },
   { key: 'notary',     label: 'Notary' },
   { key: 'resources',  label: 'Resources' },
+  { key: 'voices',     label: 'Voices' },
+  { key: 'mailbox',    label: 'Mailbox' },
 ];
 
 const TabBar = ({ activeTab, onChange }) => (

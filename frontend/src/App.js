@@ -29,6 +29,9 @@ import ShareKit from './pages/ShareKit';
 import Beatitudes from './pages/Beatitudes';
 import Notary from './pages/Notary';
 import ResourceDirectory from './pages/ResourceDirectory';
+import Voices from './pages/Voices';
+import VoicesRecord from './pages/VoicesRecord';
+import Mailbox from './pages/Mailbox';
 import SparkleCursor from './components/SparkleCursor';
 import KonamiCode from './components/KonamiCode';
 import VerseShuffleButton from './components/VerseShuffleButton';
@@ -54,6 +57,9 @@ function App() {
           <Route path="/beatitudes" element={<Beatitudes />} />
           <Route path="/notary" element={<Notary />} />
           <Route path="/resources/:category" element={<ResourceDirectory />} />
+          <Route path="/voices" element={<Voices />} />
+          <Route path="/voices/record" element={<VoicesRecord />} />
+          <Route path="/mailbox/:code" element={<Mailbox />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/blog" element={<Blog />} />

@@ -1,0 +1,42 @@
+{
+  "summary": "Full-stack testing of the new Voices from the Street + Miracle Mailbox features. Backend: 15/15 pytest cases pass (mailbox generate/get/delete/404/visit-count, MM-[A-Z2-9]{5} pattern with no confusing chars, voices submit/approve/delete lifecycle, public list, migration SQL download). Frontend: all data-testids present on /voices, /voices/record (with ref query param preserved), /mailbox/:code (both valid + not-found states). Admin dashboard: deep-links ?tab=voices and ?tab=mailbox open the right panels; all 8 tabs (donations, volunteers, contacts, prayers, notary, resources, voices, mailbox) clickable; generator flow (fill 5, generate, print modal opens, delete row) works end-to-end; QR generator toggle renders qrcode.react SVG and updates when ref changes. Header 'Voices' link present. No blocking issues.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Voices.jsx", "issue": "Both data-testid='voices-empty' and empty data-testid='voices-list' <div> render simultaneously when items.length===0. Not visually broken (empty grid has 0 children) but the list container should conditionally render only when items exist for cleaner DOM.", "selector": "[data-testid='voices-list']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Admin Dashboard (all tabs)", "issues": ["React hydration warnings in console: '<span> cannot be a child of <select>/<tbody>/<option>'. Root cause is the preview-only Emergent dev instrumentation wrapping mapped children in <span data-ve-dynamic='true' x-excluded='true' style='display:contents'>. This does NOT affect the production Cloudflare build (instrumentation is stripped), so it is a preview environment artifact only, not application code. Called out for transparency."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_voices_mailbox.py",
+    "/app/test_reports/pytest/voices_mailbox.xml"
+  ],
+  "action_items": [
+    "Optional cleanup: In /app/frontend/src/pages/Voices.jsx, wrap the voices-list <div> in `{items.length > 0 && ...}` so the empty state and the (empty) grid don't co-exist in the DOM. Cosmetic only.",
+    "No other action items — feature is production-ready for the preview backend contract. Whisper transcription + R2 audio playback remain Cloudflare-only as documented."
+  ],
+  "critical_code_review_comments": [
+    "/app/backend/server.py has grown to 458 lines with in-memory stubs interleaved with real MongoDB routes; the Voices+Mailbox stubs (~140 lines) should be extracted to /app/backend/voices_mailbox_stub.py for maintainability once the file crosses ~600 lines. Currently under the 700-line threshold so acceptable.",
+    "_VOICES_CACHE and _MAILBOX_CACHE are module-level dicts — will be wiped on every backend restart / worker reboot. This is documented in code comments and expected in preview, but new engineers might be surprised. Consider a `# PREVIEW-ONLY: ephemeral in-memory cache` banner at the top of that section.",
+    "stub_mailbox_generate uses random.choice from Python's default (not-cryptographic) random module for MM code generation. Fine for preview (collision handling is present with 5-try retry), but production Worker in cloudflare-backend/src/index.ts should use crypto.getRandomValues to avoid predictable codes.",
+    "MailboxTab.jsx voice-qr-toggle: the QR points-to URL is built with `${window.location.origin}/voices/record?ref=...` — good, but the ref input has no validation (spaces or special chars would produce a broken URL). Consider basic sanitization.",
+    "Voices.jsx renders both voices-empty and an empty voices-list <div>. Minor DOM cleanliness issue (see UI bug above)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_voices_mailbox.py (new)"
+  ],
+  "success_rate": {"backend": "100% (15/15)", "frontend": "100% (all scenarios in review request verified)"},
+  "test_credentials": "Admin: zwatson / Anandotowel@1988* (from /app/memory/test_credentials.md) — worked as expected.",
+  "seed_data_creation": "During backend tests, 3 mailbox codes were generated via the admin API and 1 was deleted (2 remain). One voice testimony was submitted + approved + deleted. During frontend tests, 5 more mailbox codes were generated via UI and 1 was deleted (4 remain). All test data is in-memory only and will vanish on next backend restart.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Preview backend cache is in-memory — expect stale mailbox codes / voices to persist across a single supervisor process lifetime but disappear on restart. When testing on production Cloudflare, replace endpoints with the Worker URL and admin routes require admin JWT (Bearer token from /api/admin/login). Whisper transcription (env.AI + @cf/openai/whisper-large-v3-turbo) and R2 audio storage only exist in the Worker path, so audio playback of approved voices will not work in preview — the audio_url field stays empty and mailbox_voice.audio_key falls back to a /api/voices/audio/:id endpoint that returns 404 in preview.",
+  "playbook_notes": "qrcode.react v4.2.0 renders as an inline SVG (46 SVGs on the admin Mailbox tab confirmed). The QR SVG regenerates client-side on ref input change without a network call — good UX.",
+  "rca of the issue": "N/A — no bugs found."
+}

@@ -853,3 +853,73 @@ export const deleteResource = async (id, token) => {
   }
 };
 
+// --- Voices from the Street ---
+
+export const submitVoiceTestimony = async (formData) => {
+  const response = await axios.post(`${API}/voices`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data;
+};
+
+export const getApprovedVoices = async () => {
+  const response = await axios.get(`${API}/voices`);
+  return response.data;
+};
+
+export const getAdminVoices = async (token) => {
+  const response = await axios.get(`${API}/admin/voices`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const updateVoice = async (id, data, token) => {
+  const response = await axios.put(`${API}/admin/voices/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const deleteVoice = async (id, token) => {
+  const response = await axios.delete(`${API}/admin/voices/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+// --- Miracle Mailbox ---
+
+export const getMailbox = async (code) => {
+  const response = await axios.get(`${API}/mailbox/${code}`);
+  return response.data;
+};
+
+export const generateMailboxCodes = async (payload, token) => {
+  const response = await axios.post(`${API}/admin/mailbox/generate`, payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const getAdminMailbox = async (token) => {
+  const response = await axios.get(`${API}/admin/mailbox`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const updateMailboxCode = async (code, data, token) => {
+  const response = await axios.put(`${API}/admin/mailbox/${code}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const deleteMailboxCode = async (code, token) => {
+  const response = await axios.delete(`${API}/admin/mailbox/${code}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
