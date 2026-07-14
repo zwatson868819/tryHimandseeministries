@@ -104,6 +104,14 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Zero behavior changes — every data-testid preserved. AdminDashboard.jsx shrank from 1225 → 429 lines. Average sub-component ~90 lines.
 - Verified via testing_agent (iteration_6.json — 100% refactor scope, all interactive flows work end-to-end).
 
+## 2026-02-XX — URL-based Admin Tab Routing + Abuse/DV Category
+- Admin Dashboard: added `?tab=` URL param syncing via `useSearchParams`. Refreshes and shared links open the correct tab. Browser back/forward navigate between tabs. Invalid tab keys silently fall back to donations.
+- Resource Directory: added 6th category **"Abuse / Domestic Violence"** with 10 real Richmond/Henrico orgs (Greater Richmond Regional Hotline / YWCA, Safe Harbor 24/7 + admin, Henrico Police DV Victim Services, Richmond Police FSVU, Virginia Statewide Hotline, National DV Hotline, CVLAS Protective Orders, Richmond SPCA Safer Together / SAAF).
+- New icon: ShieldAlert (fuchsia→rose gradient) — visually distinct for the sensitive category.
+- Updated header dropdown (now 6 items), preview seed (now 58 total), SQL migration (81 lines), and new delta SQL file (`resources-dv-delta.sql` — 10 idempotent INSERTs the user can run against existing D1).
+- New download endpoint `/api/download/resources-dv-delta-sql`.
+- Verified via testing_agent (iteration_7.json — 100% backend 20/20 pytest, 100% frontend across 13 scenarios).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
