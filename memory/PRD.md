@@ -154,7 +154,16 @@ Four issues fixed in one iteration:
 4. **ScrollToTop**: new `/app/frontend/src/components/ScrollToTop.jsx` component watches `useLocation()` and scrolls window to (0,0) on every route change. Preserves in-page hash anchors (e.g. `/resources/food#feed-more`). Verified scrollY < 100 after clicking any link from bottom of page.
 - Verified via testing_agent (iteration_12 + iteration_13 - 100% frontend across 12 pages + 3 scroll flows + lazy-load check).
 
-## 2026-02-15 - Header Breakpoint Alignment (regression fix)
+## 2026-02-15 - Header: Restore Full Nav Tabs on Laptops (user preference)
+- User: "I dont want the hamburger on the side I want the tabs back on the header like it was originally".
+- Fix: Set nav back to `hidden lg:flex` and mobile menu to `lg:hidden` (aligned pair at 1024px). To make all 11 tabs actually fit at 1024px:
+  1. Title text ("tryHimandsee ministries" next to logo) hidden until xl (1280px+); logo icon-only at 1024-1279.
+  2. Nav item padding shrunk to `px-1.5` with `text-[12px]` at lg, scaling to `text-[13px]` at xl.
+  3. Donate button `px-3 text-xs` at lg, `px-4 text-sm` at xl.
+  4. `space-x-0` between nav items (was space-x-0.5).
+- Verified across 1024/1152/1366px: all 11 tabs + Donate + ThemeToggle visible with no overflow, no overlap. 768px correctly shows hamburger.
+
+## 2026-02-15 - Header Breakpoint Alignment (intermediate)
 - User reported: after prior overlap fix agent raised nav to `xl:` but left mobile hamburger at `xl:hidden`, meaning at 1024-1279px BOTH rendered simultaneously and 11 nav items overflowed off the right edge (Contact/Donate cut). Also caused "headers gone" on user's laptop earlier.
 - Root cause: breakpoint MISMATCH between desktop nav (`hidden lg:flex`) and mobile menu (`xl:hidden`).
 - Fix: aligned both to `xl:` (1280px). Line 74: `hidden xl:flex`. Line 140: `xl:hidden`. Now: <1280 = clean hamburger, ≥1280 = clean desktop nav.

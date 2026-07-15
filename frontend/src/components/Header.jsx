@@ -64,14 +64,14 @@ const Header = () => {
               alt="tryHimandsee ministries"
               className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110"
             />
-            <div className="hidden md:block">
+            <div className="hidden xl:block">
               <h1 className="text-xl font-bold text-amber-400">tryHimandsee</h1>
               <p className="text-xs text-amber-200/80">ministries</p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center space-x-0.5">
+          <nav className="hidden lg:flex items-center space-x-0">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div
@@ -82,7 +82,7 @@ const Header = () => {
                 >
                   <button
                     data-testid={`nav-dropdown-${link.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                    className={`px-2 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 flex items-center whitespace-nowrap ${
+                    className={`px-1.5 py-2 rounded-lg text-[12px] xl:text-[13px] font-medium transition-all duration-300 flex items-center whitespace-nowrap ${
                       isActive(link.path) || isDropdownActive(link)
                         ? 'bg-amber-500 text-slate-900'
                         : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
@@ -117,7 +117,7 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-2 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 whitespace-nowrap ${
+                  className={`px-1.5 py-2 rounded-lg text-[12px] xl:text-[13px] font-medium transition-all duration-300 whitespace-nowrap ${
                     isActive(link.path)
                       ? 'bg-amber-500 text-slate-900'
                       : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
@@ -129,7 +129,7 @@ const Header = () => {
             ))}
             <Link
               to="/donate"
-              className="ml-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 whitespace-nowrap text-sm"
+              className="ml-1.5 px-3 xl:px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900 rounded-lg font-semibold hover:from-amber-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 whitespace-nowrap text-xs xl:text-sm"
             >
               Donate
             </Link>
@@ -137,7 +137,7 @@ const Header = () => {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="xl:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             <ThemeToggle />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -151,7 +151,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="xl:hidden pb-4 animate-in slide-in-from-top duration-300">
+          <div className="lg:hidden pb-4 animate-in slide-in-from-top duration-300">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 link.dropdown ? (
