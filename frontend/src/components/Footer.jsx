@@ -37,7 +37,7 @@ const Footer = () => {
               Verse of the Day
             </p>
             <p className="text-slate-200 italic leading-relaxed">&ldquo;{verse.text}&rdquo;</p>
-            <p className="text-amber-400 text-sm font-semibold mt-2">&mdash; {verse.ref}</p>
+            <p className="text-amber-400 text-sm font-semibold mt-2">- {verse.ref}</p>
           </div>
           <button
             type="button"

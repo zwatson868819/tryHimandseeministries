@@ -88,7 +88,7 @@ export const buildShareCard = () => {
   // Scripture / call
   ctx.fillStyle = '#92400e';
   ctx.font = 'italic 26px Georgia, serif';
-  ctx.fillText('"Freely ye have received, freely give." \u2014 Matthew 10:8', w / 2, y + 30);
+  ctx.fillText('"Freely ye have received, freely give." - Matthew 10:8', w / 2, y + 30);
 
   // URL footer
   ctx.fillStyle = '#3a1d04';

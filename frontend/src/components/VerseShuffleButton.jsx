@@ -89,7 +89,7 @@ const VerseShuffleButton = () => {
                 <p className="text-slate-100 text-xl md:text-2xl italic leading-relaxed mb-5">
                   &ldquo;{verse.text}&rdquo;
                 </p>
-                <p className="text-amber-400 font-semibold mb-7">&mdash; {verse.ref}</p>
+                <p className="text-amber-400 font-semibold mb-7">- {verse.ref}</p>
               </>
             )}
             <div className="flex flex-col sm:flex-row gap-3">

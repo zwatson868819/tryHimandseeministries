@@ -165,7 +165,7 @@ const Ministries = () => {
                     Together, we can keep miracles in motion.
                   </p>
                   <p className="text-slate-400 text-sm italic">
-                    "Whoever is generous to the poor lends to the Lord, and He will repay them for their deed." &mdash; Proverbs 19:17
+                    "Whoever is generous to the poor lends to the Lord, and He will repay them for their deed." - Proverbs 19:17
                   </p>
                 </div>
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">

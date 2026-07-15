@@ -206,7 +206,7 @@ const LightACandle = () => {
           <p className="text-white text-lg leading-relaxed">
             &ldquo;The Lord is near to all who call on Him, to all who call on Him in truth.&rdquo;
           </p>
-          <p className="text-amber-400 text-sm font-semibold mt-2">&mdash; Psalm 145:18</p>
+          <p className="text-amber-400 text-sm font-semibold mt-2">- Psalm 145:18</p>
         </div>
       </section>
     </div>

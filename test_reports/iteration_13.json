@@ -1,0 +1,35 @@
+{
+  "summary": "Narrow retest of em-dash sweep after iteration_12. Verified rendered DOM (document.body.innerText) and <title> tag across all 12 target pages via Playwright at https://himandsee-faith.preview.emergentagent.com. All pages show ZERO U+2014 em-dashes. Source-code grep confirms no U+2014 raw bytes, no &mdash;, no &#8212;, and no \\u2014 literals remain in /app/frontend/src or /app/frontend/public. Regression checks (capital-M 'tryHimandsee Ministries') also pass with zero occurrences. Bug (1) from iteration_12 is fully resolved.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Blog page data fetch", "issue": "GET /api/blog/posts returns 404 (Axios error visible in console). Pre-existing, unrelated to em-dash sweep. Page still renders with zero em-dashes.", "affected_selectors": ["/blog"]},
+      {"flow": "Light-a-Candle data fetch", "issue": "GET /api/candles returns 404 (Axios error in console). Pre-existing, unrelated. Page renders correctly.", "affected_selectors": ["/light-a-candle"]}
+    ],
+    "design_issues": [
+      {"screen": "/get-involved", "issues": ["React hydration warning: <span> injected as child of <select> and inside <option> (caused by x-source instrumentation wrapping mock array items). Not related to em-dash sweep but should be tracked."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "None for em-dash bug - fully fixed and verified.",
+    "(Out of scope, prior known) Investigate /api/blog/posts and /api/candles 404s if those features are meant to be live.",
+    "(Out of scope) Fix hydration warning on /get-involved <select> caused by instrumentation spans."
+  ],
+  "critical_code_review_comments": [
+    "Grep across /app/frontend/src and /app/frontend/public shows zero occurrences of U+2014, &mdash;, &#8212;, or literal \\u2014 - sweep is complete.",
+    "PageMeta titles across all 12 pages verified free of em-dashes."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (skip)", "frontend": "100% for em-dash regression"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Em-dash purge is fully complete and verified in rendered DOM across all 12 pages. Pre-existing unrelated issues remain: blog/candles API 404s and get-involved select hydration warning. Those are outside the scope of this retest and existed before the em-dash sweep.",
+  "rca of the issue": "Iteration_12 sed sweep only targeted the raw U+2014 byte, missing HTML entities &mdash; / &#8212; and JS escape literals \\u2014. Main agent's second sweep replaced all three variants with ASCII '-' across the six files listed. Re-verification via document.body.innerText.split('\\u2014').length-1 returns 0 on every target route, confirming resolution.",
+  "pages_verified_em_dash_zero": [
+    "/", "/about", "/ministries", "/encounters", "/blog", "/light-a-candle",
+    "/voices", "/notary", "/resources/food", "/get-involved", "/contact", "/donate"
+  ]
+}

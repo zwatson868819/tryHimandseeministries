@@ -83,7 +83,7 @@ const Beatitude = ({ b, index }) => {
           className="text-2xl sm:text-3xl md:text-4xl text-white italic font-light leading-relaxed mb-6"
           dangerouslySetInnerHTML={{ __html: `&ldquo;${b.text}&rdquo;` }}
         />
-        <p className="text-amber-400 font-semibold mb-10">&mdash; {b.ref}</p>
+        <p className="text-amber-400 font-semibold mb-10">- {b.ref}</p>
         <div className="mx-auto w-24 h-px bg-gradient-to-r from-transparent via-amber-500/60 to-transparent mb-8" />
         <p
           className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto"
@@ -130,7 +130,7 @@ const Beatitudes = () => (
         <p className="text-white text-xl italic leading-relaxed mb-6">
           &ldquo;Rejoice and be exceeding glad, for great is your reward in heaven.&rdquo;
         </p>
-        <p className="text-amber-400 font-semibold">&mdash; Matthew 5:12</p>
+        <p className="text-amber-400 font-semibold">- Matthew 5:12</p>
       </div>
     </section>
   </div>
