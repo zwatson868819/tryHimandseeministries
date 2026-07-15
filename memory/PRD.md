@@ -154,6 +154,12 @@ Four issues fixed in one iteration:
 4. **ScrollToTop**: new `/app/frontend/src/components/ScrollToTop.jsx` component watches `useLocation()` and scrolls window to (0,0) on every route change. Preserves in-page hash anchors (e.g. `/resources/food#feed-more`). Verified scrollY < 100 after clicking any link from bottom of page.
 - Verified via testing_agent (iteration_12 + iteration_13 - 100% frontend across 12 pages + 3 scroll flows + lazy-load check).
 
+## 2026-02-15 - Header Breakpoint Alignment (regression fix)
+- User reported: after prior overlap fix agent raised nav to `xl:` but left mobile hamburger at `xl:hidden`, meaning at 1024-1279px BOTH rendered simultaneously and 11 nav items overflowed off the right edge (Contact/Donate cut). Also caused "headers gone" on user's laptop earlier.
+- Root cause: breakpoint MISMATCH between desktop nav (`hidden lg:flex`) and mobile menu (`xl:hidden`).
+- Fix: aligned both to `xl:` (1280px). Line 74: `hidden xl:flex`. Line 140: `xl:hidden`. Now: <1280 = clean hamburger, ≥1280 = clean desktop nav.
+- Verified via testing_agent (iteration_14.json — 100% frontend across 6 viewports 375/768/1024/1200/1280/1440 + both dropdown hovers).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
