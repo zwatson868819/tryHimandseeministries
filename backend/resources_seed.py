@@ -1,5 +1,5 @@
 """
-Curated resource directory for tryHimandsee Ministries.
+Curated resource directory for tryHimandsee ministries.
 
 Real, verified organizations serving Richmond and Henrico, Virginia.
 This is the source of truth for the FastAPI preview stub. The production

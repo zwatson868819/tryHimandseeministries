@@ -1,4 +1,4 @@
--- tryHimandsee Ministries - Resource Directory
+-- tryHimandsee ministries - Resource Directory
 -- Run this once in the Cloudflare D1 console for the tryhimandsee-db database.
 
 CREATE TABLE IF NOT EXISTS resources (

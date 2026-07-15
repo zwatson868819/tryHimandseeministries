@@ -1,4 +1,4 @@
--- tryHimandsee Ministries - Voices from the Street + Miracle Mailbox
+-- tryHimandsee ministries - Voices from the Street + Miracle Mailbox
 -- Run this once in the Cloudflare D1 console for the tryhimandsee-db database.
 
 CREATE TABLE IF NOT EXISTS voices (

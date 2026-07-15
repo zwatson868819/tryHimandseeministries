@@ -1,4 +1,4 @@
--- tryHimandsee Ministries - Delta migration for Abuse / Domestic Violence category
+-- tryHimandsee ministries - Delta migration for Abuse / Domestic Violence category
 -- Run this in your D1 console. Safe to run multiple times (uses INSERT OR REPLACE).
 
 INSERT OR REPLACE INTO resources (id, category, name, description, address, phone, website, hours, notes, sort_order, is_active, created_at, updated_at) VALUES ('40e3c3cf-8d10-5a2a-b9e1-756d96de7954', 'domestic-violence', 'Greater Richmond Regional Hotline (YWCA)', '24/7 confidential crisis line for domestic and sexual violence - serving Richmond, Henrico, and Chesterfield. Managed by YWCA, routes callers to Safe Harbor and other partners for emergency shelter, safety planning, and counseling.', 'Serving Richmond & Henrico', '(804) 612-6126', 'https://ywcarichmond.org/get-help/', '24 hours, 7 days a week', 'If you are in immediate danger, call 911 first. Text-capable line.', 48, 1, '2026-02-01T00:00:00Z', '2026-02-01T00:00:00Z');

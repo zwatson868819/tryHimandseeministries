@@ -59,7 +59,7 @@ const Notary = () => {
     <div className="min-h-screen bg-slate-950 pt-24" data-testid="notary-page">
       <PageMeta
         title="Free Notary Services"
-        description="tryHimandsee Ministries offers free notary services to the Richmond and Henrico community. Request an appointment to have your paperwork notarized at no cost."
+        description="tryHimandsee ministries offers free notary services to the Richmond and Henrico community. Request an appointment to have your paperwork notarized at no cost."
         path="/notary"
       />
 
@@ -76,7 +76,7 @@ const Notary = () => {
             Free <span className="text-amber-400">Notary Services</span>
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl mx-auto leading-relaxed">
-            Need paperwork notarized? tryHimandsee Ministries provides free notary services
+            Need paperwork notarized? tryHimandsee ministries provides free notary services
             to our Richmond &amp; Henrico neighbors. Send us a request below and we&apos;ll be in
             touch to schedule a time.
           </p>

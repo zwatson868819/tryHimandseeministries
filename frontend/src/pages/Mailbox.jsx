@@ -51,7 +51,7 @@ const Mailbox = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 pt-24" data-testid="mailbox-page">
-      <PageMeta title="A Message For You" description="A personal note from tryHimandsee Ministries." path={`/mailbox/${code}`} />
+      <PageMeta title="A Message For You" description="A personal note from tryHimandsee ministries." path={`/mailbox/${code}`} />
 
       <section className="py-16 bg-gradient-to-br from-slate-950 via-amber-900/10 to-slate-950 border-b border-amber-500/20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

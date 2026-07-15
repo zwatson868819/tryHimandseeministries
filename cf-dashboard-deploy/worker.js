@@ -3714,7 +3714,7 @@ async function createOneTimeCheckoutSession(apiKey, args) {
     mode: "payment",
     "payment_method_types[0]": "card",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][product_data][name]": "tryHimandsee Ministries \u2014 Donation",
+    "line_items[0][price_data][product_data][name]": "tryHimandsee ministries \u2014 Donation",
     "line_items[0][price_data][unit_amount]": Math.round(args.amount * 100),
     "line_items[0][quantity]": 1,
     customer_email: args.customerEmail,
@@ -3733,7 +3733,7 @@ async function createMonthlyCheckoutSession(apiKey, args) {
     mode: "subscription",
     "payment_method_types[0]": "card",
     "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][product_data][name]": "tryHimandsee Ministries \u2014 Monthly Partnership",
+    "line_items[0][price_data][product_data][name]": "tryHimandsee ministries \u2014 Monthly Partnership",
     "line_items[0][price_data][unit_amount]": Math.round(args.amount * 100),
     "line_items[0][price_data][recurring][interval]": "month",
     "line_items[0][quantity]": 1,
@@ -3809,7 +3809,7 @@ async function requireAdmin(c) {
 __name(requireAdmin, "requireAdmin");
 app.get(
   "/api/",
-  (c) => c.json({ message: "tryHimandsee Ministries API", status: "running", version: "1.0.0" })
+  (c) => c.json({ message: "tryHimandsee ministries API", status: "running", version: "1.0.0" })
 );
 app.post("/api/admin/setup", async (c) => {
   const setupKey = c.req.header("X-Setup-Key") || "";
@@ -4178,7 +4178,7 @@ async function sendBlogNotification(env2, post) {
         </td></tr>
         <tr><td style="padding:24px 32px;border-top:1px solid #334155;text-align:center;">
           <p style="color:#64748b;font-size:12px;margin:0;">
-            You're receiving this because you subscribed at <a href="${siteBase}/blog" style="color:#f59e0b;">tryHimandsee Ministries</a>.
+            You're receiving this because you subscribed at <a href="${siteBase}/blog" style="color:#f59e0b;">tryHimandsee ministries</a>.
           </p>
         </td></tr>
       </table>

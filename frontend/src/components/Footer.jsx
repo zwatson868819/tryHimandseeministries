@@ -113,7 +113,7 @@ const Footer = () => {
           <DoveProgress />
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} tryHimandsee Ministries. All rights reserved.
+              © {new Date().getFullYear()} tryHimandsee ministries. All rights reserved.
             </p>
             <div className="flex items-center justify-center space-x-1 text-slate-500 text-sm mb-3">
               <span>Made with</span>

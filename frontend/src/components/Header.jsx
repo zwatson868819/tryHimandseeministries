@@ -61,7 +61,7 @@ const Header = () => {
           <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
             <img
               src="/images/header-logo.png"
-              alt="tryHimandsee Ministries"
+              alt="tryHimandsee ministries"
               className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110"
             />
             <div className="hidden md:block">

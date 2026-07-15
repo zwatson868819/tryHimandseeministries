@@ -69,7 +69,7 @@ async function requireAdmin(c: any): Promise<{ adminId: string; username: string
 
 // ---------- health ----------
 app.get("/api/", (c) =>
-  c.json({ message: "tryHimandsee Ministries API", status: "running", version: "1.0.0" })
+  c.json({ message: "tryHimandsee ministries API", status: "running", version: "1.0.0" })
 );
 
 // ---------- admin bootstrap (one-time) ----------
@@ -941,7 +941,7 @@ async function sendBlogNotification(
         </td></tr>
         <tr><td style="padding:24px 32px;border-top:1px solid #334155;text-align:center;">
           <p style="color:#64748b;font-size:12px;margin:0;">
-            You're receiving this because you subscribed at <a href="${siteBase}/blog" style="color:#f59e0b;">tryHimandsee Ministries</a>.
+            You're receiving this because you subscribed at <a href="${siteBase}/blog" style="color:#f59e0b;">tryHimandsee ministries</a>.
           </p>
         </td></tr>
       </table>

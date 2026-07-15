@@ -196,7 +196,7 @@ const ResourceDirectory = () => {
     <div className="min-h-screen bg-slate-950 pt-24" data-testid="resource-directory-page">
       <PageMeta
         title={`${category.label} Resources - Richmond & Henrico`}
-        description={`Real, verified ${category.label.toLowerCase()} resources in Richmond and Henrico, Virginia - curated by tryHimandsee Ministries.`}
+        description={`Real, verified ${category.label.toLowerCase()} resources in Richmond and Henrico, Virginia - curated by tryHimandsee ministries.`}
         path={`/resources/${category.key}`}
       />
 
@@ -279,7 +279,7 @@ const ResourceDirectory = () => {
 
           {!loading && !error && items.length > 0 && (
             <p className="text-slate-500 text-xs text-center mt-10 max-w-2xl mx-auto">
-              This directory is maintained by tryHimandsee Ministries. Listings are provided as a public service; we do not endorse or guarantee services provided by third-party organizations. If a listing is outdated, please <Link to="/contact" className="text-amber-400 hover:underline">let us know</Link>.
+              This directory is maintained by tryHimandsee ministries. Listings are provided as a public service; we do not endorse or guarantee services provided by third-party organizations. If a listing is outdated, please <Link to="/contact" className="text-amber-400 hover:underline">let us know</Link>.
             </p>
           )}
         </div>

@@ -1,4 +1,4 @@
--- tryHimandsee Ministries - Cloudflare D1 schema
+-- tryHimandsee ministries - Cloudflare D1 schema
 -- Run with: wrangler d1 execute tryhimandsee-db --remote --file=./schema.sql
 
 CREATE TABLE IF NOT EXISTS admins (

@@ -65,7 +65,7 @@ const About = () => {
               </h2>
               <div className="space-y-4 text-slate-300 leading-relaxed">
                 <p>
-                  tryHimandsee Ministries was born from a simple yet powerful vision: to create 
+                  tryHimandsee ministries was born from a simple yet powerful vision: to create 
                   a space where people can encounter God's transformative presence while experiencing 
                   His practical love through acts of service.
                 </p>

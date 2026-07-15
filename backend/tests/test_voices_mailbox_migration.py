@@ -36,7 +36,7 @@ class TestVoicesMailboxMigration:
         body = voices_sql.text
         # Body must begin with the expected header
         assert body.startswith(
-            "-- tryHimandsee Ministries - Voices from the Street + Miracle Mailbox"
+            "-- tryHimandsee ministries - Voices from the Street + Miracle Mailbox"
         ), f"Header mismatch. First line: {body.splitlines()[0]!r}"
         # No em-dash anywhere
         assert "\u2014" not in body, "Found em-dash (U+2014) in SQL body"

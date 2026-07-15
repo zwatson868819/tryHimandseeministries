@@ -474,7 +474,7 @@ const Donate = () => {
               <h3 className="text-xl font-bold text-white mb-3">Check or Cash</h3>
               <p className="text-slate-400">
                 Mail checks to our office or bring cash donations during office hours. 
-                Make checks payable to "tryHimandsee Ministries"
+                Make checks payable to "tryHimandsee ministries"
               </p>
             </div>
 
@@ -505,7 +505,7 @@ const Donate = () => {
       <section className="py-12 bg-slate-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-slate-400 text-sm">
-            tryHimandsee Ministries is a 501(c)(3) nonprofit organization. All donations are tax-deductible 
+            tryHimandsee ministries is a 501(c)(3) nonprofit organization. All donations are tax-deductible 
             to the extent allowed by law. You will receive a receipt for your records.
           </p>
         </div>

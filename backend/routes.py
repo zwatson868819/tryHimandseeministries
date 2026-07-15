@@ -697,7 +697,7 @@ async def create_donation_checkout(
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "tryHimandsee Ministries - Monthly Partnership"
+                            "name": "tryHimandsee ministries - Monthly Partnership"
                         },
                         "unit_amount": int(round(final_amount * 100)),
                         "recurring": {"interval": "month"}

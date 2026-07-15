@@ -23,7 +23,7 @@ db = client[os.environ['DB_NAME']]
 set_database(db)
 
 # Create the main app without a prefix
-app = FastAPI(title="tryHimandsee Ministries API", version="1.0.0")
+app = FastAPI(title="tryHimandsee ministries API", version="1.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -32,7 +32,7 @@ api_router = APIRouter(prefix="/api")
 @api_router.get("/")
 async def root():
     return {
-        "message": "tryHimandsee Ministries API",
+        "message": "tryHimandsee ministries API",
         "status": "running",
         "version": "1.0.0"
     }

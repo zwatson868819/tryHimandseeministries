@@ -27,7 +27,7 @@ class TestResourcesMigrationDownload:
         r = api.get(f"{BASE_URL}/api/download/resources-migration-sql", timeout=30)
         body = r.text
         first_line = body.splitlines()[0] if body else ""
-        assert first_line.startswith("-- tryHimandsee Ministries"), (
+        assert first_line.startswith("-- tryHimandsee ministries"), (
             f"Header mismatch. First line: {first_line!r}"
         )
         assert "Resource Directory" in first_line

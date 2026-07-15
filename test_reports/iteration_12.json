@@ -1,0 +1,85 @@
+{
+  "summary": "Frontend-only regression run on the 4-bug batch. Bug (2) capital-M branding: FIXED (0 occurrences of 'tryHimandsee Ministries' in DOM text on all 12 tested pages). Bug (3) lazy loading: WORKING (Home loads only bundle.js; visiting /admin/login triggers a new src_pages_AdminLogin_jsx.chunk.js; no admin chunks appear on / ). Bug (4) ScrollToTop: WORKING (scroll-from-bottom then click footer link results in scrollY of 0/85/0 on /about, /contact, /donate; hash deep link /resources/domestic-violence#safe-harbor-24-7-helpline still scrolls to anchor at Y=735). Header logo overlap regression: no regression (16px gap at 1280 and 1920). BUG (1) em-dashes: NOT FIXED - every page still renders at least one U+2014 em-dash. Root cause: the sed sweep only replaced raw U+2014 characters but the codebase uses the HTML entity `&mdash;` which React renders back to U+2014. Sources still emit em-dashes: Footer.jsx:40, VerseShuffleButton.jsx:92, Ministries.jsx:168, LightACandle.jsx:209, Beatitudes.jsx:86 and :133, plus a literal '\\u2014' in lib/shareKit.js:91 (canvas draw for share cards). Footer is on every page, so every page fails the em-dash sweep.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Footer / VerseOfTheDay + several pages",
+        "issue": "Em-dash (U+2014) still renders in DOM. Source uses the HTML entity `&mdash;` which the sed sweep missed. Present on every page via Footer.jsx line 40; also Ministries (Proverbs quote), LightACandle (Psalm 145), Beatitudes (two spots), VerseShuffleButton dialog, and shareKit canvas.",
+        "selector": "[data-testid='verse-of-the-day'] p.text-amber-400",
+        "priority": "HIGH"
+      },
+      {
+        "component": "public/manifest.json",
+        "issue": "PWA manifest name/description still contain the em-dash and 'tryHimandsee Ministries' (capital M). Not visible in page body but shows in browser install prompts and OS launcher.",
+        "selector": "N/A (metadata)",
+        "priority": "LOW"
+      },
+      {
+        "component": "Hero background image on Home",
+        "issue": "Decorative background artwork on / renders the text 'tryHimandsee Ministries' (capital M) as part of the image. Not DOM text so text-sweep passes, but the capital M is still visible to users. Flagging for main agent awareness only.",
+        "selector": "hero background",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Blog list + Candles list",
+        "issue": "Console shows 404 + AxiosError when fetching /api/blog and /api/candles from the preview backend. Pre-existing (not part of this iteration's scope), pages render fine but data is empty.",
+        "affected_selectors": ["blog list", "light-a-candle wall"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_details": {
+    "text_sweep_per_page": {
+      "/": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/about": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/ministries": {"emdash_count": 2, "cap_Ministries_count": 0},
+      "/encounters": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/blog": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/light-a-candle": {"emdash_count": 2, "cap_Ministries_count": 0},
+      "/voices": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/notary": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/resources/food": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/get-involved": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/contact": {"emdash_count": 1, "cap_Ministries_count": 0},
+      "/donate": {"emdash_count": 1, "cap_Ministries_count": 0}
+    },
+    "scrolltotop_flows": [
+      {"from": "/ bottom -> /about", "scrollY_after": 0, "verdict": "PASS"},
+      {"from": "/ bottom -> /contact", "scrollY_after": 85, "verdict": "PASS (<100)"},
+      {"from": "/ bottom -> /donate", "scrollY_after": 0, "verdict": "PASS"}
+    ],
+    "hash_exception": {"path": "/resources/domestic-violence#safe-harbor-24-7-helpline", "scrollY": 735, "verdict": "PASS - anchor preserved"},
+    "lazy_loading": {
+      "home_js_files": ["bundle.js"],
+      "admin_chunks_on_home": [],
+      "admin_login_new_chunk": "src_pages_AdminLogin_jsx.chunk.js",
+      "verdict": "PASS - admin chunk only fetched on /admin/login"
+    },
+    "suspense_fallback": {"loading_text_visible": false, "note": "chunk loaded fast enough that 'Loading...' fallback did not appear. Non-blocking."},
+    "header_regression": {
+      "1280px": {"logo_right": 227, "nav_left": 243, "gap_px": 16, "verdict": "PASS"},
+      "1920px": {"logo_right": 547, "nav_left": 563, "gap_px": 16, "verdict": "PASS"}
+    }
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Fix em-dash bug: replace the HTML entity `&mdash;` with a regular hyphen `-` in: /app/frontend/src/components/Footer.jsx:40, /app/frontend/src/components/VerseShuffleButton.jsx:92, /app/frontend/src/pages/Ministries.jsx:168, /app/frontend/src/pages/LightACandle.jsx:209, /app/frontend/src/pages/Beatitudes.jsx:86 and :133. Also replace the literal U+2014 in /app/frontend/src/lib/shareKit.js:91 with '-'. A single command that catches all: `grep -rln 'mdash\\|\\u2014' /app/frontend/src` then sed both patterns.",
+    "Consider updating /app/frontend/public/manifest.json to lowercase 'ministries' and replace its em-dash for consistency with the site branding.",
+    "Investigate the pre-existing 404s from /api/blog and /api/candles in the preview backend - out of scope for this iteration but affects those pages."
+  ],
+  "critical_code_review_comments": [
+    "The text sweep in the review request should have used a regex covering both U+2014 and &mdash; (and &#8212;). Recommend adding a small unit / grep check in CI to prevent regression: `! grep -rn '\\u2014\\|mdash\\|#8212' /app/frontend/src`.",
+    "ScrollToTop uses behavior:'instant' which is only recently supported in some browsers; older Safari treats unknown values as 'auto' which happens to be instant anyway, so this is fine, but consider dropping the option entirely (default behavior is instant).",
+    "Suspense fallback is a full-screen dark spinner that flashes on every route transition on slow networks. Consider a lightweight top-bar/skeleton to avoid the whole page going blank."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "N/A (skipped per request)", "frontend": "75% (3 of 4 bugs verified; em-dash bug still failing)" },
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Bugs (2), (3), (4) are working correctly - do not re-test them unless main agent touched App.js / ScrollToTop.jsx again. Only re-verify bug (1) after the &mdash; entities are replaced. Quick verification command in browser: `document.body.innerText.split('\\u2014').length - 1` should be 0 on /, /about, /ministries, /light-a-candle, /notary at minimum. Also grep-guard: `grep -rn 'mdash' /app/frontend/src` should return no results.",
+  "rca of the issue": "Main agent's sed sweep only searched for the actual U+2014 codepoint in source files. But most of this codebase writes em-dashes using the HTML entity `&mdash;` (a common React/JSX pattern to avoid unicode literals in source). React parses `&mdash;` and emits U+2014 into the DOM at render time, so the source stays 'clean' by the sed grep but the browser still shows em-dashes on every page. Fix: replace `&mdash;` occurrences with a plain '-' (with the surrounding spaces the layout already provides), and also fix the one literal U+2014 in lib/shareKit.js used inside a canvas fillText."
+}

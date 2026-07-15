@@ -83,7 +83,7 @@ const Voices = () => {
     <div className="min-h-screen bg-slate-950 pt-24" data-testid="voices-page">
       <PageMeta
         title="Voices from the Street"
-        description="Real voices, real stories. Audio testimonies from the people tryHimandsee Ministries serves in Richmond and Henrico."
+        description="Real voices, real stories. Audio testimonies from the people tryHimandsee ministries serves in Richmond and Henrico."
         path="/voices"
       />
 

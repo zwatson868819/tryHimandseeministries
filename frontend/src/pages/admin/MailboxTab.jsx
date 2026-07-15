@@ -5,7 +5,7 @@ import { Printer, Trash2, ExternalLink, Copy, Wand2 } from 'lucide-react';
 import { formatDate } from './utils';
 
 const publicOriginFor = () => {
-  // Prefer explicit env — many production Cloudflare Pages sites differ from the API host.
+  // Prefer explicit env - many production Cloudflare Pages sites differ from the API host.
   const explicit = process.env.REACT_APP_PUBLIC_URL || process.env.REACT_APP_SITE_URL;
   if (explicit) return explicit.replace(/\/$/, '');
   return window.location.origin;

@@ -1,4 +1,4 @@
-# tryHimandsee Ministries - Cloudflare Dashboard-Only Deployment Guide
+# tryHimandsee ministries - Cloudflare Dashboard-Only Deployment Guide
 
 Everything below is done in the Cloudflare web dashboard. **No terminal commands.**
 
@@ -123,7 +123,7 @@ In your browser, visit your Worker URL + `/api/`:
 
 You should see:
 ```json
-{"message":"tryHimandsee Ministries API","status":"running","version":"1.0.0"}
+{"message":"tryHimandsee ministries API","status":"running","version":"1.0.0"}
 ```
 
 If yes, your backend is alive!

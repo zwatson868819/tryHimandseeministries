@@ -1,4 +1,4 @@
-// Mock data for tryHimandsee Ministries website
+// Mock data for tryHimandsee ministries website
 
 export const ministryInfo = {
   name: "tryHimandsee ministries",
