@@ -56,7 +56,7 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-amber-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4 gap-4">
+        <div className="flex justify-between items-center py-4 gap-6">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
             <img
@@ -64,14 +64,14 @@ const Header = () => {
               alt="tryHimandsee ministries"
               className="h-12 w-12 object-contain transition-transform duration-300 group-hover:scale-110"
             />
-            <div className="hidden xl:block">
-              <h1 className="text-xl font-bold text-amber-400">tryHimandsee</h1>
-              <p className="text-xs text-amber-200/80">ministries</p>
+            <div className="block">
+              <h1 className="text-lg xl:text-xl font-bold text-amber-400 leading-tight">tryHimandsee</h1>
+              <p className="text-xs text-amber-200/80 leading-tight">ministries</p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-0">
+          <nav className="hidden lg:flex items-center space-x-0.5">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div
@@ -82,7 +82,7 @@ const Header = () => {
                 >
                   <button
                     data-testid={`nav-dropdown-${link.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-                    className={`px-1.5 py-2 rounded-lg text-[12px] xl:text-[13px] font-medium transition-all duration-300 flex items-center whitespace-nowrap ${
+                    className={`px-2 py-2 rounded-lg text-[12px] xl:text-[13px] font-medium transition-all duration-300 flex items-center whitespace-nowrap cursor-pointer ${
                       isActive(link.path) || isDropdownActive(link)
                         ? 'bg-amber-500 text-slate-900'
                         : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'
@@ -117,7 +117,8 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-1.5 py-2 rounded-lg text-[12px] xl:text-[13px] font-medium transition-all duration-300 whitespace-nowrap ${
+                  data-testid={`nav-${link.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                  className={`px-2 py-2 rounded-lg text-[12px] xl:text-[13px] font-medium transition-all duration-300 whitespace-nowrap cursor-pointer ${
                     isActive(link.path)
                       ? 'bg-amber-500 text-slate-900'
                       : 'text-amber-100 hover:bg-amber-500/10 hover:text-amber-300'

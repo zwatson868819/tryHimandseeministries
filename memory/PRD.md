@@ -154,7 +154,17 @@ Four issues fixed in one iteration:
 4. **ScrollToTop**: new `/app/frontend/src/components/ScrollToTop.jsx` component watches `useLocation()` and scrolls window to (0,0) on every route change. Preserves in-page hash anchors (e.g. `/resources/food#feed-more`). Verified scrollY < 100 after clicking any link from bottom of page.
 - Verified via testing_agent (iteration_12 + iteration_13 - 100% frontend across 12 pages + 3 scroll flows + lazy-load check).
 
-## 2026-02-15 - Header: Restore Full Nav Tabs on Laptops (user preference)
+## 2026-02-15 - Header: Restore Title + Fix Click Issues (P0)
+- User: "I'm missing the tryHimandsee ministries beside the logo... some tabs don't work like they used to".
+- Root causes:
+  1. Prior change hid the title below xl (`hidden xl:block`), removing it entirely from user's view at their typical laptop width.
+  2. Nav padding was too tight (`px-1.5`) and `space-x-0` created micro-overlap with the logo Link, hijacking some tab clicks.
+- Fix:
+  1. Title always shown (`block` — no breakpoint), scales `text-lg` at lg → `text-xl` at xl. Added `leading-tight` for cleaner stacking.
+  2. Row gap bumped `gap-4` → `gap-6` for firm separation between logo group and nav.
+  3. Nav padding restored to `px-2`, `space-x-0.5`, and `cursor-pointer` added for clear click affordance.
+  4. Added `data-testid="nav-{name}"` on every simple nav Link for testability.
+- Verified click navigation for Ministries, Voices, Contact — all route correctly. Header renders cleanly at 1280+.
 - User: "I dont want the hamburger on the side I want the tabs back on the header like it was originally".
 - Fix: Set nav back to `hidden lg:flex` and mobile menu to `lg:hidden` (aligned pair at 1024px). To make all 11 tabs actually fit at 1024px:
   1. Title text ("tryHimandsee ministries" next to logo) hidden until xl (1280px+); logo icon-only at 1024-1279.
