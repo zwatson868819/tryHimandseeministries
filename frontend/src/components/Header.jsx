@@ -56,9 +56,9 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-amber-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-4 gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
+          <Link to="/" className="flex items-center space-x-3 group flex-shrink-0">
             <img
               src="/images/header-logo.png"
               alt="tryHimandsee Ministries"
@@ -71,7 +71,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-0.5">
+          <nav className="hidden xl:flex items-center space-x-0.5">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div
@@ -137,7 +137,7 @@ const Header = () => {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center">
+          <div className="xl:hidden flex items-center">
             <ThemeToggle />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -151,7 +151,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden pb-4 animate-in slide-in-from-top duration-300">
+          <div className="xl:hidden pb-4 animate-in slide-in-from-top duration-300">
             <nav className="flex flex-col space-y-2">
               {navLinks.map((link) => (
                 link.dropdown ? (

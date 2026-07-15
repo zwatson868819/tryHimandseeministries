@@ -1,0 +1,40 @@
+{
+  "summary": "Verified Header overlap bug fix across 7 viewport widths (375, 768, 1024, 1280, 1440, 1600, 1920). The fix (gap-4 on header row, flex-shrink-0 on logo, lg:->xl: breakpoint) works correctly. No overlap between logo and nav at any desktop width; all 12 top-level nav items + ThemeToggle render inline. Mobile hamburger correctly takes over at <1280px. Dropdowns (About, Resource Directory) still open on hover.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_details": {
+    "desktop_widths_verified": {
+      "1280": { "logo_right": 227, "nav_left": 243, "gap_px": 16, "leftmost_nav_item": "Home@243", "clickable_items_count": 13, "result": "PASS" },
+      "1440": { "logo_right": 307, "nav_left": 323, "gap_px": 16, "leftmost_nav_item": "Home@323", "clickable_items_count": 13, "result": "PASS" },
+      "1600": { "logo_right": 387, "nav_left": 403, "gap_px": 16, "leftmost_nav_item": "Home@403", "clickable_items_count": 13, "result": "PASS" },
+      "1920": { "logo_right": 547, "nav_left": 563, "gap_px": 16, "leftmost_nav_item": "Home@563", "clickable_items_count": 13, "result": "PASS" }
+    },
+    "mobile_widths_verified": {
+      "1024": { "desktop_nav_display": "none", "mobile_toggle_visible": true, "mobile_menu_contents": ["Home","About Us","News","Ministries","Encounters","Blog","Light a Candle","Voices","Free Notary","Housing / Rental","Food","Clothing","Social Services","Mental / Behavioral Health","Abuse / Domestic Violence","Get Involved","Contact","Donate"], "result": "PASS" },
+      "768": { "desktop_nav_display": "none", "mobile_toggle_visible": true, "result": "PASS" },
+      "375": { "desktop_nav_display": "none", "mobile_toggle_visible": true, "result": "PASS" }
+    },
+    "dropdown_hover_1440": {
+      "about_dropdown_opens": true,
+      "resource_directory_dropdown_opens": true
+    },
+    "all_required_items_present_desktop": ["Home","About","Ministries","Encounters","Blog","Light a Candle","Voices","Free Notary","Resource Directory","Get Involved","Contact","Donate"]
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Header.jsx (~207 lines) is fine size-wise but consider extracting DesktopNav and MobileNav subcomponents if nav grows further. With 12 top-level items already, the desktop bar is tight at 1280px (item spacing is space-x-0.5 with text-[13px]); any additional item will require raising the breakpoint again or truncating labels.",
+    "At 1280px viewport, the entire desktop nav width is 1026px vs logo width ~195px, using nearly the full 1216px content area (gap 16px). This is close to the edge; a longer future label could re-trigger wrap/overlap. Consider a runtime overflow guard or media-query based label shortening."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "N/A (skipped per request)", "frontend": "100%" },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Header overlap bug is fully fixed. gap-4 + flex-shrink-0 provide a stable 16px gap between logo and nav across all desktop widths (1280-1920). The lg:->xl: breakpoint switch means users on 1024-1279px laptops now see the hamburger menu instead of a cramped desktop nav. All existing data-testids (mobile-menu-toggle, nav-dropdown-about, nav-dropdown-menu-about, nav-dropdown-resource-directory, nav-dropdown-menu-resource-directory) are intact and working. No regressions detected.",
+  "rca of the issue": "Original bug: with 10 nav items + Donate + ThemeToggle at the lg (>=1024px) breakpoint, the desktop nav exceeded available width in the flex row (justify-between). Since the logo used no shrink control and had no explicit gap to the nav, the nav overflowed and visually overlapped the logo's text (tryHimandsee). Fix applied by main agent: (a) added gap-4 to the header row div to guarantee 16px min separation between logo and nav; (b) added flex-shrink-0 to the logo Link so it never shrinks under pressure; (c) raised the mobile-menu breakpoint from lg (1024) to xl (1280) so any viewport < 1280 shows the hamburger instead of trying to render 12 items inline. Verified visually and via bounding-rect measurements at 1280/1440/1600/1920 (all show 16px gap, no overlap)."
+}
