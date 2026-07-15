@@ -146,6 +146,14 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - Fix: added `gap-4` on header row, `flex-shrink-0` on logo Link, and raised desktop breakpoint from `lg:` to `xl:` (1280px). Viewports < 1280px now show the mobile hamburger.
 - Verified via testing_agent (iteration_11.json - 100% frontend across 7 viewport widths 375-1920px).
 
+## 2026-02-XX - Cleanup Pass + Perf + ScrollToTop
+Four issues fixed in one iteration:
+1. **Em-dash purge (pass 2)**: replaced all `&mdash;`, `&#8212;`, `\u2014`, and remaining raw U+2014 bytes across 6 files (Footer.jsx, VerseShuffleButton.jsx, Ministries.jsx, LightACandle.jsx, Beatitudes.jsx, shareKit.js). Verified iteration_13 shows 0 em-dashes in rendered DOM on all 12 tested pages.
+2. **Branding**: `tryHimandsee Ministries` → `tryHimandsee ministries` (lowercase 'm') via sed. Verified 0 occurrences in source or DOM.
+3. **Speed**: added React.lazy() code splitting for ALL routes except Home. Initial bundle now contains only the Home page code; admin/other pages are fetched only when navigated to. Suspense fallback with a small loading spinner.
+4. **ScrollToTop**: new `/app/frontend/src/components/ScrollToTop.jsx` component watches `useLocation()` and scrolls window to (0,0) on every route change. Preserves in-page hash anchors (e.g. `/resources/food#feed-more`). Verified scrollY < 100 after clicking any link from bottom of page.
+- Verified via testing_agent (iteration_12 + iteration_13 - 100% frontend across 12 pages + 3 scroll flows + lazy-load check).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
