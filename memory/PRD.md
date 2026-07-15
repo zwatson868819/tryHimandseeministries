@@ -135,6 +135,17 @@ Nonprofit website for tryHimandsee Ministries — outreach to the poor and under
 - qrcode.react v4.2.0 added.
 - Verified via testing_agent (iteration_9.json - 100% backend 15/15 pytest, 100% frontend across 13 scenarios).
 
+## 2026-02-XX - D1 Migration SQL Cleanup
+- User reported 'incomplete input: SQLITE_ERROR' when pasting voices-mailbox migration into D1 console. Root cause: Cloudflare D1 web console mishandles inline `-- column comments` inside CREATE TABLE blocks.
+- Rewrote SQL without inline comments, removed FOREIGN KEY constraint (D1 doesn't enforce FKs), removed em-dash from header comment.
+- Verified via testing_agent (iteration_10.json - 100% backend 10/10 pytest, parses cleanly under SQLite/D1).
+
+## 2026-02-XX - Header Overlap Fix
+- User reported the 'Home' nav button overlapping the 'tryHimandsee' logo text at desktop widths.
+- Root cause: 10 nav items + Donate + ThemeToggle at `lg:` breakpoint (1024px) forced the flex row to spill leftward into the logo. No gap or shrink control between logo and nav.
+- Fix: added `gap-4` on header row, `flex-shrink-0` on logo Link, and raised desktop breakpoint from `lg:` to `xl:` (1280px). Viewports < 1280px now show the mobile hamburger.
+- Verified via testing_agent (iteration_11.json - 100% frontend across 7 viewport widths 375-1920px).
+
 ## Notes
 - All "customer-assets.emergentagent.com" image URLs replaced with local `/images/` paths
 - Stripe LIVE keys in use
